@@ -1,0 +1,48 @@
+div.irclog {
+    font-family: monospace;
+    text-indent: -4em;
+    padding-left: 4em;
+}
+div.irclog p { margin: 2px 0; }
+
+a.time, a.time:visited {
+    text-decoration: none;
+    color: #8888cc;
+}
+a.time:active, a.time:hover {
+    text-decoration: none;
+    color: #9999dd;
+}
+a.time:before { content: "["; }
+a.time:after { content: "]"; }
+
+.nick { font-weight: bold; }
+
+.part { color: #000099; }
+.join { color: #009900; }
+.servermsg { color: #009900; }
+.nickchange { color: #009900; }
+.action { color: #cc00cc; }
+
+
+div.generatedby {
+    margin-top: 1em;
+    font-size: small;
+    color: #888888;
+}
+div.generatedby a:link {
+    color: #8888cc;
+    text-decoration: none;
+    border-bottom: 1px dotted #8888cc;
+}
+div.generatedby a:visited {
+    color: #cc88cc;
+    text-decoration: none;
+    border-bottom: 1px dotted #cc88cc;
+}
+div.generatedby a:active,
+div.generatedby a:hover {
+    color: #ff8888;
+    text-decoration: none;
+    border-bottom: 1px dotted #ff8888;
+}
