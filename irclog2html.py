@@ -43,6 +43,7 @@ was written by Jeff Waugh and is available at www.perkypants.org
 import os
 import re
 import sys
+import urllib
 import optparse
 
 VERSION = "2.1mg"
@@ -452,32 +453,27 @@ class XHTMLStyle(AbstractStyle):
     def heading(self, title):
         print >> self.outfile, '<h1>%s</h1>' % escape(title)
 
+    def link(self, url, title):
+        # Intentionally not escaping title so that &entities; work
+        if url:
+            print >> self.outfile, ('<a href="%s">%s</a>'
+                                    % (escape(urllib.quote(url)),
+                                       title or escape(url))),
+        elif title:
+            print >> self.outfile, ('<span class="disabled">%s</span>'
+                                    % title),
+
     def navbar(self, prev, index, next):
-        prev_title, prev_url = map(escape, prev)
-        index_title, index_url = map(escape, index)
-        next_title, next_url = map(escape, next)
+        prev_title, prev_url = prev
+        index_title, index_url = index
+        next_title, next_url = next
         if not (prev_title or index_title or next_title or
                 prev_url or index_url or next_url):
             return
         print >> self.outfile, '<div class="navigation">',
-        if prev_url:
-            print >> self.outfile, ('<a href="%s">%s</a>'
-                                    % (prev_url, prev_title or prev_url)),
-        elif prev_title:
-            print >> self.outfile, ('<span class="disabled">%s</span>'
-                                    % prev_title),
-        if index_url:
-            print >> self.outfile, ('<a href="%s">%s</a>'
-                                    % (index_url, index_title or index_url)),
-        elif index_title:
-            print >> self.outfile, ('<span class="disabled">%s</span>'
-                                    % index_title),
-        if next_url:
-            print >> self.outfile, ('<a href="%s">%s</a>'
-                                    % (next_url, next_title or next_url)),
-        elif next_title:
-            print >> self.outfile, ('<span class="disabled">%s</span>'
-                                    % next_title),
+        self.link(prev_url, prev_title)
+        self.link(index_url, index_title)
+        self.link(next_url, next_title)
         print >> self.outfile, '</div>'
 
     def foot(self):
@@ -587,9 +583,10 @@ COLOURS = [
 ]
 
 
-def main():
-    progname = os.path.basename(sys.argv[0])
+def main(argv=sys.argv):
+    progname = os.path.basename(argv[0])
     parser = optparse.OptionParser("usage: %prog [options] filename",
+                                   prog=progname,
                                    description="Colourises and converts IRC"
                                                " logs to HTML format for easy"
                                                " web reading.")
@@ -616,7 +613,7 @@ def main():
                           dest="colour_%s" % name, default=default,
                           help="select %s colour (default: %s)"
                                % (name, default))
-    options, args = parser.parse_args()
+    options, args = parser.parse_args(argv[1:])
     if options.style == "help":
         print "The following styles are available for use with irclog2html.py:"
         for style in STYLES:

@@ -30,6 +30,16 @@ h1 {
     margin: 0.5em 0;
 }
 
+a {
+    color: #869ABF;
+}
+a:visited {
+    color: purple;
+}
+a:active, a:hover {
+    color: #B22222;
+}
+
 .navigation {
     margin-bottom: 1em;
 }
