@@ -11,6 +11,11 @@ Looks for *.log in a given directory.  Needs an ISO 8601 date (YYYY-MM-DD) in
 the filename.
 """
 
+# Copyright (c) 2005, Marius Gedminas 
+#
+# Released under the terms of the GNU GPL
+# http://www.gnu.org/copyleft/gpl.html
+
 import os
 import re
 import sys
