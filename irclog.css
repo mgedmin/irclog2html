@@ -71,8 +71,8 @@ a.time:after { content: "]"; }
 .other { color: #888888; }
 
 /* Make boring messages small */
-.part, .join, .servermgs, .nickchange, .other { font-size: smaller; }
-td.part + td, td.join + td, td.servermgs + td, td.nickchange + td,
+.part, .join, .servermsg, .nickchange, .other { font-size: smaller; }
+td.part + td, td.join + td, td.servermsg + td, td.nickchange + td,
 td.other + td { font-size: smaller; text-align: right; }
 
 
