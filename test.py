@@ -87,7 +87,7 @@ def run_and_compare(inputfile, args=""):
 
 
 DEFAULT_ARGS = ('', '-s table', '-s simplett', '-s tt', '-s simpletable',
-                '--colour-part "#deadbeef"', '--color-action=#cafebabe')
+                '--colour-part="#deadbe"', '--color-action=#cafeba')
 
 
 def testcase(inputfile, args_to_try=DEFAULT_ARGS):
