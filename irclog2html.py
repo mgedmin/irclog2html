@@ -29,6 +29,9 @@ was written by Jeff Waugh and is available at www.perkypants.org
 #   There are no hardcoded nick colour preferences for jdub, cantanker and
 #   chuckd
 #
+#   Colours are preserver accross nick changes (irclog2html.pl tries to do
+#   that, but its regexes are buggy)
+#
 #   irclog2html.pl interprets --colour-server #rrggbb as -s #rrggbb,
 #   irclog2html.py does not have this bug
 #

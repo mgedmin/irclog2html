@@ -6,6 +6,7 @@
 # Changed by Marius Gedminas (marius@pov.lt) on 2005-01-09:
 #   changed time regexps to support ISO-8601 (YYYY-MM-DDTHH:MM:SS) timestamps
 #   commented out print $time;
+#   fixed bugs in code that tried to preserve colours accross nick changes
 
 # Author:
 #   Jeff Waugh <jdub@perkypants.org>
@@ -320,10 +321,10 @@ sub main {
 					my $nick_new;
 					
 					$nick_old = $line;
-					$nick_old =~ s/^(\*\*\*|---) (.*?) (are|is) now known as .*/$1/;
+					$nick_old =~ s/^(?:\*\*\*|---) (.*?) (?:are|is) now known as .*/$1/;
 
 					$nick_new = $line;
-					$nick_new =~ s/^(\*\*\*|---) .*? (are|is) now known as (.*)/$2/;
+					$nick_new =~ s/^(?:\*\*\*|---) .*? (?:are|is) now known as (.*)/$1/;
 
 					$colour_nick{$nick_new} = $colour_nick{$nick_old};
 					$colour_nick{$nick_old} = undef;
