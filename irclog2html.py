@@ -248,7 +248,7 @@ class NickColourizer:
 # HTML
 #
 
-URL_REGEXP = re.compile(r'((http|https|ftp|gopher|news)://\S*)')
+URL_REGEXP = re.compile(r'((http|https|ftp|gopher|news)://[^ \'")>]*)')
 
 def createlinks(text):
     """Replace possible URLs with links."""
