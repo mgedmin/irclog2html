@@ -500,13 +500,16 @@ class XHTMLStyle(AbstractStyle):
         """
         text = escape(text)
         text = createlinks(text)
-        displaytime = shorttime(time)
-	time = time or ''
-        print >> self.outfile, ('<p id="t%s" class="%s">'
-                                '<a href="#t%s" class="time">%s</a> '
-                                '%s</p>'
-                                % (time, self.CLASSMAP[what], time,
-                                   displaytime, text))
+	if time:
+            displaytime = shorttime(time)
+            print >> self.outfile, ('<p id="t%s" class="%s">'
+                                    '<a href="#t%s" class="time">%s</a> '
+                                    '%s</p>'
+                                    % (time, self.CLASSMAP[what], time,
+                                       displaytime, text))
+        else:
+            print >> self.outfile, ('<p class="%s">%s</p>'
+                                    % (self.CLASSMAP[what], text))
 
     def nicktext(self, time, nick, text, htmlcolour):
         """Output a comment uttered by someone.
@@ -519,15 +522,21 @@ class XHTMLStyle(AbstractStyle):
         text = escape(text)
         text = createlinks(text)
         text = text.replace('  ', '&nbsp;&nbsp;')
-	time = time or ''
-        displaytime = shorttime(time)
-        print >> self.outfile, ('<p id="t%s" class="comment">'
-                                '<a href="t#%s" class="time">%s</a> '
-                                '<span class="nick" style="color: %s">'
-                                '&lt;%s&gt;</span>'
-                                ' <span class="text">%s</span></p>'
-                                % (time, time, displaytime, htmlcolour, nick,
-                                   text))
+        if time:
+            displaytime = shorttime(time)
+            print >> self.outfile, ('<p id="t%s" class="comment">'
+                                    '<a href="t#%s" class="time">%s</a> '
+                                    '<span class="nick" style="color: %s">'
+                                    '&lt;%s&gt;</span>'
+                                    ' <span class="text">%s</span></p>'
+                                    % (time, time, displaytime, htmlcolour, nick,
+                                       text))
+        else:
+            print >> self.outfile, ('<p class="comment">'
+                                    '<span class="nick" style="color: %s">'
+                                    '&lt;%s&gt;</span>'
+                                    ' <span class="text">%s</span></p>'
+                                    % (htmlcolour, nick, text))
 
 
 class XHTMLTableStyle(XHTMLStyle):
@@ -542,30 +551,41 @@ class XHTMLTableStyle(XHTMLStyle):
     def servermsg(self, time, what, text):
         text = escape(text)
         text = createlinks(text)
-	time = time or ''
-        displaytime = shorttime(time)
-        print >> self.outfile, ('<tr id="t%s">'
-                                '<td class="%s" colspan="2">%s</td>'
-                                '<td><a href="#t%s" class="time">%s</a></td>'
-                                '</tr>'
-                                % (time, self.CLASSMAP[what], text,
-                                   time, displaytime))
+	if time:
+            displaytime = shorttime(time)
+            print >> self.outfile, ('<tr id="t%s">'
+                                    '<td class="%s" colspan="2">%s</td>'
+                                    '<td><a href="#t%s" class="time">%s</a></td>'
+                                    '</tr>'
+                                    % (time, self.CLASSMAP[what], text,
+                                       time, displaytime))
+        else:
+            print >> self.outfile, ('<tr>'
+                                    '<td class="%s" colspan="3">%s</td>'
+                                    '</tr>'
+                                    % (self.CLASSMAP[what], text))
 
     def nicktext(self, time, nick, text, htmlcolour):
         nick = escape(nick)
         text = escape(text)
         text = createlinks(text)
         text = text.replace('  ', '&nbsp;&nbsp;')
-	time = time or ''
-        displaytime = shorttime(time)
-        print >> self.outfile, ('<tr id="t%s">'
-                                '<th class="nick" style="background: %s">%s</th>'
-                                '<td class="text" style="color: %s">%s</td>'
-                                '<td class="time">'
-                                '<a href="#t%s" class="time">%s</a></td>'
-                                '</tr>'
-                                % (time, htmlcolour, nick, htmlcolour, text,
-                                   time, displaytime))
+	if time:
+            displaytime = shorttime(time)
+            print >> self.outfile, ('<tr id="t%s">'
+                                    '<th class="nick" style="background: %s">%s</th>'
+                                    '<td class="text" style="color: %s">%s</td>'
+                                    '<td class="time">'
+                                    '<a href="#t%s" class="time">%s</a></td>'
+                                    '</tr>'
+                                    % (time, htmlcolour, nick, htmlcolour, text,
+                                       time, displaytime))
+        else:
+            print >> self.outfile, ('<tr>'
+                                    '<th class="nick" style="background: %s">%s</th>'
+                                    '<td class="text" colspan="2" style="color: %s">%s</td>'
+                                    '</tr>'
+                                    % (htmlcolour, nick, htmlcolour, text))
 
 
 #
