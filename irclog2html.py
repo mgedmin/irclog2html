@@ -95,7 +95,7 @@ class LogParser(object):
             r'^\[?((?:\d\d\d\d-\d\d-\d\dT)?\d\d:\d\d(:\d\d)?)\]? +')
     NICK_REGEXP = re.compile(r'^<(.*?)>\s')
     JOIN_REGEXP = re.compile(r'^(?:\*\*\*|-->)\s.*joined')
-    PART_REGEXP = re.compile(r'^(?:\*\*\*|-->)\s.*(quit|left)')
+    PART_REGEXP = re.compile(r'^(?:\*\*\*|<--)\s.*(quit|left)')
     SERVMSG_REGEXP = re.compile(r'^(?:\*\*\*|---)\s')
     NICK_CHANGE_REGEXP = re.compile(
             r'^(?:\*\*\*|---)\s+(.*?) (?:are|is) now known as (.*)')
