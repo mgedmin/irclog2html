@@ -44,7 +44,7 @@ a:active, a:hover {
 }
 
 .navigation {
-    margin-bottom: 1em;
+    margin: 1em 0em;
 }
 .navigation a, .navigation span {
     margin-right: 1em;
