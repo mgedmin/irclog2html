@@ -50,6 +50,8 @@ def doctest_LogParser():
         '14:18:55' COMMENT ('mg', 'Hello!')
         >>> test('[2004-02-04T14:18:55] <mg> Hello!')
         '2004-02-04T14:18:55' COMMENT ('mg', 'Hello!')
+        >>> test('[02-Feb-2004 14:18:55] <mg> Hello!')
+        '02-Feb-2004 14:18:55' COMMENT ('mg', 'Hello!')
 
     `what` can be COMMENT...
 

@@ -91,7 +91,10 @@ class LogParser(object):
     OTHER = Enum('OTHER')
 
     TIME_REGEXP = re.compile(
-            r'^\[?((?:\d\d\d\d-\d\d-\d\dT)?\d\d:\d\d(:\d\d)?)\]? +')
+            r'^\[?(' # Optional [
+            r'(?:\d{4}-\d{2}-\d{2}T|\d{2}-\w{3}-\d{4} )?' # Optional date
+            r'\d\d:\d\d(:\d\d)?' # Mandatory HH:MM, optional :SS
+            r')\]? +') # Optional ], mandatory space
     NICK_REGEXP = re.compile(r'^<(.*?)>\s')
     JOIN_REGEXP = re.compile(r'^(?:\*\*\*|-->)\s.*joined')
     PART_REGEXP = re.compile(r'^(?:\*\*\*|<--)\s.*(quit|left)')
