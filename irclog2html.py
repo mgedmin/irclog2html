@@ -46,17 +46,150 @@ RELEASE = "2005-01-09"
 
 # $Id$
 
-# Default colours for actions
-DEFAULT_COLOURS = {
-    "part":         "#000099",
-    "join":         "#009900",
-    "server":       "#009900",
-    "nickchange":   "#009900",
-    "action":       "#CC00CC",
-}
+
+#
+# Log parsing
+#
+
+class Enum(object):
+    """Enumerated value."""
+
+    def __init__(self, value):
+        self.value = value
+
+    def __repr__(self):
+        return self.value
 
 
-# Styles
+class LogParser(object):
+    """Parse an IRC log file.
+
+    When iterated, yields the following events:
+
+        time, COMMENT, (nick, text)
+        time, ACTION, text
+        time, JOIN, text
+        time, PART, text,
+        time, NICKCHANGE, (text, oldnick, newnick)
+        time, SERVER, text
+
+    """
+
+    COMMENT = Enum('COMMENT')
+    ACTION = Enum('ACTION')
+    JOIN = Enum('JOIN')
+    PART = Enum('PART')
+    NICKCHANGE = Enum('NICKCHANGE')
+    SERVER = Enum('SERVER')
+    OTHER = Enum('OTHER')
+
+    TIME_REGEXP = re.compile(
+            r'^\[?((?:\d\d\d\d-\d\d-\d\dT)?\d\d:\d\d(:\d\d)?)\]? +')
+    NICK_REGEXP = re.compile(r'^<(.*?)>\s')
+    NICK_CHANGE_REGEXP = re.compile(
+            r'^(?:\*\*\*|---) (.*?) (?:are|is) now known as (.*)')
+
+    def __init__(self, infile):
+        self.infile = infile
+
+    def __iter__(self):
+        for line in self.infile:
+            line = line.rstrip('\r\n')
+            if not line:
+                continue
+
+            m = self.TIME_REGEXP.match(line)
+            if m:
+                time = m.group(1)
+                line = line[len(m.group(0)):]
+            else:
+                time = None
+
+            m = self.NICK_REGEXP.match(line)
+            if m:
+                nick = m.group(1)
+                text = line[len(m.group(0)):]
+                yield time, self.COMMENT, (nick, text)
+            elif line.startswith('* '):
+                yield time, self.ACTION, line
+            elif (line.startswith('*** ') or line.startswith('--> ')
+                  and 'joined' in line):
+                yield time, self.JOIN, line
+            elif (line.startswith('*** ') or line.startswith('--> ')
+                  and ('left' in line or 'quit' in line)):
+                yield time, self.PART, line
+            else:
+                m = self.NICK_CHANGE_REGEXP.match(line)
+                if m:
+                    nick_old = m.group(1)
+                    nick_new = m.group(2)
+                    yield time, self.NICKCHANGE, (line, oldnick, newnick)
+                elif line.startswith('*** ') or line.startswith('--- '):
+                    yield time, self.SERVER, line
+                else:
+                    yield time, self.OTHER, line
+
+
+#
+# Colouring stuff
+#
+
+class ColourChooser:
+    """Choose distinguishable colours."""
+
+    def __init__(self, rgbmin=240, rgbmax=125, rgb=None, a=0.95, b=0.5):
+        """Define a range of colours available for choosing.
+
+        `rgbmin` and `rgbmax` define the outmost range of colour depth (note
+        that it is allowed to have rgbmin > rgbmax).
+
+        `rgb`, if specified, is a list of (r,g,b) values where each component
+        is between 0 and 1.0.
+
+        If `rgb` is not specified, then it is constructed as
+           [(a,b,b), (b,a,b), (b,b,a), (a,a,b), (a,b,a), (b,a,a)]
+
+        You can tune `a` and `b` for the starting and ending concentrations of
+        RGB.
+        """
+        assert 0 <= rgbmin < 256
+        assert 0 <= rgbmax < 256
+        self.rgbmin = rgbmin
+        self.rgbmax = rgbmax
+        if not rgb:
+            assert 0 <= a <= 1.0
+            assert 0 <= b <= 1.0
+            rgb = [(a,b,b), (b,a,b), (b,b,a), (a,a,b), (a,b,a), (b,a,a)]
+        else:
+            for r, g, b in rgb:
+                assert 0 <= r <= 1.0
+                assert 0 <= g <= 1.0
+                assert 0 <= b <= 1.0
+        self.rgb = rgb
+
+    def choose(self, i, n):
+        """Choose a colour.
+
+        `n` specifies how many different colours you want in total.
+        `i` identifies a particular colour in a set of `n` distinguishable
+        colours.
+
+        Returns a string '#rrggbb'.
+        """
+        if n == 0:
+            n = 1
+        r, g, b = self.rgb[i % len(self.rgb)]
+        m = self.rgbmin + (self.rgbmax - self.rgbmin) * float(n - i) / n
+        r, g, b = map(int, (r * m, g * m, b * m))
+        assert 0 <= r < 256
+        assert 0 <= g < 256
+        assert 0 <= b < 256
+        return '#%02x%02x%02x' % (r, g, b)
+
+
+#
+# Output styles
+#
 
 class AbstractStyle(object):
     """A style defines the way HTML is formatted.
@@ -183,6 +316,10 @@ STYLES = [
     TableStyle
 ]
 
+#
+# Main
+#
+
 # Precompiled regexps
 URL_REGEXP = re.compile(r'(http|https|ftp|gopher|news)://\S*')
 TIME_REGEXP = re.compile(r'^\[?((?:\d\d\d\d-\d\d-\d\dT)?\d\d:\d\d(:\d\d)?)\]?'
@@ -191,61 +328,19 @@ NICK_REGEXP = re.compile(r'^&lt;(.*?)&gt;\s')
 NICK_CHANGE_REGEXP = re.compile(r'^(?:\*\*\*|---) (.*?)'
                                 r' (?:are|is) now known as (.*)')
 
-# Colouring stuff
-class ColourChooser:
-    """Choose distinguishable colours."""
-
-    def __init__(self, rgbmin=240, rgbmax=125, rgb=None, a=0.95, b=0.5):
-        """Define a range of colours available for choosing.
-
-        `rgbmin` and `rgbmax` define the outmost range of colour depth (note
-        that it is allowed to have rgbmin > rgbmax).
-
-        `rgb`, if specified, is a list of (r,g,b) values where each component
-        is between 0 and 1.0.
-
-        If `rgb` is not specified, then it is constructed as
-           [(a,b,b), (b,a,b), (b,b,a), (a,a,b), (a,b,a), (b,a,a)]
-
-        You can tune `a` and `b` for the starting and ending concentrations of
-        RGB.
-        """
-        assert 0 <= rgbmin < 256
-        assert 0 <= rgbmax < 256
-        self.rgbmin = rgbmin
-        self.rgbmax = rgbmax
-        if not rgb:
-            assert 0 <= a <= 1.0
-            assert 0 <= b <= 1.0
-            rgb = [(a,b,b), (b,a,b), (b,b,a), (a,a,b), (a,b,a), (b,a,a)]
-        else:
-            for r, g, b in rgb:
-                assert 0 <= r <= 1.0
-                assert 0 <= g <= 1.0
-                assert 0 <= b <= 1.0
-        self.rgb = rgb
-
-    def choose(self, i, n):
-        """Choose a colour.
-
-        `n` specifies how many different colours you want in total.
-        `i` identifies a particular colour in a set of `n` distinguishable
-        colours.
-
-        Returns a string '#rrggbb'.
-        """
-        if n == 0:
-            n = 1
-        r, g, b = self.rgb[i % len(self.rgb)]
-        m = self.rgbmin + (self.rgbmax - self.rgbmin) * float(n - i) / n
-        r, g, b = map(int, (r * m, g * m, b * m))
-        assert 0 <= r < 256
-        assert 0 <= g < 256
-        assert 0 <= b < 256
-        return '#%02x%02x%02x' % (r, g, b)
 
 
 html_rgb = ColourChooser().choose
+
+# Default colours for actions
+DEFAULT_COLOURS = {
+    "part":         "#000099",
+    "join":         "#009900",
+    "server":       "#009900",
+    "nickchange":   "#009900",
+    "action":       "#CC00CC",
+}
+
 
 
 def main():
@@ -296,14 +391,22 @@ def main():
             sys.exit("%s: cannot open %s for writing: %s"
                      % (progname, outfilename, e))
         try:
+            parser = LogParser(infile)
             formatter = style(outfile)
-            log2html(infile, formatter, filename, colours)
+            log2html(parser, formatter, filename, colours)
         finally:
             outfile.close()
             infile.close()
 
 
-def log2html(infile, formatter, title, colours, charset="iso-8859-1"):
+
+def escape(s):
+    """Replace ampersands, pointies, control characters"""
+    s = s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+    return ''.join([c for c in s if ord(c) > 0x1F])
+
+
+def log2html(parser, formatter, title, colours, charset="iso-8859-1"):
     """Convert IRC log to HTML.
 
     `infile` and `outfile` are file objects.
@@ -314,38 +417,17 @@ def log2html(infile, formatter, title, colours, charset="iso-8859-1"):
        nickchange
        action
     """
+    colour_map = {LogParser.PART: 'part', LogParser.JOIN: 'join',
+                  LogParser.SERVER: 'server', LogParser.ACTION: 'action',
+                  LogParser.NICKCHANGE: 'nickchange'}
     colour_nick = {}
     nickcount = 0
     nickmax = 30
 
     formatter.head(title, charset)
-    for line in infile:
-        line = line.rstrip('\r\n')
-        if not line:
-            continue
-
-        # Replace ampersands, pointies, control characters
-        line = (line.replace('&', '&amp;')
-                    .replace('<', '&lt;')
-                    .replace('>', '&gt;'))
-        line = ''.join([c for c in line if ord(c) > 0x1F])
-
-        # Replace possible URLs with links
-        line = URL_REGEXP.sub(r'<a href="\0">\0</a>', line)
-
-        # Rip out the time
-        time = TIME_REGEXP.match(line)
-        if time:
-            line = line[len(time.group(0)):]
-            time = time.group(1)
-
-        # Colourise the comments
-        nick = NICK_REGEXP.match(line)
-        if nick:
-            # Split nick and line
-            text = line[len(nick.group(0)):].replace('  ', '&nbsp;&nbsp;')
-            nick = nick.group(1)
-
+    for time, what, info in parser:
+        if what == LogParser.COMMENT:
+            nick, text = map(escape, info)
             htmlcolour = colour_nick.get(nick)
             if not htmlcolour:
                 # new nick
@@ -355,37 +437,25 @@ def log2html(infile, formatter, title, colours, charset="iso-8859-1"):
                 if nickcount >= nickmax:
                     nickmax *= 2
                 htmlcolour = colour_nick[nick] = html_rgb(nickcount, nickmax)
+            # Replace possible URLs with links
+            text = URL_REGEXP.sub(r'<a href="\0">\0</a>', text)
+            text = text.replace('  ', '&nbsp;&nbsp;')
             formatter.nicktext(nick, text, htmlcolour)
         else:
-            # Colourise the /me's
-            if line.startswith('* '):
-                line = '<font color="%s">%s</font>' % (colours['action'], line)
-            # Colourise joined/left messages #
-            elif line.endswith('joined') and (line.startswith('*** ') or
-                                              line.startswith('--&gt; ')):
-                line = '<font color="%s">%s</font>' % (colours['join'], line)
-            elif ((line.endswith('left') or line.endswith('quit')) and
-                  (line.startswith('*** ') or line.startswith('--&gt; '))):
-                line = '<font color="%s">%s</font>' % (colours['part'], line)
-            # Process changed nick results, and remember colours accordingly
-            elif ((line.startswith('*** ') or line.startswith('--- ')) and
-                  (' are now known as ' in line or
-                   ' is now known as ' in line)):
-                m = NICK_CHANGE_REGEXP.match(line)
-                assert m
-                nick_old = m.group(1)
-                nick_new = m.group(2)
-                if nick_old in colour_nick:
-                    colour_nick[nick_new] = colour_nick[nick_old]
-                    del colour_nick[nick_old]
-                line = '<font color="%s">%s</font>' % (colours['nickchange'],
-                                                       line)
-            # Server messages
-            elif line.startswith('*** ') or line.startswith('--- '):
-                line = '<font color="%s">%s</font>' % (colours['server'], line)
-
-            formatter.servermsg(line)
-
+            if what == LogParser.NICKCHANGE:
+                text, oldnick, newnick = map(escape, info)
+                if oldnick in colour_nick:
+                    colour_nick[newnick] = colour_nick[oldnick]
+                    del colour_nick[oldnick]
+            else:
+                text = escape(info)
+            # Replace possible URLs with links
+            text = URL_REGEXP.sub(r'<a href="\0">\0</a>', text)
+            # Colorize the line
+            if what in colour_map:
+                colour = colours[colour_map[what]]
+                text = '<font color="%s">%s</font>' % (colour, text)
+            formatter.servermsg(text)
     formatter.foot()
 
 
