@@ -117,10 +117,10 @@ class LogParser(object):
                 yield time, self.COMMENT, (nick, text)
             elif line.startswith('* '):
                 yield time, self.ACTION, line
-            elif (line.startswith('*** ') or line.startswith('--> ')
+            elif ((line.startswith('*** ') or line.startswith('--> '))
                   and 'joined' in line):
                 yield time, self.JOIN, line
-            elif (line.startswith('*** ') or line.startswith('--> ')
+            elif ((line.startswith('*** ') or line.startswith('--> '))
                   and ('left' in line or 'quit' in line)):
                 yield time, self.PART, line
             else:
@@ -245,11 +245,11 @@ class NickColourizer:
 # HTML
 #
 
-URL_REGEXP = re.compile(r'(http|https|ftp|gopher|news)://\S*')
+URL_REGEXP = re.compile(r'((http|https|ftp|gopher|news)://\S*)')
 
 def createlinks(text):
     """Replace possible URLs with links."""
-    return URL_REGEXP.sub(r'<a href="\0">\0</a>', text)
+    return URL_REGEXP.sub(r'<a href="\1">\1</a>', text)
 
 def escape(s):
     """Replace ampersands, pointies, control characters"""
@@ -578,8 +578,8 @@ COLOURS = [
     ("part",       "#000099", LogParser.PART),
     ("join",       "#009900", LogParser.JOIN),
     ("server",     "#009900", LogParser.SERVER),
-    ("nickchange", "#009900", LogParser.ACTION),
-    ("action",     "#CC00CC", LogParser.NICKCHANGE),
+    ("nickchange", "#009900", LogParser.NICKCHANGE),
+    ("action",     "#CC00CC", LogParser.ACTION),
 ]
 
 
