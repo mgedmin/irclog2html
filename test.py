@@ -65,6 +65,7 @@ def run_and_compare(inputfile, args=""):
     output1 = run_in_tempdir(inputfile, './irclog2html.py', args)
     output1 = replace(output1, {'irclog2html.py': 'SCRIPT',
                                 'Marius Gedminas': 'AUTHOR',
+                                '2.1mg': 'VERSION',
                                 '2005-01-09': 'REVISION',
                                 'marius@pov.lt': 'EMAIL',
                                 'http://mg.pov.lt/': 'URL',
@@ -72,6 +73,7 @@ def run_and_compare(inputfile, args=""):
     output2 = run_in_tempdir(inputfile, './irclog2html.pl', args)
     output2 = replace(output2, {'irclog2html.pl': 'SCRIPT',
                                 'Jeff Waugh': 'AUTHOR',
+                                '2.1mg': 'VERSION',
                                 '27th July, 2001': 'REVISION',
                                 'jdub@NOSPAMperkypants.org': 'EMAIL',
                                 'http://freshmeat.net/projects/': 'URL',

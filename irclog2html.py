@@ -38,7 +38,7 @@ import re
 import sys
 import optparse
 
-VERSION = "2.1"
+VERSION = "2.1mg"
 RELEASE = "2005-01-09"
 
 # $Id$
@@ -62,7 +62,8 @@ STYLES = [
 
 # Precompiled regexps
 URL_REGEXP = re.compile(r'(http|https|ftp|gopher|news)://\S*')
-TIME_REGEXP = re.compile(r'^\[?(\d\d:\d\d(:\d\d)?)\]? ')
+TIME_REGEXP = re.compile(r'^\[?((?:\d\d\d\d-\d\d-\d\dT)?\d\d:\d\d(:\d\d)?)\]?'
+                         r' +')
 NICK_REGEXP = re.compile(r'^&lt;(.*?)&gt;\s')
 NICK_CHANGE_REGEXP = re.compile(r'^(?:\*\*\*|---) (.*?)'
                                 r' (?:are|is) now known as (.*)')
@@ -72,17 +73,21 @@ a = 0.95        # tune these for the starting and ending concentrations of RGB
 b = 0.5
 RGB = [(a,b,b), (b,a,b), (b,b,a), (a,a,b), (a,b,a), (b,a,a)]
 del a, b
-RGBMIN = 240    # tune these two for the outmost ranges of colour depth
-RGBMAX = 125
+RGBMAX = 125    # tune these two for the outmost ranges of colour depth
+RGBMIN = 240
 
 def html_rgb(i, ncolours):
     if ncolours == 0:
         ncolours = 1
     r, g, b = RGB[i % len(RGB)]
-    m = RGBMIN + (RGBMAX - RGBMIN) * (ncolours - i) / ncolours
+    m = RGBMIN + (RGBMAX - RGBMIN) * float(ncolours - i) / ncolours
     r *= m
     g *= m
-    r *= m
+    b *= m
+    r, g, b = map(int, (r, g, b))
+    assert 0 <= r < 0x100
+    assert 0 <= g < 0x100
+    assert 0 <= b < 0x100
     return '#%02x%02x%02x' % (r, g, b)
 
 
@@ -190,14 +195,13 @@ def log2html(infile, outfile, title, style, colours, charset="iso-8859-1"):
         if time:
             line = line[len(time.group(0)):]
             time = time.group(1)
-            outfile.write(time)
 
         # Colourise the comments
         nick = NICK_REGEXP.match(line)
         if nick:
             # Split nick and line
-            nick = nick.group(1)
             text = line[len(nick.group(0)):].replace('  ', '&nbsp;&nbsp;')
+            nick = nick.group(1)
 
             htmlcolour = colour_nick.get(nick)
             if not htmlcolour:
@@ -252,10 +256,10 @@ def output_nicktext(outfile, style, nick, text, htmlcolour):
         print >> outfile, ('<tr><th bgcolor="%s"><font color="#ffffff">'
                            '<tt>%s</tt></font></th>'
                            '<td width="100%%" bgcolor="#eeeeee"><tt><font'
-                           ' color="%s">%s<\/font></tt></td></tr>'
+                           ' color="%s">%s</font></tt></td></tr>'
                            % (htmlcolour, nick, htmlcolour, text))
     elif style == "simpletable":
-        print >> outfile, ('<tr><th bgcolor="#eeeeee"><font color="%s">'
+        print >> outfile, ('<tr bgcolor="#eeeeee"><th><font color="%s">'
                            '<tt>%s</tt></font></th>'
                            '<td width="100%%"><tt>%s</tt></td></tr>'
                            % (htmlcolour, nick, text))
