@@ -65,6 +65,7 @@ a.time:after { content: "]"; }
 .servermsg { color: #009900; }
 .nickchange { color: #009900; }
 .action { color: #cc00cc; }
+.other { color: #888888; }
 
 
 div.generatedby {
