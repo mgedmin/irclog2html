@@ -222,6 +222,10 @@ class NickColourizer:
             self.nick_colour[nick] = colour
         return colour
 
+    def nickchange(self, oldnick, newnick):
+        if oldnick in self.nick_colour:
+            self.nick_colour[newnick] = self.nick_colour.pop(oldnick)
+
 
 #
 # HTML
@@ -279,8 +283,18 @@ class SimpleTextStyle(object):
     name = "simplett"
     description = property(lambda self: self.__doc__)
 
-    def __init__(self, outfile):
+    def __init__(self, outfile, colours=None):
+        """Create a text formatter for writing to outfile.
+
+        `colours` may have the following attributes:
+           part
+           join
+           server
+           nickchange
+           action
+        """
         self.outfile = outfile
+        self.colours = colours or {}
 
     def head(self, title, charset="iso-8859-1"):
         print >> self.outfile, """\
@@ -305,7 +319,13 @@ class SimpleTextStyle(object):
  - find it at <a href="http://mg.pov.lt/irclog2html.py">mg.pov.lt</a>!
 </tt></body></html>""" % {'VERSION': VERSION, 'RELEASE': RELEASE},
 
-    def servermsg(self, line):
+    def servermsg(self, what, text):
+        colour = self.colours.get(what)
+        if colour:
+            text = '<font color="%s">%s</font>' % (colour, text)
+        self._servermsg(text)
+
+    def _servermsg(self, line):
         print >> self.outfile, '%s<br>' % line
 
     def nicktext(self, nick, text, htmlcolour):
@@ -336,7 +356,7 @@ class SimpleTableStyle(SimpleTextStyle):
         print >> self.outfile, "</table>"
         SimpleTextStyle.foot(self)
 
-    def servermsg(self, line):
+    def _servermsg(self, line):
         print >> self.outfile, ('<tr><td colspan=2><tt>%s</tt></td></tr>'
                                 % line)
 
@@ -360,6 +380,10 @@ class TableStyle(SimpleTableStyle):
                                 % (htmlcolour, nick, htmlcolour, text))
 
 
+#
+# Main
+#
+
 # All styles
 STYLES = [
     SimpleTextStyle,
@@ -368,25 +392,14 @@ STYLES = [
     TableStyle
 ]
 
-#
-# Main
-#
-
-# Precompiled regexps
-
-
-
-html_rgb = ColourChooser().choose
-
-# Default colours for actions
-DEFAULT_COLOURS = {
-    "part":         "#000099",
-    "join":         "#009900",
-    "server":       "#009900",
-    "nickchange":   "#009900",
-    "action":       "#CC00CC",
-}
-
+# Customizable colours
+COLOURS = [
+    ("part",       "#000099", LogParser.PART),
+    ("join",       "#009900", LogParser.JOIN),
+    ("server",     "#009900", LogParser.SERVER),
+    ("nickchange", "#009900", LogParser.ACTION),
+    ("action",     "#CC00CC", LogParser.NICKCHANGE),
+]
 
 
 def main():
@@ -399,10 +412,11 @@ def main():
                       help="format log according to specific style"
                            " (default: table); try -s help for a list of"
                            " available styles")
-    for item, value in DEFAULT_COLOURS.items():
-        parser.add_option('--color-%s' % item, '--colour-%s' % item,
-                          dest="colour_%s" % item, default=value,
-                          help="select %s colour (default: %s)" % (item, value))
+    for name, default, what in COLOURS:
+        parser.add_option('--color-%s' % name, '--colour-%s' % name,
+                          dest="colour_%s" % name, default=default,
+                          help="select %s colour (default: %s)"
+                               % (name, default))
     options, args = parser.parse_args()
     if options.style == "help":
         print "The following styles are available for use with irclog2html.py:"
@@ -418,8 +432,8 @@ def main():
     else:
         parser.error("unknown style: %s" % style)
     colours = {}
-    for key in DEFAULT_COLOURS:
-        colours[key] = getattr(options, 'colour_%s' % key)
+    for name, default, what in COLOURS:
+        colours[what] = getattr(options, 'colour_%s' % name)
     if not args:
         parser.error("required parameter missing")
 
@@ -438,51 +452,32 @@ def main():
                      % (progname, outfilename, e))
         try:
             parser = LogParser(infile)
-            formatter = style(outfile)
-            log2html(parser, formatter, filename, colours)
+            formatter = style(outfile, colours)
+            log2html(parser, formatter, filename)
         finally:
             outfile.close()
             infile.close()
 
 
-
-def log2html(parser, formatter, title, colours, charset="iso-8859-1"):
-    """Convert IRC log to HTML.
-
-    `infile` and `outfile` are file objects.
-    `colours` has the following attributes:
-       part
-       join
-       server
-       nickchange
-       action
-    """
-    colour_map = {LogParser.PART: 'part', LogParser.JOIN: 'join',
-                  LogParser.SERVER: 'server', LogParser.ACTION: 'action',
-                  LogParser.NICKCHANGE: 'nickchange'}
+def log2html(parser, formatter, title):
+    """Convert IRC log to HTML."""
     nick_colour = NickColourizer()
-    formatter.head(title, charset)
+    formatter.head(title)
     for time, what, info in parser:
         if what == LogParser.COMMENT:
             nick, text = map(escape, info)
-            htmlcolour = nick_colour[nick]
             text = createlinks(text)
             text = text.replace('  ', '&nbsp;&nbsp;')
+            htmlcolour = nick_colour[nick]
             formatter.nicktext(nick, text, htmlcolour)
         else:
             if what == LogParser.NICKCHANGE:
                 text, oldnick, newnick = map(escape, info)
-                if oldnick in colour_nick:
-                    colour_nick[newnick] = colour_nick[oldnick]
-                    del colour_nick[oldnick]
+                nick_colour.change(oldnick, newnick)
             else:
                 text = escape(info)
             text = createlinks(text)
-            # Colorize the line
-            if what in colour_map:
-                colour = colours[colour_map[what]]
-                text = '<font color="%s">%s</font>' % (colour, text)
-            formatter.servermsg(text)
+            formatter.servermsg(what, text)
     formatter.foot()
 
 
