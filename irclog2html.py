@@ -35,7 +35,7 @@ was written by Jeff Waugh and is available at www.perkypants.org
 #   irclog2html.py understands ISO8601 timestamps such as used by supybot's
 #   ChannelLogger (http://supybot.sourceforge.net/)
 #
-#   New option: --title
+#   New options: --title, --{prev,index,next}-{url,title}
 #
 #   New styles: xhtml, xhtmltable
 #
@@ -283,8 +283,12 @@ class AbstractStyle(object):
         self.outfile = outfile
         self.colours = colours or {}
 
-    def head(self, title):
-        """Generate the header."""
+    def head(self, title, prev=('', ''), index=('', ''), next=('', '')):
+        """Generate the header.
+
+        `prev`, `index` and `next` are tuples (title, url) that comprise
+        the navigation bar.
+        """
 
     def foot(self):
         """Generate the footer."""
@@ -312,7 +316,8 @@ class SimpleTextStyle(AbstractStyle):
     name = "simplett"
     description = __doc__
 
-    def head(self, title, charset="iso-8859-1"):
+    def head(self, title, prev=None, index=None, next=None,
+             charset="iso-8859-1"):
         print >> self.outfile, """\
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
@@ -374,8 +379,9 @@ class SimpleTableStyle(SimpleTextStyle):
 
     name = "simpletable"
 
-    def head(self, title, charset="iso-8859-1"):
-        SimpleTextStyle.head(self, title, charset)
+    def head(self, title, prev=None, index=None, next=None,
+             charset="iso-8859-1"):
+        SimpleTextStyle.head(self, title, prev, index, next, charset)
         print >> self.outfile, "<table cellspacing=3 cellpadding=2 border=0>"
 
     def foot(self):
@@ -425,7 +431,8 @@ class XHTMLStyle(AbstractStyle):
     prefix = '<div class="irclog">'
     suffix = '</div>'
 
-    def head(self, title, charset="UTF-8"):
+    def head(self, title, prev=('', ''), index=('', ''), next=('', ''),
+             charset="UTF-8"):
         print >> self.outfile, """\
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
 <html>
@@ -439,10 +446,39 @@ class XHTMLStyle(AbstractStyle):
 <body>""" % {'VERSION': VERSION, 'RELEASE': RELEASE,
              'title': escape(title), 'charset': charset}
         self.heading(title)
+        self.navbar(prev, index, next)
         print >> self.outfile, self.prefix
 
     def heading(self, title):
         print >> self.outfile, '<h1>%s</h1>' % escape(title)
+
+    def navbar(self, prev, index, next):
+        prev_title, prev_url = map(escape, prev)
+        index_title, index_url = map(escape, index)
+        next_title, next_url = map(escape, next)
+        if not (prev_title or index_title or next_title or
+                prev_url or index_url or next_url):
+            return
+        print >> self.outfile, '<div class="navigation">',
+        if prev_url:
+            print >> self.outfile, ('<a href="%s">%s</a>'
+                                    % (prev_url, prev_title or prev_url)),
+        elif prev_title:
+            print >> self.outfile, ('<span class="disabled">%s</span>'
+                                    % prev_title),
+        if index_url:
+            print >> self.outfile, ('<a href="%s">%s</a>'
+                                    % (index_url, index_title or index_url)),
+        elif index_title:
+            print >> self.outfile, ('<span class="disabled">%s</span>'
+                                    % index_title),
+        if next_url:
+            print >> self.outfile, ('<a href="%s">%s</a>'
+                                    % (next_url, next_title or next_url)),
+        elif next_title:
+            print >> self.outfile, ('<span class="disabled">%s</span>'
+                                    % next_title),
+        print >> self.outfile, '</div>'
 
     def foot(self):
         print >> self.outfile, self.suffix
@@ -563,6 +599,18 @@ def main():
                            " available styles")
     parser.add_option('-t', '--title', dest="title", default=None,
                       help="title of the page (default: same as file name)")
+    parser.add_option('--prev-title', dest="prev_title", default='',
+                      help="title of the previous page (default: none)")
+    parser.add_option('--prev-url', dest="prev_url", default='',
+                      help="URL of the previous page (default: none)")
+    parser.add_option('--index-title', dest="index_title", default='',
+                      help="title of the index page (default: none)")
+    parser.add_option('--index-url', dest="index_url", default='',
+                      help="URL of the index page (default: none)")
+    parser.add_option('--next-title', dest="next_title", default='',
+                      help="title of the next page (default: none)")
+    parser.add_option('--next-url', dest="next_url", default='',
+                      help="URL of the next page (default: none)")
     for name, default, what in COLOURS:
         parser.add_option('--color-%s' % name, '--colour-%s' % name,
                           dest="colour_%s" % name, default=default,
@@ -588,6 +636,9 @@ def main():
     if not args:
         parser.error("required parameter missing")
     title = options.title
+    prev = (options.prev_title, options.prev_url)
+    index = (options.index_title, options.index_url)
+    next = (options.next_title, options.next_url)
 
     for filename in args:
         try:
@@ -605,16 +656,17 @@ def main():
         try:
             parser = LogParser(infile)
             formatter = style(outfile, colours)
-            convert_irc_log(parser, formatter, title or filename)
+            convert_irc_log(parser, formatter, title or filename,
+                            prev, index, next)
         finally:
             outfile.close()
             infile.close()
 
 
-def convert_irc_log(parser, formatter, title):
+def convert_irc_log(parser, formatter, title, prev, index, next):
     """Convert IRC log to HTML or some other format."""
     nick_colour = NickColourizer()
-    formatter.head(title)
+    formatter.head(title, prev, index, next)
     for time, what, info in parser:
         if what == LogParser.COMMENT:
             nick, text = info

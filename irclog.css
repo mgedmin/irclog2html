@@ -30,6 +30,13 @@ h1 {
     margin: 0.5em 0;
 }
 
+.navigation {
+    margin-bottom: 1em;
+}
+.navigation a, .navigation span {
+    margin-right: 1em;
+}
+
 a.time, a.time:visited {
     text-decoration: none;
     color: #8888cc;
