@@ -41,6 +41,8 @@ was written by Jeff Waugh and is available at www.perkypants.org
 #
 #   New styles: xhtml, xhtmltable
 #
+#   New default style: xhtmltable
+#
 
 import os
 import re
@@ -48,8 +50,8 @@ import sys
 import urllib
 import optparse
 
-VERSION = "2.2"
-RELEASE = "2005-02-04"
+VERSION = "2.3"
+RELEASE = "2005-03-18"
 
 # $Id$
 
@@ -642,9 +644,9 @@ def main(argv=sys.argv):
                                    description="Colourises and converts IRC"
                                                " logs to HTML format for easy"
                                                " web reading.")
-    parser.add_option('-s', '--style', dest="style", default="table",
+    parser.add_option('-s', '--style', dest="style", default="xhtmltable",
                       help="format log according to specific style"
-                           " (default: table); try -s help for a list of"
+                           " (default: xhtmltable); try -s help for a list of"
                            " available styles")
     parser.add_option('-t', '--title', dest="title", default=None,
                       help="title of the page (default: same as file name)")
