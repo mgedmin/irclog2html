@@ -65,8 +65,8 @@ def run_and_compare(inputfile, args=""):
     output1 = run_in_tempdir(inputfile, './irclog2html.py', args)
     output1 = replace(output1, {'irclog2html.py': 'SCRIPT',
                                 'Marius Gedminas': 'AUTHOR',
-                                '2.1mg': 'VERSION',
-                                '2005-01-09': 'REVISION',
+                                '2.3': 'VERSION',
+                                '2005-03-18': 'REVISION',
                                 'marius@pov.lt': 'EMAIL',
                                 'http://mg.pov.lt/irclog2html.py': 'URL',
                                 'mg.pov.lt': 'WEBSITE'})
@@ -86,8 +86,9 @@ def run_and_compare(inputfile, args=""):
                                                    output2.splitlines(True))))
 
 
-DEFAULT_ARGS = ('', '-s table', '-s simplett', '-s tt', '-s simpletable',
-                '--colour-part="#deadbe"', '--color-action=#cafeba')
+DEFAULT_ARGS = ('-s table', '-s simplett', '-s tt', '-s simpletable',
+                '-s table --colour-part="#deadbe"',
+                '-s table --color-action=#cafeba')
 
 
 def testcase(inputfile, args_to_try=DEFAULT_ARGS):
