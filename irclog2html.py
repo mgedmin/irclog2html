@@ -434,7 +434,11 @@ class XHTMLStyle(AbstractStyle):
 </head>
 <body>""" % {'VERSION': VERSION, 'RELEASE': RELEASE,
              'title': escape(title), 'charset': charset}
+        self.heading(title)
         print >> self.outfile, self.prefix
+
+    def heading(self, title):
+        print >> self.outfile, '<h1>%s</h1>' % escape(title)
 
     def foot(self):
         print >> self.outfile, self.suffix
@@ -553,6 +557,8 @@ def main():
                       help="format log according to specific style"
                            " (default: table); try -s help for a list of"
                            " available styles")
+    parser.add_option('-t', '--title', dest="title", default=None,
+                      help="title of the page (default: same as file name)")
     for name, default, what in COLOURS:
         parser.add_option('--color-%s' % name, '--colour-%s' % name,
                           dest="colour_%s" % name, default=default,
@@ -577,6 +583,7 @@ def main():
         colours[what] = getattr(options, 'colour_%s' % name)
     if not args:
         parser.error("required parameter missing")
+    title = options.title
 
     for filename in args:
         try:
@@ -594,7 +601,7 @@ def main():
         try:
             parser = LogParser(infile)
             formatter = style(outfile, colours)
-            convert_irc_log(parser, formatter, filename)
+            convert_irc_log(parser, formatter, title or filename)
         finally:
             outfile.close()
             infile.close()

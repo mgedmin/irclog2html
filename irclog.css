@@ -25,6 +25,11 @@ td.text {
 
 /* Common rules */
 
+h1 {
+    color: #134d73;
+    margin: 0.5em 0;
+}
+
 a.time, a.time:visited {
     text-decoration: none;
     color: #8888cc;
