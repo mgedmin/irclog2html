@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- encoding: utf-8 -*-
 """
 Split xchat2 log file into daily log files suitable as input for logs2html.py.
 
@@ -10,29 +11,41 @@ XXX code is ugly
 import sys
 import time
 import os
+import re
+import locale
 from warnings import warn
 
+STAMP_RX = re.compile(r'^[*][*][*][*] ((BEGIN|ENDING) LOGGING AT|(LOGINIMAS|ŽURNALAS) (PRADĖTAS|BAIGTAS)) ')
 
 def readxchatlogs(infile):
     date = None
     ymd = None
     for line in infile:
-        if line.startswith('**** BEGIN LOGGING AT '):
-            t = time.strptime(line[len('**** BEGIN LOGGING AT '):].strip(),
-                              '%a %b %d %H:%M:%S %Y')
-            ymd = t[:3]
-            date = time.strftime("%Y-%m-%d", t)
-        elif line.startswith('**** ENDING LOGGING AT '):
-            t = time.strptime(line[len('**** ENDING LOGGING AT '):].strip(),
-                              '%a %b %d %H:%M:%S %Y')
+        m = STAMP_RX.match(line)
+        if m:
+            stamp = line[len(m.group(0)):].strip()
+            try:
+                t = time.strptime(stamp, '%a %b %d %H:%M:%S %Y')
+            except ValueError:
+                locale.setlocale(locale.LC_TIME, "")
+                t = time.strptime(stamp, '%a %b %d %H:%M:%S %Y')
+                locale.setlocale(locale.LC_TIME, "C")
+
             ymd = t[:3]
             date = time.strftime("%Y-%m-%d", t)
         elif line.strip():
-            assert date
+            assert date, 'what year?  got only %s' % line
             try:
                 t = time.strptime(line[:len('Ddd YY HH:MM:SS'):], '%b %d %H:%M:%S')
             except ValueError:
-                warn("Skipping %s" % line.strip())
+                locale.setlocale(locale.LC_TIME, "")
+		try:
+		    t = time.strptime(stamp, '%a %b %d %H:%M:%S %Y')
+		except:
+                    warn("Skipping %s" % line.strip())
+		    locale.setlocale(locale.LC_TIME, "C")
+		    continue
+                locale.setlocale(locale.LC_TIME, "C")
             t = (ymd[0], ) + t[1:]
             if t[:3] < ymd: # new year wraparound
                 warn("Guessing that wraparound occurred: %s -> %s" % (ymd, t[:3]))
