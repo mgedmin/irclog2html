@@ -248,7 +248,7 @@ def escape(s):
 #
 
 class AbstractStyle(object):
-    """A style defines the way HTML is formatted.
+    """A style defines the way output is formatted.
 
     This is not a real class, rather it is an description of how style
     classes should be written.
@@ -257,23 +257,26 @@ class AbstractStyle(object):
     name = "stylename"
     description = "Single-line description"
 
-    def head(self, title, charset=None):
+    def head(self, title):
         """Generate the header."""
 
     def foot(self):
         """Generate the footer."""
 
-    def servermsg(self, line):
+    def servermsg(self, time, what, line):
         """Output a generic server message.
 
-        `line` may contain HTML markup.
+        `time` is a string.
+        `line` is not escaped.
+        `what` is one of LogParser event constants (e.g. LogParser.JOIN).
         """
 
-    def nicktext(self, nick, text, htmlcolour):
+    def nicktext(self, time, nick, text, htmlcolour):
         """Output a comment uttered by someone.
 
-        `text` may contain HTML markup.
-        `htmlcolour` is a string (#rrggbb).
+        `time` is a string.
+        `nick` and `text` are not escaped.
+        `htmlcolour` is a string ('#rrggbb').
         """
 
 
@@ -319,7 +322,9 @@ class SimpleTextStyle(object):
  - find it at <a href="http://mg.pov.lt/irclog2html.py">mg.pov.lt</a>!
 </tt></body></html>""" % {'VERSION': VERSION, 'RELEASE': RELEASE},
 
-    def servermsg(self, what, text):
+    def servermsg(self, time, what, text):
+        text = escape(text)
+        text = createlinks(text)
         colour = self.colours.get(what)
         if colour:
             text = '<font color="%s">%s</font>' % (colour, text)
@@ -328,7 +333,14 @@ class SimpleTextStyle(object):
     def _servermsg(self, line):
         print >> self.outfile, '%s<br>' % line
 
-    def nicktext(self, nick, text, htmlcolour):
+    def nicktext(self, time, nick, text, htmlcolour):
+        nick = escape(nick)
+        text = escape(text)
+        text = createlinks(text)
+        text = text.replace('  ', '&nbsp;&nbsp;')
+        self._nicktext(time, nick, text, htmlcolour)
+
+    def _nicktext(self, time, nick, text, htmlcolour):
         print >> self.outfile, '&lt;%s&gt; %s<br>' % (nick, text)
 
 
@@ -337,7 +349,7 @@ class TextStyle(SimpleTextStyle):
 
     name = "tt"
 
-    def nicktext(self, nick, text, htmlcolour):
+    def _nicktext(self, time, nick, text, htmlcolour):
         print >> self.outfile, ('<font color="%s">&lt;%s&gt;</font>'
                                 ' <font color="#000000">%s</font><br>'
                                 % (htmlcolour, nick, text))
@@ -360,7 +372,7 @@ class SimpleTableStyle(SimpleTextStyle):
         print >> self.outfile, ('<tr><td colspan=2><tt>%s</tt></td></tr>'
                                 % line)
 
-    def nicktext(self, nick, text, htmlcolour):
+    def _nicktext(self, time, nick, text, htmlcolour):
         print >> self.outfile, ('<tr bgcolor="#eeeeee"><th><font color="%s">'
                                 '<tt>%s</tt></font></th>'
                                 '<td width="100%%"><tt>%s</tt></td></tr>'
@@ -372,7 +384,7 @@ class TableStyle(SimpleTableStyle):
 
     name = "table"
 
-    def nicktext(self, nick, text, htmlcolour):
+    def _nicktext(self, time, nick, text, htmlcolour):
         print >> self.outfile, ('<tr><th bgcolor="%s"><font color="#ffffff">'
                                 '<tt>%s</tt></font></th>'
                                 '<td width="100%%" bgcolor="#eeeeee"><tt><font'
@@ -453,31 +465,28 @@ def main():
         try:
             parser = LogParser(infile)
             formatter = style(outfile, colours)
-            log2html(parser, formatter, filename)
+            convert_irc_log(parser, formatter, filename)
         finally:
             outfile.close()
             infile.close()
 
 
-def log2html(parser, formatter, title):
-    """Convert IRC log to HTML."""
+def convert_irc_log(parser, formatter, title):
+    """Convert IRC log to HTML or some other format."""
     nick_colour = NickColourizer()
     formatter.head(title)
     for time, what, info in parser:
         if what == LogParser.COMMENT:
-            nick, text = map(escape, info)
-            text = createlinks(text)
-            text = text.replace('  ', '&nbsp;&nbsp;')
+            nick, text = info
             htmlcolour = nick_colour[nick]
-            formatter.nicktext(nick, text, htmlcolour)
+            formatter.nicktext(time, nick, text, htmlcolour)
         else:
             if what == LogParser.NICKCHANGE:
-                text, oldnick, newnick = map(escape, info)
+                text, oldnick, newnick = info
                 nick_colour.change(oldnick, newnick)
             else:
-                text = escape(info)
-            text = createlinks(text)
-            formatter.servermsg(what, text)
+                text = info
+            formatter.servermsg(time, what, text)
     formatter.foot()
 
 
