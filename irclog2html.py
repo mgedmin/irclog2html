@@ -126,8 +126,8 @@ class LogParser(object):
             else:
                 m = self.NICK_CHANGE_REGEXP.match(line)
                 if m:
-                    nick_old = m.group(1)
-                    nick_new = m.group(2)
+                    oldnick = m.group(1)
+                    newnick = m.group(2)
                     yield time, self.NICKCHANGE, (line, oldnick, newnick)
                 elif line.startswith('*** ') or line.startswith('--- '):
                     yield time, self.SERVER, line
@@ -236,7 +236,7 @@ class NickColourizer:
             self.nick_colour[nick] = colour
         return colour
 
-    def nickchange(self, oldnick, newnick):
+    def change(self, oldnick, newnick):
         if oldnick in self.nick_colour:
             self.nick_colour[newnick] = self.nick_colour.pop(oldnick)
 
