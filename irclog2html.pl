@@ -1,7 +1,11 @@
 #!/usr/bin/perl
 
-# irclog2html.pl Version 2.1 - 27th July, 2001
+# irclog2html.pl Version 2.1mg - 27th July, 2001
 # Copyright (C) 2000, Jeffrey W. Waugh
+
+# Changed by Marius Gedminas (marius@pov.lt) on 2005-01-09:
+#   changed time regexps to support ISO-8601 (YYYY-MM-DDTHH:MM:SS) timestamps
+#   commented out print $time;
 
 # Author:
 #   Jeff Waugh <jdub@perkypants.org>
@@ -25,7 +29,7 @@
 use strict;
 #$^W = 1;	#RW# turn on warnings
 
-my $VERSION = "2.1";
+my $VERSION = "2.1mg";
 my $RELEASE = "27th July, 2001";
 
 
@@ -263,11 +267,11 @@ sub main {
 			$line =~ s/((http|https|ftp|gopher|news):\/\/\S*)/<a href="$1">$1<\/a>/g;
 
 			# Rip out the time #
-			if ($line =~ /^\[?\d\d:\d\d(:\d\d)?\]? .*$/) {
+			if ($line =~ /^\[?(?:\d\d\d\d-\d\d-\d\dT)?\d\d:\d\d(:\d\d)?\]? +.*$/) {
 				$time = $line;
-				$time =~ s/^\[?(\d\d:\d\d(:\d\d)?)\]? .*$/$1/;
-				$line =~ s/^\[?\d\d:\d\d(:\d\d)?\]? (.*)$/$2/;
-				print $time;
+				$time =~ s/^\[?(?:\d\d\d\d-\d\d-\d\dT)?(\d\d:\d\d(:\d\d)?)\]? +.*$/$1/;
+				$line =~ s/^\[?(?:\d\d\d\d-\d\d-\d\dT)?\d\d:\d\d(:\d\d)?\]? +(.*)$/$2/;
+##				print $time;
 			}
 
 			# Colourise the comments
