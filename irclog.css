@@ -1,9 +1,29 @@
+/* Alternative 1: text */
+
 div.irclog {
     font-family: monospace;
-    text-indent: -4em;
-    padding-left: 4em;
+    text-indent: -7em;
+    padding-left: 7em;
 }
 div.irclog p { margin: 2px 0; }
+
+
+/* Alternative 2: table */
+
+table.irclog {
+    width: 100%;
+}
+th.nick {
+    color: #ffffff;
+    padding: 1px 2px;
+}
+td.text {
+    width: 100%;
+    background: #eeeeee;
+}
+
+
+/* Common rules */
 
 a.time, a.time:visited {
     text-decoration: none;
