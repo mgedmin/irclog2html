@@ -21,6 +21,9 @@ td.text {
     width: 100%;
     background: #eeeeee;
 }
+td.action {
+    background: #eeeeee;
+}
 
 
 /* Common rules */
@@ -66,6 +69,11 @@ a.time:after { content: "]"; }
 .nickchange { color: #009900; }
 .action { color: #cc00cc; }
 .other { color: #888888; }
+
+/* Make boring messages small */
+.part, .join, .servermgs, .nickchange, .other { font-size: smaller; }
+td.part + td, td.join + td, td.servermgs + td, td.nickchange + td,
+td.other + td { font-size: smaller; text-align: right; }
 
 
 div.generatedby {
