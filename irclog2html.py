@@ -192,33 +192,60 @@ NICK_CHANGE_REGEXP = re.compile(r'^(?:\*\*\*|---) (.*?)'
                                 r' (?:are|is) now known as (.*)')
 
 # Colouring stuff
-a = 0.95        # tune these for the starting and ending concentrations of RGB
-b = 0.5
-RGB = [(a,b,b), (b,a,b), (b,b,a), (a,a,b), (a,b,a), (b,a,a)]
-del a, b
-RGBMAX = 125    # tune these two for the outmost ranges of colour depth
-RGBMIN = 240
+class ColourChooser:
+    """Choose distinguishable colours."""
 
-def html_rgb(i, ncolours):
-    """Choose a distinguishable colour.
+    def __init__(self, rgbmin=240, rgbmax=125, rgb=None, a=0.95, b=0.5):
+        """Define a range of colours available for choosing.
 
-    `ncolours` tells how many different colours you want, `i` identifies a
-    colour in that set.
+        `rgbmin` and `rgbmax` define the outmost range of colour depth (note
+        that it is allowed to have rgbmin > rgbmax).
 
-    Returns a string '#rrggbb'.
-    """
-    if ncolours == 0:
-        ncolours = 1
-    r, g, b = RGB[i % len(RGB)]
-    m = RGBMIN + (RGBMAX - RGBMIN) * float(ncolours - i) / ncolours
-    r *= m
-    g *= m
-    b *= m
-    r, g, b = map(int, (r, g, b))
-    assert 0 <= r < 0x100
-    assert 0 <= g < 0x100
-    assert 0 <= b < 0x100
-    return '#%02x%02x%02x' % (r, g, b)
+        `rgb`, if specified, is a list of (r,g,b) values where each component
+        is between 0 and 1.0.
+
+        If `rgb` is not specified, then it is constructed as
+           [(a,b,b), (b,a,b), (b,b,a), (a,a,b), (a,b,a), (b,a,a)]
+
+        You can tune `a` and `b` for the starting and ending concentrations of
+        RGB.
+        """
+        assert 0 <= rgbmin < 256
+        assert 0 <= rgbmax < 256
+        self.rgbmin = rgbmin
+        self.rgbmax = rgbmax
+        if not rgb:
+            assert 0 <= a <= 1.0
+            assert 0 <= b <= 1.0
+            rgb = [(a,b,b), (b,a,b), (b,b,a), (a,a,b), (a,b,a), (b,a,a)]
+        else:
+            for r, g, b in rgb:
+                assert 0 <= r <= 1.0
+                assert 0 <= g <= 1.0
+                assert 0 <= b <= 1.0
+        self.rgb = rgb
+
+    def choose(self, i, n):
+        """Choose a colour.
+
+        `n` specifies how many different colours you want in total.
+        `i` identifies a particular colour in a set of `n` distinguishable
+        colours.
+
+        Returns a string '#rrggbb'.
+        """
+        if n == 0:
+            n = 1
+        r, g, b = self.rgb[i % len(self.rgb)]
+        m = self.rgbmin + (self.rgbmax - self.rgbmin) * float(n - i) / n
+        r, g, b = map(int, (r * m, g * m, b * m))
+        assert 0 <= r < 256
+        assert 0 <= g < 256
+        assert 0 <= b < 256
+        return '#%02x%02x%02x' % (r, g, b)
+
+
+html_rgb = ColourChooser().choose
 
 
 def main():
