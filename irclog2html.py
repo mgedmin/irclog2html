@@ -7,7 +7,7 @@ Usage: irclog2html.py filename
 irclog2html will write out a colourised irc log, appending a .html
 extension to the output file.
 
-This is a Python port (+ improvements) of irclog2html.py Version 2.1, which
+This is a Python port (+ improvements) of irclog2html.pl Version 2.1, which
 was written by Jeff Waugh and is available at www.perkypants.org
 """
 
