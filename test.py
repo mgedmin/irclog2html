@@ -68,7 +68,7 @@ def run_and_compare(inputfile, args=""):
                                 '2.1mg': 'VERSION',
                                 '2005-01-09': 'REVISION',
                                 'marius@pov.lt': 'EMAIL',
-                                'http://mg.pov.lt/': 'URL',
+                                'http://mg.pov.lt/irclog2html.py': 'URL',
                                 'mg.pov.lt': 'WEBSITE'})
     output2 = run_in_tempdir(inputfile, './irclog2html.pl', args)
     output2 = replace(output2, {'irclog2html.pl': 'SCRIPT',
@@ -76,7 +76,8 @@ def run_and_compare(inputfile, args=""):
                                 '2.1mg': 'VERSION',
                                 '27th July, 2001': 'REVISION',
                                 'jdub@NOSPAMperkypants.org': 'EMAIL',
-                                'http://freshmeat.net/projects/': 'URL',
+                                'http://freshmeat.net/projects/irclog2html.pl/':
+                                    'URL',
                                 'freshmeat.net': 'WEBSITE'})
     if output1 != output2:
         raise AssertionError('files differ (- irclog2html.py,'
