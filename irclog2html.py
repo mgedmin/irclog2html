@@ -35,6 +35,10 @@ was written by Jeff Waugh and is available at www.perkypants.org
 #   irclog2html.py understands ISO8601 timestamps such as used by supybot's
 #   ChannelLogger (http://supybot.sourceforge.net/)
 #
+#   New option: --title
+#
+#   New styles: xhtml, xhtmltable
+#
 
 import os
 import re
