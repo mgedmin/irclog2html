@@ -187,6 +187,58 @@ class ColourChooser:
         return '#%02x%02x%02x' % (r, g, b)
 
 
+class NickColourizer:
+    """Choose distinguishable colours for nicknames."""
+
+    def __init__(self, maxnicks=30, colour_chooser=None, default_colours=None):
+        """Create a colour chooser for nicknames.
+
+        If you know how many different nicks there might be, specify that
+        numer as `maxnicks`.  If you don't know, don't worry.
+
+        If you really want to, you can specify a colour chooser.  Default is
+        ColourChooser().
+
+        If you want, you can specify default colours for certain nicknames
+        (`default_colours` is a mapping of nicknames to HTML colours, that is
+        '#rrggbb' strings).
+        """
+        if colour_chooser is None:
+            colour_chooser = ColourChooser()
+        self.colour_chooser = colour_chooser
+        self.nickcount = 0
+        self.maxnicks = maxnicks
+        self.nick_colour = {}
+        if default_colours:
+            self.nick_colour.update(default_colours)
+
+    def __getitem__(self, nick):
+        colour = self.nick_colour.get(nick)
+        if not colour:
+            self.nickcount += 1
+            if self.nickcount >= self.maxnicks:
+                self.maxnicks *= 2
+            colour = self.colour_chooser.choose(self.nickcount, self.maxnicks)
+            self.nick_colour[nick] = colour
+        return colour
+
+
+#
+# HTML
+#
+
+URL_REGEXP = re.compile(r'(http|https|ftp|gopher|news)://\S*')
+
+def createlinks(text):
+    """Replace possible URLs with links."""
+    return URL_REGEXP.sub(r'<a href="\0">\0</a>', text)
+
+def escape(s):
+    """Replace ampersands, pointies, control characters"""
+    s = s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+    return ''.join([c for c in s if ord(c) > 0x1F])
+
+
 #
 # Output styles
 #
@@ -321,12 +373,6 @@ STYLES = [
 #
 
 # Precompiled regexps
-URL_REGEXP = re.compile(r'(http|https|ftp|gopher|news)://\S*')
-TIME_REGEXP = re.compile(r'^\[?((?:\d\d\d\d-\d\d-\d\dT)?\d\d:\d\d(:\d\d)?)\]?'
-                         r' +')
-NICK_REGEXP = re.compile(r'^&lt;(.*?)&gt;\s')
-NICK_CHANGE_REGEXP = re.compile(r'^(?:\*\*\*|---) (.*?)'
-                                r' (?:are|is) now known as (.*)')
 
 
 
@@ -400,12 +446,6 @@ def main():
 
 
 
-def escape(s):
-    """Replace ampersands, pointies, control characters"""
-    s = s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
-    return ''.join([c for c in s if ord(c) > 0x1F])
-
-
 def log2html(parser, formatter, title, colours, charset="iso-8859-1"):
     """Convert IRC log to HTML.
 
@@ -420,25 +460,13 @@ def log2html(parser, formatter, title, colours, charset="iso-8859-1"):
     colour_map = {LogParser.PART: 'part', LogParser.JOIN: 'join',
                   LogParser.SERVER: 'server', LogParser.ACTION: 'action',
                   LogParser.NICKCHANGE: 'nickchange'}
-    colour_nick = {}
-    nickcount = 0
-    nickmax = 30
-
+    nick_colour = NickColourizer()
     formatter.head(title, charset)
     for time, what, info in parser:
         if what == LogParser.COMMENT:
             nick, text = map(escape, info)
-            htmlcolour = colour_nick.get(nick)
-            if not htmlcolour:
-                # new nick
-                nickcount += 1
-                # if we've exceeded our estimate of the number of nicks, double
-                # it
-                if nickcount >= nickmax:
-                    nickmax *= 2
-                htmlcolour = colour_nick[nick] = html_rgb(nickcount, nickmax)
-            # Replace possible URLs with links
-            text = URL_REGEXP.sub(r'<a href="\0">\0</a>', text)
+            htmlcolour = nick_colour[nick]
+            text = createlinks(text)
             text = text.replace('  ', '&nbsp;&nbsp;')
             formatter.nicktext(nick, text, htmlcolour)
         else:
@@ -449,8 +477,7 @@ def log2html(parser, formatter, title, colours, charset="iso-8859-1"):
                     del colour_nick[oldnick]
             else:
                 text = escape(info)
-            # Replace possible URLs with links
-            text = URL_REGEXP.sub(r'<a href="\0">\0</a>', text)
+            text = createlinks(text)
             # Colorize the line
             if what in colour_map:
                 colour = colours[colour_map[what]]
