@@ -438,7 +438,8 @@ class XHTMLStyle(AbstractStyle):
     def head(self, title, prev=('', ''), index=('', ''), next=('', ''),
              charset="UTF-8"):
         print >> self.outfile, """\
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=%(charset)s" />
@@ -499,8 +500,8 @@ class XHTMLStyle(AbstractStyle):
         text = escape(text)
         text = createlinks(text)
         displaytime = shorttime(time)
-        print >> self.outfile, ('<p id="%s" class="%s">'
-                                '<a href="#%s" class="time">%s</a> '
+        print >> self.outfile, ('<p id="t%s" class="%s">'
+                                '<a href="#t%s" class="time">%s</a> '
                                 '%s</p>'
                                 % (time, self.CLASSMAP[what], time,
                                    displaytime, text))
@@ -517,8 +518,8 @@ class XHTMLStyle(AbstractStyle):
         text = createlinks(text)
         text = text.replace('  ', '&nbsp;&nbsp;')
         displaytime = shorttime(time)
-        print >> self.outfile, ('<p id="%s" class="comment">'
-                                '<a href="#%s" class="time">%s</a> '
+        print >> self.outfile, ('<p id="t%s" class="comment">'
+                                '<a href="t#%s" class="time">%s</a> '
                                 '<span class="nick" style="color: %s">'
                                 '&lt;%s&gt;</span>'
                                 ' <span class="text">%s</span></p>'
@@ -539,9 +540,9 @@ class XHTMLTableStyle(XHTMLStyle):
         text = escape(text)
         text = createlinks(text)
         displaytime = shorttime(time)
-        print >> self.outfile, ('<tr id="%s">'
+        print >> self.outfile, ('<tr id="t%s">'
                                 '<td class="%s" colspan="2">%s</td>'
-                                '<td><a href="#%s" class="time">%s</a></td>'
+                                '<td><a href="#t%s" class="time">%s</a></td>'
                                 '</tr>'
                                 % (time, self.CLASSMAP[what], text,
                                    time, displaytime))
@@ -552,11 +553,11 @@ class XHTMLTableStyle(XHTMLStyle):
         text = createlinks(text)
         text = text.replace('  ', '&nbsp;&nbsp;')
         displaytime = shorttime(time)
-        print >> self.outfile, ('<tr id="%s">'
+        print >> self.outfile, ('<tr id="t%s">'
                                 '<th class="nick" style="background: %s">%s</th>'
                                 '<td class="text" style="color: %s">%s</td>'
                                 '<td class="time">'
-                                '<a href="#%s" class="time">%s</a></td>'
+                                '<a href="#t%s" class="time">%s</a></td>'
                                 '</tr>'
                                 % (time, htmlcolour, nick, htmlcolour, text,
                                    time, displaytime))

@@ -90,7 +90,8 @@ def escape(s):
 def write_index(outfile, title, logfiles):
     """Write an index with links to all log files."""
     print >> outfile, """\
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=%(charset)s" />
