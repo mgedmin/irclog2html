@@ -94,8 +94,11 @@ class LogParser(object):
     TIME_REGEXP = re.compile(
             r'^\[?((?:\d\d\d\d-\d\d-\d\dT)?\d\d:\d\d(:\d\d)?)\]? +')
     NICK_REGEXP = re.compile(r'^<(.*?)>\s')
+    JOIN_REGEXP = re.compile(r'^(?:\*\*\*|-->)\s.*joined')
+    PART_REGEXP = re.compile(r'^(?:\*\*\*|-->)\s.*(quit|left)')
+    SERVMSG_REGEXP = re.compile(r'^(?:\*\*\*|---)\s')
     NICK_CHANGE_REGEXP = re.compile(
-            r'^(?:\*\*\*|---) (.*?) (?:are|is) now known as (.*)')
+            r'^(?:\*\*\*|---)\s+(.*?) (?:are|is) now known as (.*)')
 
     def __init__(self, infile):
         self.infile = infile
@@ -118,13 +121,11 @@ class LogParser(object):
                 nick = m.group(1)
                 text = line[len(m.group(0)):]
                 yield time, self.COMMENT, (nick, text)
-            elif line.startswith('* '):
+            elif line.startswith('* ') or line.startswith('*\t'):
                 yield time, self.ACTION, line
-            elif ((line.startswith('*** ') or line.startswith('--> '))
-                  and 'joined' in line):
+            elif self.JOIN_REGEXP.match(line):
                 yield time, self.JOIN, line
-            elif ((line.startswith('*** ') or line.startswith('--> '))
-                  and ('left' in line or 'quit' in line)):
+            elif self.PART_REGEXP.match(line):
                 yield time, self.PART, line
             else:
                 m = self.NICK_CHANGE_REGEXP.match(line)
@@ -132,7 +133,7 @@ class LogParser(object):
                     oldnick = m.group(1)
                     newnick = m.group(2)
                     yield time, self.NICKCHANGE, (line, oldnick, newnick)
-                elif line.startswith('*** ') or line.startswith('--- '):
+                elif self.SERVMSG_REGEXP.match(line):
                     yield time, self.SERVER, line
                 else:
                     yield time, self.OTHER, line
