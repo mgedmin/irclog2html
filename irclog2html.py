@@ -523,7 +523,7 @@ class XHTMLStyle(AbstractStyle):
         """
         text = escape(text)
         text = createlinks(text)
-	if time:
+        if time:
             displaytime = shorttime(time)
             print >> self.outfile, ('<p id="t%s" class="%s">'
                                     '<a href="#t%s" class="time">%s</a> '
@@ -548,7 +548,7 @@ class XHTMLStyle(AbstractStyle):
         if time:
             displaytime = shorttime(time)
             print >> self.outfile, ('<p id="t%s" class="comment">'
-                                    '<a href="t#%s" class="time">%s</a> '
+                                    '<a href="#t%s" class="time">%s</a> '
                                     '<span class="nick" style="color: %s">'
                                     '&lt;%s&gt;</span>'
                                     ' <span class="text">%s</span></p>'
@@ -574,7 +574,7 @@ class XHTMLTableStyle(XHTMLStyle):
     def servermsg(self, time, what, text):
         text = escape(text)
         text = createlinks(text)
-	if time:
+        if time:
             displaytime = shorttime(time)
             print >> self.outfile, ('<tr id="t%s">'
                                     '<td class="%s" colspan="2">%s</td>'
@@ -593,7 +593,7 @@ class XHTMLTableStyle(XHTMLStyle):
         text = escape(text)
         text = createlinks(text)
         text = text.replace('  ', '&nbsp;&nbsp;')
-	if time:
+        if time:
             displaytime = shorttime(time)
             print >> self.outfile, ('<tr id="t%s">'
                                     '<th class="nick" style="background: %s">%s</th>'
