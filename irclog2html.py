@@ -7,7 +7,7 @@ Usage: irclog2html.py filename
 irclog2html will write out a colourised irc log, appending a .html
 extension to the output file.
 
-This is a Python port of irclog2html.py Version 2.1, which
+This is a Python port (+ improvements) of irclog2html.py Version 2.1, which
 was written by Jeff Waugh and is available at www.perkypants.org
 """
 
@@ -35,8 +35,7 @@ was written by Jeff Waugh and is available at www.perkypants.org
 #   irclog2html.pl interprets --colour-server #rrggbb as -s #rrggbb,
 #   irclog2html.py does not have this bug
 #
-#   irclog2html.py understands ISO8601 timestamps such as used by supybot's
-#   ChannelLogger (http://supybot.sourceforge.net/)
+#   irclog2html.py understands ISO 8601 timestamps (YYYY-MM-DDTHH:MM:SS)
 #
 #   New options: --title, --{prev,index,next}-{url,title}
 #
@@ -49,8 +48,8 @@ import sys
 import urllib
 import optparse
 
-VERSION = "2.1mg"
-RELEASE = "2005-01-09"
+VERSION = "2.2"
+RELEASE = "2005-02-04"
 
 # $Id$
 
@@ -140,7 +139,16 @@ class LogParser(object):
 
 
 def shorttime(time):
-    """Strip date and seconds from time."""
+    """Strip date and seconds from time.
+
+        >>> shorttime('12:45:17')
+        '12:45'
+        >>> shorttime('12:45')
+        '12:45'
+        >>> shorttime('2005-02-04T12:45')
+        '12:45'
+
+    """
     if 'T' in time:
         time = time.split('T')[-1]
     if time.count(':') > 1:
@@ -256,7 +264,19 @@ def createlinks(text):
     return URL_REGEXP.sub(r'<a href="\1">\1</a>', text)
 
 def escape(s):
-    """Replace ampersands, pointies, control characters"""
+    """Replace ampersands, pointies, control characters.
+
+        >>> escape('Hello & <world>')
+        'Hello &amp; &lt;world&gt;'
+        >>> escape('Hello & <world>')
+        'Hello &amp; &lt;world&gt;'
+
+    Control characters (ASCII 0 to 31) are stripped away
+
+        >>> escape(''.join([chr(x) for x in range(32)]))
+        ''
+
+    """
     s = s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
     return ''.join([c for c in s if ord(c) > 0x1F])
 
