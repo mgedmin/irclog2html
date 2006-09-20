@@ -31,6 +31,9 @@ RELEASE = "2005-01-09"
 
 DATE_REGEXP = re.compile('^.*(\d\d\d\d)-(\d\d)-(\d\d)')
 
+class Error(Exception):
+    """Application error."""
+
 
 class LogFile:
     """IRC log file."""
@@ -39,6 +42,9 @@ class LogFile:
         self.filename = filename
         basename = os.path.basename(filename)
         m = DATE_REGEXP.match(basename)
+        if not m:
+            raise Error("File name does not contain a YYYY-MM-DD date: %s"
+                        % filename)
         self.date = datetime.date(*map(int, m.groups()))
         self.link = basename + ".html"
         self.title = self.date.strftime('%Y-%m-%d (%A)')
@@ -156,6 +162,14 @@ def main(argv=sys.argv):
         parser.error("incorrect number of arguments")
     dir = args[0]
 
+    try:
+        process(dir, options)
+    except Error, e:
+        sys.exit("%s: %s" % (progname, e))
+
+
+def process(dir, options):
+    """Process log files in a given directory."""
     logfiles = find_log_files(dir)
     logfiles.reverse() # newest first
     for n, logfile in enumerate(logfiles):
