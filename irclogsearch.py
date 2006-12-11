@@ -5,6 +5,14 @@ Search IRC logs (a CGI script).
 Expects to find *.log in the directory specified by the IRCLOG_LOCATION
 environment variable.  Expects the filenames to contain a ISO 8601 date
 (YYYY-MM-DD).
+
+Apache configuration example:
+
+  ScriptAlias /irclogs/search /path/to/irclogsearch.py
+  <Location /irclogs/search>
+    SetEnv IRCLOG_LOCATION /path/to/irclog/files/
+  </Location>
+
 """
 
 # Copyright (c) 2006, Marius Gedminas 
