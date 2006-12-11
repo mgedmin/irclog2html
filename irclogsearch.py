@@ -17,6 +17,7 @@ import sys
 import os
 import re
 import glob
+import urllib
 import datetime
 import time
 
@@ -25,6 +26,9 @@ import cgitb; cgitb.enable()
 from irclog2html import LogParser, XHTMLTableStyle, NickColourizer
 
 logfile_path = os.getenv('IRCLOG_LOCATION')
+if not logfile_path:
+    logfile_path = os.path.dirname(__file__)
+
 
 VERSION = "0.1"
 RELEASE = "2006-12-11"
@@ -89,7 +93,7 @@ class SearchResultFormatter(object):
         print self.style.prefix
 
     def print_html(self, result):
-        link = cgi.escape(result.link, True)
+        link = urlescape(result.link)
         if result.event == LogParser.COMMENT:
             nick, text = result.info
             htmlcolour = self.nick_colour[nick]
@@ -105,6 +109,9 @@ class SearchResultFormatter(object):
     def print_suffix(self):
         print self.style.suffix
 
+
+def urlescape(link):
+    return cgi.escape(urllib.quote(link), True)
 
 def date_from_filename(filename):
     basename = os.path.basename(filename)
@@ -180,7 +187,7 @@ def print_search_results(query):
                 print "  </li>"
             else:
                 print "<ul>"
-            print '  <li><a href="%s">%s</a>:' % (cgi.escape(result.link, True),
+            print '  <li><a href="%s">%s</a>:' % (urlescape(result.link),
                                         result.date.strftime('%Y-%m-%d (%A)'))
             date = result.date
         if not prev_result:
