@@ -2,12 +2,12 @@
 """
 Search IRC logs (a CGI script).
 
-Expects to find *.log in the directory specified by logfile_path (by default
-it is the same directory where this script resides).  Expects the filenames
-to contain a ISO 8601 date (YYYY-MM-DD).
+Expects to find *.log in the directory specified by the IRCLOG_LOCATION
+environment variable.  Expects the filenames to contain a ISO 8601 date
+(YYYY-MM-DD).
 """
 
-# Copyright (c) 2005, Marius Gedminas 
+# Copyright (c) 2006, Marius Gedminas 
 #
 # Released under the terms of the GNU GPL
 # http://www.gnu.org/copyleft/gpl.html
@@ -23,7 +23,7 @@ import cgitb; cgitb.enable()
 
 from irclog2html import LogParser, XHTMLTableStyle, NickColourizer
 
-logfile_path = os.path.dirname(__file__)
+logfile_path = os.getenv('IRCLOG_LOCATION')
 
 VERSION = "0.1"
 RELEASE = "2006-12-11"
