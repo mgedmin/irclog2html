@@ -123,7 +123,9 @@ def search_irc_logs(query, stats=None):
     if not stats:
         stats = SearchStats() # will be discarded, but, oh, well
     query = query.lower()
-    for filename in sorted(glob.glob(os.path.join(logfile_path, '*.log'))):
+    files = glob.glob(os.path.join(logfile_path, '*.log'))
+    files.sort() # ISO-8601 dates sort the right way
+    for filename in files:
         date = date_from_filename(filename)
         link = link_from_filename(filename)
         stats.files += 1
