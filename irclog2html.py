@@ -577,24 +577,24 @@ class XHTMLTableStyle(XHTMLStyle):
     prefix = '<table class="irclog">'
     suffix = '</table>'
 
-    def servermsg(self, time, what, text):
+    def servermsg(self, time, what, text, link=''):
         text = escape(text)
         text = createlinks(text)
         if time:
             displaytime = shorttime(time)
             print >> self.outfile, ('<tr id="t%s">'
                                     '<td class="%s" colspan="2">%s</td>'
-                                    '<td><a href="#t%s" class="time">%s</a></td>'
+                                    '<td><a href="%s#t%s" class="time">%s</a></td>'
                                     '</tr>'
                                     % (time, self.CLASSMAP[what], text,
-                                       time, displaytime))
+                                       link, time, displaytime))
         else:
             print >> self.outfile, ('<tr>'
                                     '<td class="%s" colspan="3">%s</td>'
                                     '</tr>'
                                     % (self.CLASSMAP[what], text))
 
-    def nicktext(self, time, nick, text, htmlcolour):
+    def nicktext(self, time, nick, text, htmlcolour, link=''):
         nick = escape(nick)
         text = escape(text)
         text = createlinks(text)
@@ -605,10 +605,10 @@ class XHTMLTableStyle(XHTMLStyle):
                                     '<th class="nick" style="background: %s">%s</th>'
                                     '<td class="text" style="color: %s">%s</td>'
                                     '<td class="time">'
-                                    '<a href="#t%s" class="time">%s</a></td>'
+                                    '<a href="%s#t%s" class="time">%s</a></td>'
                                     '</tr>'
                                     % (time, htmlcolour, nick, htmlcolour, text,
-                                       time, displaytime))
+                                       link, time, displaytime))
         else:
             print >> self.outfile, ('<tr>'
                                     '<th class="nick" style="background: %s">%s</th>'
