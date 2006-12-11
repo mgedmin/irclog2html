@@ -50,8 +50,8 @@ import sys
 import urllib
 import optparse
 
-VERSION = "2.3"
-RELEASE = "2005-03-28"
+VERSION = "2.4"
+RELEASE = "2006-12-11"
 
 # $Id$
 
