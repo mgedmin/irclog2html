@@ -194,7 +194,7 @@ def print_search_results(query):
             if date:
                 print "  </li>"
             else:
-                print "<ul>"
+                print '<ul class="searchresults">'
             print '  <li><a href="%s">%s</a>:' % (urlescape(result.link),
                                         result.date.strftime('%Y-%m-%d (%A)'))
             date = result.date
