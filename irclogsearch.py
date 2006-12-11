@@ -18,6 +18,7 @@ import os
 import re
 import glob
 import datetime
+import time
 
 import cgitb; cgitb.enable()
 
@@ -124,7 +125,8 @@ def search_irc_logs(query, stats=None):
         stats = SearchStats() # will be discarded, but, oh, well
     query = query.lower()
     files = glob.glob(os.path.join(logfile_path, '*.log'))
-    files.sort() # ISO-8601 dates sort the right way
+    files.sort()    # ISO-8601 dates sort the right way
+    files.reverse() # newest first
     for filename in files:
         date = date_from_filename(filename)
         link = link_from_filename(filename)
@@ -164,6 +166,7 @@ def print_search_results(query):
     print '<input type="text" name="q" value="%s" />' % cgi.escape(query)
     print '<input type="submit" />'
     print '</form>'
+    started = time.time()
     date = None
     prev_result = None
     formatter = SearchResultFormatter()
@@ -189,9 +192,9 @@ def print_search_results(query):
     if date:
         print "  </li>"
         print "</ul>"
-    print "<p>%d matches in %d log files with %d lines.</p>" % (stats.matches,
-                                                                stats.files,
-                                                                stats.lines)
+    total_time = time.time() - started
+    print "<p>%d matches in %d log files with %d lines (%.1f seconds).</p>" % (
+                stats.matches, stats.files, stats.lines, total_time)
     print FOOTER
 
 
