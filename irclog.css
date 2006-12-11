@@ -25,6 +25,11 @@ td.action {
     background: #eeeeee;
 }
 
+/* Search results */
+
+ul.searchresults table {
+    margin: 0.5ex 0 1ex 0.5ex;
+}
 
 /* Common rules */
 
