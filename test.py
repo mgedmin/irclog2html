@@ -11,6 +11,8 @@ import shutil
 import difflib
 import glob
 
+from irclog2html import VERSION, RELEASE
+
 
 def replace(s, replacements):
     """Replace a bunch of things in a string."""
@@ -65,8 +67,8 @@ def run_and_compare(inputfile, args=""):
     output1 = run_in_tempdir(inputfile, './irclog2html.py', args)
     output1 = replace(output1, {'irclog2html.py': 'SCRIPT',
                                 'Marius Gedminas': 'AUTHOR',
-                                '2.4': 'VERSION',
-                                '2006-12-11': 'REVISION',
+                                VERSION: 'VERSION',
+                                RELEASE: 'REVISION',
                                 'marius@pov.lt': 'EMAIL',
                                 'http://mg.pov.lt/irclog2html/': 'URL',
                                 'mg.pov.lt': 'WEBSITE'})
@@ -109,6 +111,7 @@ def testcase(inputfile, args_to_try=DEFAULT_ARGS):
 
 def main():
     testcases = glob.glob('testcases/*.log')
+    print "Comparing outputs produced by the Perl version and the Python port"
     print "There are %d test cases" % len(testcases)
     n = 0
     for inputfile in testcases:
