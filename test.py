@@ -65,8 +65,8 @@ def run_and_compare(inputfile, args=""):
     output1 = run_in_tempdir(inputfile, './irclog2html.py', args)
     output1 = replace(output1, {'irclog2html.py': 'SCRIPT',
                                 'Marius Gedminas': 'AUTHOR',
-                                '2.3': 'VERSION',
-                                '2005-03-28': 'REVISION',
+                                '2.4': 'VERSION',
+                                '2006-12-11': 'REVISION',
                                 'marius@pov.lt': 'EMAIL',
                                 'http://mg.pov.lt/irclog2html/': 'URL',
                                 'mg.pov.lt': 'WEBSITE'})
