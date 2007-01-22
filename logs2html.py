@@ -166,7 +166,7 @@ def main(argv=sys.argv):
     parser.add_option('-f', '--force', action="store_true", dest="force",
                       default=False,
                       help="ignore mtime and regenerate all files")
-    parser.add_option('-s', '--searchbox', action="store_true", dest="searchbox",
+    parser.add_option('-S', '--searchbox', action="store_true", dest="searchbox",
                       default=False,
                       help="include a search box")
     options, args = parser.parse_args(argv[1:])
