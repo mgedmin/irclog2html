@@ -71,10 +71,13 @@ class LogFile:
             return False
         return html_mtime > log_mtime
 
-    def generate(self, style, title_prefix='', prev=None, next=None):
+    def generate(self, style, title_prefix='', prev=None, next=None,
+                 searchbox=False):
         """Generate HTML for this log file."""
         self.newfile() # update newness flag and remember it
         argv = ['irclog2html.py', '-s', style]
+        if searchbox:
+            argv += ['-S']
         argv += ['-t', title_prefix + self.date.strftime('%A, %Y-%m-%d')]
         if prev:
             argv += ['--prev-url', prev.link,
@@ -127,8 +130,8 @@ def write_index(outfile, title, logfiles, searchbox=False):
         print >> outfile, """
 <div class="searchbox">
 <form action="search" method="get">
-<input type="text" name="q" />
-<input type="submit" />
+<input type="text" name="q" id="searchtext" />
+<input type="submit" value="Search" id="searchbutton" />
 </form>
 </div>
 """
