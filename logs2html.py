@@ -107,7 +107,7 @@ def escape(s):
     return ''.join([c for c in s if ord(c) > 0x1F])
 
 
-def write_index(outfile, title, logfiles):
+def write_index(outfile, title, logfiles, searchbox=False):
     """Write an index with links to all log files."""
     print >> outfile, """\
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -123,6 +123,15 @@ def write_index(outfile, title, logfiles):
 <body>""" % {'VERSION': VERSION, 'RELEASE': RELEASE,
              'title': escape(title), 'charset': 'UTF-8'}
     print >> outfile, '<h1>%s</h1>' % escape(title)
+    if searchbox:
+        print >> outfile, """
+<div class="searchbox">
+<form action="search" method="get">
+<input type="text" name="q" />
+<input type="submit" />
+</form>
+</div>
+"""
     print >> outfile, '<ul>'
     for logfile in logfiles:
         link = escape(urllib.quote(logfile.link))
@@ -157,6 +166,9 @@ def main(argv=sys.argv):
     parser.add_option('-f', '--force', action="store_true", dest="force",
                       default=False,
                       help="ignore mtime and regenerate all files")
+    parser.add_option('-s', '--searchbox', action="store_true", dest="searchbox",
+                      default=False,
+                      help="include a search box")
     options, args = parser.parse_args(argv[1:])
     if len(args) != 1:
         parser.error("incorrect number of arguments")
@@ -183,7 +195,8 @@ def process(dir, options):
             prev = None
         if (options.force or not logfile.uptodate()
             or prev and prev.newfile() or next and next.newfile()):
-            logfile.generate(options.style, options.prefix, prev, next)
+            logfile.generate(options.style, options.prefix, prev, next,
+                             options.searchbox)
     outfilename = os.path.join(dir, 'index.html')
     try:
         outfile = open(outfilename, 'w')
@@ -191,7 +204,7 @@ def process(dir, options):
         sys.exit("%s: cannot open %s for writing: %s"
                  % (progname, outfilename, e))
     try:
-        write_index(outfile, options.title, logfiles)
+        write_index(outfile, options.title, logfiles, options.searchbox)
     finally:
         outfile.close()
 

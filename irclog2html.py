@@ -313,7 +313,8 @@ class AbstractStyle(object):
         self.outfile = outfile
         self.colours = colours or {}
 
-    def head(self, title, prev=('', ''), index=('', ''), next=('', '')):
+    def head(self, title, prev=('', ''), index=('', ''), next=('', ''),
+             searchbox=False):
         """Generate the header.
 
         `prev`, `index` and `next` are tuples (title, url) that comprise
@@ -347,7 +348,7 @@ class SimpleTextStyle(AbstractStyle):
     description = __doc__
 
     def head(self, title, prev=None, index=None, next=None,
-             charset="iso-8859-1"):
+             charset="iso-8859-1", searchbox=False):
         print >> self.outfile, """\
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
@@ -410,8 +411,8 @@ class SimpleTableStyle(SimpleTextStyle):
     name = "simpletable"
 
     def head(self, title, prev=None, index=None, next=None,
-             charset="iso-8859-1"):
-        SimpleTextStyle.head(self, title, prev, index, next, charset)
+             charset="iso-8859-1", searchbox=False):
+        SimpleTextStyle.head(self, title, prev, index, next, charset, searchbox)
         print >> self.outfile, "<table cellspacing=3 cellpadding=2 border=0>"
 
     def foot(self):
@@ -462,7 +463,7 @@ class XHTMLStyle(AbstractStyle):
     suffix = '</div>'
 
     def head(self, title, prev=('', ''), index=('', ''), next=('', ''),
-             charset="UTF-8"):
+             charset="UTF-8", searchbox=False):
         self.prev = prev
         self.index = index
         self.next = next
@@ -480,6 +481,8 @@ class XHTMLStyle(AbstractStyle):
 <body>""" % {'VERSION': VERSION, 'RELEASE': RELEASE,
              'title': escape(title), 'charset': charset}
         self.heading(title)
+        if searchbox:
+            self.searchbox()
         self.navbar(prev, index, next)
         print >> self.outfile, self.prefix
 
@@ -496,6 +499,15 @@ class XHTMLStyle(AbstractStyle):
             print >> self.outfile, ('<span class="disabled">%s</span>'
                                     % title),
 
+    def searchbox(self):
+        print >> self.outfile, """
+<div class="searchbox">
+<form action="search" method="get">
+<input type="text" name="q" />
+<input type="submit" />
+</form>
+</div>
+"""
     def navbar(self, prev, index, next):
         prev_title, prev_url = prev
         index_title, index_url = index
@@ -718,10 +730,11 @@ def main(argv=sys.argv):
             infile.close()
 
 
-def convert_irc_log(parser, formatter, title, prev, index, next):
+def convert_irc_log(parser, formatter, title, prev, index, next,
+                    searchbox=False):
     """Convert IRC log to HTML or some other format."""
     nick_colour = NickColourizer()
-    formatter.head(title, prev, index, next)
+    formatter.head(title, prev, index, next, searchbox=searchbox)
     for time, what, info in parser:
         if what == LogParser.COMMENT:
             nick, text = info
