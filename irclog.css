@@ -25,6 +25,35 @@ td.action {
     background: #eeeeee;
 }
 
+/* Search box  */
+
+div.searchbox {
+    float: right;
+    position: absolute;
+    top: 1em;
+    right: 1em;
+}
+
+div.searchbox input#searchtext {
+    border: 1px solid gray;
+    padding: 2px 4px;
+}
+div.searchbox input#searchtext:hover {
+    border: 1px solid #869abf;
+}
+div.searchbox input#searchbutton {
+    color: gray;
+    background: white;
+    border: 1px solid gray;
+    font-weight: bold;
+    padding: 1px 4px 2px 4px;
+    margin-left: 0.3ex;
+}
+div.searchbox input#searchbutton:hover {
+    color: #134D73;
+    border: 1px solid #869abf;
+}
+
 /* Search results */
 
 ul.searchresults table {
@@ -35,7 +64,7 @@ ul.searchresults table {
 
 h1 {
     color: #134d73;
-    margin: 0.5em 0;
+    margin: 0.5em 8em 0.5em 0;
 }
 
 a {

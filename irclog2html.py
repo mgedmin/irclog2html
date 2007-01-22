@@ -50,8 +50,8 @@ import sys
 import urllib
 import optparse
 
-VERSION = "2.4"
-RELEASE = "2006-12-11"
+VERSION = "2.5"
+RELEASE = "2007-01-22"
 
 # $Id$
 
@@ -503,8 +503,8 @@ class XHTMLStyle(AbstractStyle):
         print >> self.outfile, """
 <div class="searchbox">
 <form action="search" method="get">
-<input type="text" name="q" />
-<input type="submit" />
+<input type="text" name="q" id="searchtext" />
+<input type="submit" value="Search" id="searchbutton" />
 </form>
 </div>
 """
@@ -678,6 +678,9 @@ def main(argv=sys.argv):
                       help="title of the next page (default: none)")
     parser.add_option('--next-url', dest="next_url", default='',
                       help="URL of the next page (default: none)")
+    parser.add_option('-S', '--searchbox', action="store_true", dest="searchbox",
+                      default=False,
+                      help="include a search box")
     for name, default, what in COLOURS:
         parser.add_option('--color-%s' % name, '--colour-%s' % name,
                           dest="colour_%s" % name, default=default,
@@ -724,7 +727,7 @@ def main(argv=sys.argv):
             parser = LogParser(infile)
             formatter = style(outfile, colours)
             convert_irc_log(parser, formatter, title or filename,
-                            prev, index, next)
+                            prev, index, next, searchbox=options.searchbox)
         finally:
             outfile.close()
             infile.close()
