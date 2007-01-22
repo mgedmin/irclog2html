@@ -177,7 +177,7 @@ def print_search_results(query):
     print
     print HEADER
     print "<h1>IRC log search results for %s</h1>" % cgi.escape(query)
-    print '<form action="" method="post">'
+    print '<form action="" method="get">'
     print '<input type="text" name="q" value="%s" />' % cgi.escape(query)
     print '<input type="submit" />'
     print '</form>'
