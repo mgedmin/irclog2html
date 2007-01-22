@@ -165,7 +165,7 @@ def print_search_form():
     print
     print HEADER
     print "<h1>Search IRC logs</h1>"
-    print '<form action="" method="post">'
+    print '<form action="" method="get">'
     print '<input type="text" name="q" />'
     print '<input type="submit" />'
     print '</form>'
