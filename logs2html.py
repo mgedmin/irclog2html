@@ -11,7 +11,8 @@ Looks for *.log in a given directory.  Needs an ISO 8601 date (YYYY-MM-DD) in
 the filename.
 """
 
-# Copyright (c) 2005, Marius Gedminas 
+# Copyright (c) 2005, 2007  Marius Gedminas 
+# latest.log.html symlink suggested by Chris Foster
 #
 # Released under the terms of the GNU GPL
 # http://www.gnu.org/copyleft/gpl.html
@@ -26,8 +27,8 @@ import optparse
 
 import irclog2html
 
-VERSION = "0.1"
-RELEASE = "2005-01-09"
+VERSION = "0.2"
+RELEASE = "2007-03-20"
 
 DATE_REGEXP = re.compile('^.*(\d\d\d\d)-(\d\d)-(\d\d)')
 
@@ -110,7 +111,7 @@ def escape(s):
     return ''.join([c for c in s if ord(c) > 0x1F])
 
 
-def write_index(outfile, title, logfiles, searchbox=False):
+def write_index(outfile, title, logfiles, searchbox=False, latest_log_link=None):
     """Write an index with links to all log files."""
     print >> outfile, """\
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -135,11 +136,19 @@ def write_index(outfile, title, logfiles, searchbox=False):
 </form>
 </div>
 """
+    if latest_log_link:
+        link = escape(urllib.quote(latest_log_link))
+        print >> outfile, '<ul>'
+        print >> outfile, ('<li><a href="%s">Latest (bookmarkable)</a></li>' %
+                           link)
+        print >> outfile, '</ul>'
     print >> outfile, '<ul>'
     for logfile in logfiles:
+        # TODO: split by year/month.  Perhaps split off old logs into separate
+        # pages
         link = escape(urllib.quote(logfile.link))
         title = escape(logfile.title)
-        print >> outfile, ('<li><a href="%s">%s</a></li>' % (link, title))
+        print >> outfile, '<li><a href="%s">%s</a></li>' % (link, title)
     print >> outfile, '</ul>'
     print >> outfile, """
 <div class="generatedby">
@@ -200,6 +209,10 @@ def process(dir, options):
             or prev and prev.newfile() or next and next.newfile()):
             logfile.generate(options.style, options.prefix, prev, next,
                              options.searchbox)
+    latest_log_link = None
+    if logfiles:
+        latest_log_link = 'latest.log.html'
+        move_symlink(logfiles[0].link, os.path.join(dir, latest_log_link))
     outfilename = os.path.join(dir, 'index.html')
     try:
         outfile = open(outfilename, 'w')
@@ -207,9 +220,19 @@ def process(dir, options):
         sys.exit("%s: cannot open %s for writing: %s"
                  % (progname, outfilename, e))
     try:
-        write_index(outfile, options.title, logfiles, options.searchbox)
+        write_index(outfile, options.title, logfiles, options.searchbox,
+                    latest_log_link)
     finally:
         outfile.close()
+
+
+def move_symlink(src, dst):
+    """Create or overwrite a symlink"""
+    try:
+        os.unlink(dst)
+    except OSError:
+        pass
+    os.symlink(src, dst)
 
 
 if __name__ == '__main__':
