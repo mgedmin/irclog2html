@@ -38,8 +38,8 @@ if not logfile_path:
     logfile_path = os.path.dirname(__file__)
 
 
-VERSION = "0.1"
-RELEASE = "2006-12-11"
+VERSION = "0.2"
+RELEASE = "2007-04-26"
 
 DATE_REGEXP = re.compile('^.*(\d\d\d\d)-(\d\d)-(\d\d)')
 
@@ -178,7 +178,7 @@ def print_search_results(query):
     print HEADER
     print "<h1>IRC log search results for %s</h1>" % cgi.escape(query)
     print '<form action="" method="get">'
-    print '<input type="text" name="q" value="%s" />' % cgi.escape(query)
+    print '<input type="text" name="q" value="%s" />' % cgi.escape(query, True)
     print '<input type="submit" />'
     print '</form>'
     started = time.time()
