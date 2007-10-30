@@ -50,8 +50,8 @@ import sys
 import urllib
 import optparse
 
-VERSION = "2.5"
-RELEASE = "2007-01-22"
+VERSION = "2.6"
+RELEASE = "2007-10-30"
 
 # $Id$
 
@@ -94,7 +94,7 @@ class LogParser(object):
 
     TIME_REGEXP = re.compile(
             r'^\[?(' # Optional [
-            r'(?:\d{4}-\d{2}-\d{2}T|\d{2}-\w{3}-\d{4} )?' # Optional date
+            r'(?:\d{4}-\d{2}-\d{2}T|\d{2}-\w{3}-\d{4} |\w{3} \d{2} )?' # Optional date
             r'\d\d:\d\d(:\d\d)?' # Mandatory HH:MM, optional :SS
             r')\]? +') # Optional ], mandatory space
     NICK_REGEXP = re.compile(r'^<(.*?)>\s')
