@@ -117,23 +117,60 @@ def doctest_MediaWikiStyle():
 
     We may have simple messages
 
-        >>> style.nicktext('02:24', 'mgedmin', 'Hello, world!', '#77ff77')
-        |- id="t02:24"
+        >>> style.nicktext('02:24:17', 'mgedmin', 'Hello, world!', '#77ff77')
+        |- id="t02:24:17"
         ! style="background-color: #77ff77" | mgedmin
         | style="color: #77ff77" | Hello, world!
+        || [[#t02:24:17|02:24]] 
+
+    Note that we don't need special markup for hyperlinks
+
+        >>> style.nicktext('02:24', 'mgedmin', 'http://google.com/ has a new favicon', '#77ff77')
+        |- id="t02:24"
+        ! style="background-color: #77ff77" | mgedmin
+        | style="color: #77ff77" | http://google.com/ has a new favicon
         || [[#t02:24|02:24]] 
 
-    and other kinds of things
+    But we ought to escape MediaWiki markup (XXX this is not currently done,
+    would someone familiar with the markup please fix the code)
+
+        >>> style.nicktext('02:24', '[|mg|]', '[!@#$%^&*()_+{};:,./<>?]', '#77ff77')
+        |- id="t02:24"
+        ! style="background-color: #77ff77" | [|mg|]
+        | style="color: #77ff77" | [!@#$%^&amp;*()_+{};:,./&lt;&gt;?]
+        || [[#t02:24|02:24]] 
+
+    The time is optional (some IRC logs don't have it)
+
+        >>> style.nicktext(None, 'mgedmin', 'what time is it?', '#77ff77')
+        |-
+        | style="background-color: #77ff77" | mgedmin
+        | style="color: #77ff77" colspan="2" | what time is it? 
+
+    There are other kinds of things that happen in IRC channels
 
         >>> style.servermsg('02:25', LogParser.ACTION, '* mgedmin hacks')
         |- id="t02:25"
         | colspan="2" | * mgedmin hacks
         || [[#t02:25|02:25]]
 
-        >>> style.servermsg('02:26', LogParser.PART, '* mgedmin leaves')
-        |- id="t02:26"
+        >>> style.servermsg('02:26:01', LogParser.PART, '* mgedmin leaves')
+        |- id="t02:26:01"
         | colspan="2" | * mgedmin leaves
-        || [[#t02:26|02:26]]
+        || [[#t02:26:01|02:26]]
+
+    The time is optional (some IRC logs don't have it)
+
+        >>> style.servermsg(None, LogParser.JOIN, '* wombat joins')
+        |-
+        | colspan="3" | * wombat joins
+
+    Again, we ought to escape MediaWiki markup (XXX this is not currently
+    done, would someone familiar with the markup please fix the code)
+
+        >>> style.servermsg(None, LogParser.SERVER, '[!@#$%^&*()_+{};:,./<>?]')
+        |-
+        | colspan="3" | [!@#$%^&amp;*()_+{};:,./&lt;&gt;?]
 
     The footer is also simple
 
