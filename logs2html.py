@@ -217,8 +217,7 @@ def process(dir, options):
     try:
         outfile = open(outfilename, 'w')
     except IOError, e:
-        sys.exit("%s: cannot open %s for writing: %s"
-                 % (progname, outfilename, e))
+        raise Error("cannot open %s for writing: %s" % (outfilename, e))
     try:
         write_index(outfile, options.title, logfiles, options.searchbox,
                     latest_log_link)
