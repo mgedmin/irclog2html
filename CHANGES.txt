@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-2.8 (unreleased)
+2.8 (2010-07-22)
 ----------------
 
 * Added README.txt and CHANGES.txt.
