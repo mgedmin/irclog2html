@@ -51,7 +51,7 @@ import sys
 import urllib
 import optparse
 
-VERSION = "2.8dev"
+VERSION = "2.8"
 RELEASE = "2010-07-22"
 
 
