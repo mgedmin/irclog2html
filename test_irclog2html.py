@@ -111,6 +111,32 @@ def doctest_LogParser():
     """
 
 
+def doctest_LogParser_dircproxy_support():
+    r"""Tests for LogParser
+
+    I'll define a helper function to test parsing.
+
+        >>> from irclog2html import LogParser
+        >>> def test(line):
+        ...     for time, what, info in LogParser([line], dircproxy=True):
+        ...         print repr(time), what, repr(info)
+
+        >>> test('[15 Jan 08:42] <mg!n=user@10.0.0.1> -hmm')
+        '15 Jan 08:42' COMMENT ('mg', 'hmm')
+        >>> test('[15 Jan 08:42] <mg!n=user@10.0.0.1> +this')
+        '15 Jan 08:42' COMMENT ('mg', 'this')
+        >>> test('[15 Jan 08:42] <mg!n=user@10.0.0.1> maybe')
+        '15 Jan 08:42' COMMENT ('mg', 'maybe')
+        >>> test('[15 Jan 08:42] <mg!n=user@10.0.0.1> --1')
+        '15 Jan 08:42' COMMENT ('mg', '-1')
+        >>> test('[15 Jan 08:42] <mg!n=user@10.0.0.1> ++2')
+        '15 Jan 08:42' COMMENT ('mg', '+2')
+        >>> test('[15 Jan 08:42] <mg!n=user@10.0.0.1> +-3')
+        '15 Jan 08:42' COMMENT ('mg', '-3')
+
+    """
+
+
 def doctest_MediaWikiStyle():
     r"""Tests for MediaWikiStyle
 

@@ -97,14 +97,17 @@ class LogParser(object):
             r'\d\d:\d\d(:\d\d)?' # Mandatory HH:MM, optional :SS
             r')\]? +') # Optional ], mandatory space
     NICK_REGEXP = re.compile(r'^<(.*?)(!.*)?>\s')
+    DIRCPROXY_NICK_REGEXP = re.compile(r'^<(.*?)(!.*)?>\s[\+-]?')
     JOIN_REGEXP = re.compile(r'^(?:\*\*\*|-->)\s.*joined')
     PART_REGEXP = re.compile(r'^(?:\*\*\*|<--)\s.*(quit|left)')
     SERVMSG_REGEXP = re.compile(r'^(?:\*\*\*|---)\s')
     NICK_CHANGE_REGEXP = re.compile(
             r'^(?:\*\*\*|---)\s+(.*?) (?:are|is) now known as (.*)')
 
-    def __init__(self, infile):
+    def __init__(self, infile, dircproxy=False):
         self.infile = infile
+        if dircproxy:
+            self.NICK_REGEXP = self.DIRCPROXY_NICK_REGEXP
 
     def __iter__(self):
         for line in self.infile:
@@ -710,6 +713,8 @@ def main(argv=sys.argv):
                                    description="Colourises and converts IRC"
                                                " logs to HTML format for easy"
                                                " web reading.")
+    parser.add_option('--dircproxy', action='store_true', default=False,
+                      help="dircproxy log file support (strips leading + or - from messages; off by default)")
     parser.add_option('-s', '--style', dest="style", default="xhtmltable",
                       help="format log according to specific style"
                            " (default: xhtmltable); try -s help for a list of"
@@ -774,7 +779,7 @@ def main(argv=sys.argv):
             sys.exit("%s: cannot open %s for writing: %s"
                      % (progname, outfilename, e))
         try:
-            parser = LogParser(infile)
+            parser = LogParser(infile, dircproxy=options.dircproxy)
             formatter = style(outfile, colours)
             convert_irc_log(parser, formatter, title or filename,
                             prev, index, next, searchbox=options.searchbox)
