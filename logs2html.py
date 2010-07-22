@@ -73,12 +73,11 @@ class LogFile:
         return html_mtime > log_mtime
 
     def generate(self, style, title_prefix='', prev=None, next=None,
-                 searchbox=False):
+                 extra_args=()):
         """Generate HTML for this log file."""
         self.newfile() # update newness flag and remember it
         argv = ['irclog2html.py', '-s', style]
-        if searchbox:
-            argv += ['-S']
+        argv.extend(extra_args)
         argv += ['-t', title_prefix + self.date.strftime('%A, %Y-%m-%d')]
         if prev:
             argv += ['--prev-url', prev.link,
@@ -181,6 +180,8 @@ def main(argv=sys.argv):
     parser.add_option('-S', '--searchbox', action="store_true", dest="searchbox",
                       default=False,
                       help="include a search box")
+    parser.add_option('--dircproxy', action='store_true', default=False,
+                      help="dircproxy log file support (strips leading + or - from messages; off by default)")
     options, args = parser.parse_args(argv[1:])
     if len(args) != 1:
         parser.error("incorrect number of arguments")
@@ -194,6 +195,11 @@ def main(argv=sys.argv):
 
 def process(dir, options):
     """Process log files in a given directory."""
+    extra_args = []
+    if options.searchbox:
+        extra_args += ['-S']
+    if options.dircproxy:
+        extra_args += ['--dircproxy']
     logfiles = find_log_files(dir)
     logfiles.reverse() # newest first
     for n, logfile in enumerate(logfiles):
@@ -208,7 +214,7 @@ def process(dir, options):
         if (options.force or not logfile.uptodate()
             or prev and prev.newfile() or next and next.newfile()):
             logfile.generate(options.style, options.prefix, prev, next,
-                             options.searchbox)
+                             extra_args)
     latest_log_link = None
     if logfiles:
         latest_log_link = 'latest.log.html'

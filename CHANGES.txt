@@ -10,6 +10,9 @@ Changelog
 * Support dircproxy log files (new date format: "[15 Jan 08:42]",
   strip ident and IP address from nicknames).  Patch by Paul Frields.
 
+* New option: --dircproxy also makes irclog2html strip a single leading
+  '+' or '-' from messages.
+
 
 2.7.1 (2009-04-30)
 ------------------
