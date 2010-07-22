@@ -55,6 +55,13 @@ def doctest_LogParser():
         '2004-02-04T14:18:55' COMMENT ('mg', 'Hello!')
         >>> test('[02-Feb-2004 14:18:55] <mg> Hello!')
         '02-Feb-2004 14:18:55' COMMENT ('mg', 'Hello!')
+        >>> test('[15 Jan 08:42] <mg> +++Hello+++')
+        '15 Jan 08:42' COMMENT ('mg', '+++Hello+++')
+
+    Excessive metainformation is stripped from nicknames
+
+        >>> test('[15 Jan 08:42] <jsmith!n=jsmith@10.20.30.40> Hello!')
+        '15 Jan 08:42' COMMENT ('jsmith', 'Hello!')
 
     `what` can be COMMENT...
 
