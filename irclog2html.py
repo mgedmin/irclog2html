@@ -11,7 +11,7 @@ This is a Python port (+ improvements) of irclog2html.pl Version 2.1, which
 was written by Jeff Waugh and is available at www.perkypants.org
 """
 
-# Copyright (c) 2005--2008, Marius Gedminas 
+# Copyright (c) 2005--2010, Marius Gedminas 
 # Copyright (c) 2000, Jeffrey W. Waugh
 
 # Python port:
@@ -51,10 +51,8 @@ import sys
 import urllib
 import optparse
 
-VERSION = "2.7"
-RELEASE = "2008-06-10"
-
-# $Id$
+VERSION = "2.8dev"
+RELEASE = "2010-07-22"
 
 
 #
@@ -95,10 +93,10 @@ class LogParser(object):
 
     TIME_REGEXP = re.compile(
             r'^\[?(' # Optional [
-            r'(?:\d{4}-\d{2}-\d{2}T|\d{2}-\w{3}-\d{4} |\w{3} \d{2} )?' # Optional date
+            r'(?:\d{4}-\d{2}-\d{2}T|\d{2}-\w{3}-\d{4} |\w{3} \d{2} |\d{2} \w{3} )?' # Optional date
             r'\d\d:\d\d(:\d\d)?' # Mandatory HH:MM, optional :SS
             r')\]? +') # Optional ], mandatory space
-    NICK_REGEXP = re.compile(r'^<(.*?)>\s')
+    NICK_REGEXP = re.compile(r'^<(.*?)(!.*)?>\s')
     JOIN_REGEXP = re.compile(r'^(?:\*\*\*|-->)\s.*joined')
     PART_REGEXP = re.compile(r'^(?:\*\*\*|<--)\s.*(quit|left)')
     SERVMSG_REGEXP = re.compile(r'^(?:\*\*\*|---)\s')

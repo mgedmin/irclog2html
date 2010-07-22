@@ -110,7 +110,8 @@ def testcase(inputfile, args_to_try=DEFAULT_ARGS):
 
 
 def main():
-    testcases = glob.glob('testcases/*.log')
+    # the Perl script takes ages to process dircproxy-example.log; ignore it
+    testcases = glob.glob('testcases/test*.log')
     print "Comparing outputs produced by the Perl version and the Python port"
     print "There are %d test cases" % len(testcases)
     n = 0
