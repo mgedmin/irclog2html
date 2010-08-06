@@ -110,6 +110,7 @@ def testcase(inputfile, args_to_try=DEFAULT_ARGS):
 
 
 def main():
+    os.chdir(os.path.dirname(__file__))
     # the Perl script takes ages to process dircproxy-example.log; ignore it
     testcases = glob.glob('testcases/test*.log')
     print "Comparing outputs produced by the Perl version and the Python port"

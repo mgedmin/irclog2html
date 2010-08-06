@@ -1,0 +1,11 @@
+Porting from Perl
+=================
+
+Originally irclog2html.py was a straight port of Jeff Waugh's irclog2html.pl.
+This directory contains a test suite I used to make sure my port was producing
+the same output as the original perl script.
+
+To run the comparison tests, use::
+
+    python test.py
+

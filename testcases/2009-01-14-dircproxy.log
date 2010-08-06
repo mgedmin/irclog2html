@@ -1,0 +1,25 @@
+[14 Jan 10:36] --> jsmith (n=user@68-246-114-6.area3.spcsdns.net) joined the channel
+[14 Jan 11:08] --> jsmith (n=jsmith@72.21.36.138) joined the channel
+[14 Jan 11:32] *** You disconnected
+[14 Jan 12:35] --> nombyte (n=nmcbride@208.176.91.226.ptr.us.xo.net) joined the channel
+[14 Jan 12:36] <nombyte!n=nmcbride@208.176.91.226.ptr.us.xo.net> -hey doesn't anyone know a fedora app that can be used to make java gui's?
+[14 Jan 12:37] <jsmith!n=jsmith@72.21.36.138> +No clue... there's probably an Eclipse plugin that does it
+[14 Jan 12:37] <jsmith!n=jsmith@72.21.36.138> +But I don't claim to know anything about Java
+[14 Jan 12:37] <nombyte!n=nmcbride@208.176.91.226.ptr.us.xo.net> -me either thats why im trying to learn
+[14 Jan 12:37] <nombyte!n=nmcbride@208.176.91.226.ptr.us.xo.net> -i searched for it but came up blank...
+[14 Jan 12:41] <nombyte!n=nmcbride@208.176.91.226.ptr.us.xo.net> -i keep seeing stuff about awt and jfc but it has all confused me...
+[14 Jan 12:53] *** You connected
+[14 Jan 15:11] *** You disconnected
+[14 Jan 15:12] *** You connected
+[14 Jan 15:12] *** You disconnected
+[14 Jan 15:12] *** You connected
+[14 Jan 16:47] *** You disconnected
+[14 Jan 16:59] --> quigleymd (n=quigley@c-24-30-241-47.hsd1.va.comcast.net) joined the channel
+[14 Jan 19:15] *** You connected
+[14 Jan 20:03] *** You disconnected
+[14 Jan 20:09] *** You connected
+[14 Jan 21:27] *** You disconnected
+[14 Jan 21:27] *** You connected
+[14 Jan 23:06] <nombyte!n=nomb@c-71-62-193-105.hsd1.va.comcast.net> -hey if u ssh into a box and run a script with & at the end of it to background it, if u end ur ssh session will it still run?
+[14 Jan 23:26] <stickster!n=paul@fedora/stickster> nombyte: Yes, it'll keep running just fine.
+[14 Jan 23:35] <nombyte!n=nomb@c-71-62-193-105.hsd1.va.comcast.net> +k

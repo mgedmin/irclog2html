@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 
 import sys
+import unittest
+import doctest
+
+from irclog2html.irclog2html import LogParser, MediaWikiStyle
 
 
 def doctest_LogParser():
@@ -8,7 +12,6 @@ def doctest_LogParser():
 
     I'll define a helper function to test parsing.
 
-        >>> from irclog2html import LogParser
         >>> def test(line):
         ...     for time, what, info in LogParser([line]):
         ...         print repr(time), what, repr(info)
@@ -116,7 +119,6 @@ def doctest_LogParser_dircproxy_support():
 
     I'll define a helper function to test parsing.
 
-        >>> from irclog2html import LogParser
         >>> def test(line):
         ...     for time, what, info in LogParser([line], dircproxy=True):
         ...         print repr(time), what, repr(info)
@@ -140,7 +142,6 @@ def doctest_LogParser_dircproxy_support():
 def doctest_MediaWikiStyle():
     r"""Tests for MediaWikiStyle
 
-        >>> from irclog2html import MediaWikiStyle, LogParser
         >>> style = MediaWikiStyle(sys.stdout)
 
     The heading is trivial
@@ -215,12 +216,13 @@ def doctest_MediaWikiStyle():
     """
 
 
-def main():
-    import unittest, doctest, irclog2html
-    suite = unittest.TestSuite([
-                doctest.DocTestSuite(irclog2html),
+def test_suite():
+    return unittest.TestSuite([
+                doctest.DocTestSuite('irclog2html.irclog2html'),
                 doctest.DocTestSuite()])
-    unittest.TextTestRunner().run(suite)
+
+def main():
+    unittest.main(defaultTest='test_suite')
 
 
 if __name__ == '__main__':
