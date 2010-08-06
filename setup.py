@@ -12,7 +12,7 @@ long_description = read('README.txt') + '\n\n' + read('CHANGES.txt')
 
 setup(
     name='irclog2html',
-    version='2.9',
+    version='2.9.1',
     author='Marius Gedminas',
     author_email='marius@gedmin.as',
     license='GPL',
@@ -29,6 +29,7 @@ setup(
     ],
     packages=['irclog2html'],
     package_dir={'': 'src'},
+    include_package_data=True,
     entry_points="""
         [console_scripts]
         irclog2html = irclog2html.irclog2html:main
