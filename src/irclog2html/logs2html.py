@@ -11,7 +11,7 @@ Looks for *.log in a given directory.  Needs an ISO 8601 date (YYYY-MM-DD) in
 the filename.
 """
 
-# Copyright (c) 2005, 2007  Marius Gedminas 
+# Copyright (c) 2005--2010  Marius Gedminas 
 # latest.log.html symlink suggested by Chris Foster
 #
 # Released under the terms of the GNU GPL
@@ -24,11 +24,12 @@ import glob
 import urllib
 import datetime
 import optparse
+import shutil
 
 import irclog2html
 
-VERSION = "0.2"
-RELEASE = "2007-03-20"
+VERSION = "0.3"
+RELEASE = "2010-08-06"
 
 DATE_REGEXP = re.compile('^.*(\d\d\d\d)-(\d\d)-(\d\d)')
 
@@ -229,6 +230,10 @@ def process(dir, options):
                     latest_log_link)
     finally:
         outfile.close()
+    css_file = os.path.join(dir, 'irclog.css')
+    if not os.path.exists(css_file):
+        source = os.path.join(os.path.dirname(__file__), 'irclog.css')
+        shutil.copy(source, css_file)
 
 
 def move_symlink(src, dst):
