@@ -26,7 +26,9 @@ with next/prev links, with mtime checks, usable from cron::
 CGI script for log searching
 ============================
 
-.. warning: the script can be easily abused to cause a denial of service attack
+.. warning::
+   The script can be easily abused to cause a denial of service attack; it
+   parses *all* log files every time you perform a search.
 
 You can generate search boxes on IRC log pages by passing the ``--searchbox``
 option to ``logs2html``.  Here's an example Apache config snippet that makes
