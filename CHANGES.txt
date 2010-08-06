@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-2.9 (unreleased)
+2.9 (2010-08-06)
 ----------------
 
 * Restructured source tree, made irclogs2html into a package, added setup.py,
@@ -10,6 +10,8 @@ Changelog
   suite into a subdirectory (porting).
 
 * logs2html copies irclog.css file into the destination directory.
+
+* Released into PyPI.
 
 
 2.8 (2010-07-22)
