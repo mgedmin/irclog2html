@@ -9,6 +9,8 @@ Changelog
   buildout.cfg, bootstrap.py, Makefile, HACKING.txt; moved old porting test
   suite into a subdirectory (porting).
 
+* logs2html copies irclog.css file into the destination directory.
+
 
 2.8 (2010-07-22)
 ----------------

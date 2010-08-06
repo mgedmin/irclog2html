@@ -84,7 +84,7 @@ release: releasechecklist
 
 .PHONY: clean
 clean:
-	rm -f testcases/*.html
+	rm -f testcases/*.html testcases/*.css
 
 
 bin/buildout: bootstrap.py
