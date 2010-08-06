@@ -22,9 +22,6 @@ with next/prev links, with mtime checks, usable from cron::
 
   logs2html directory/            (looks for *.log, produces *.log.html)
 
-You'll probably also want to copy irclog.css to the directory with HTML files,
-as irclog2html doesn't do that yet.
-
 
 CGI script for log searching
 ============================
