@@ -12,3 +12,5 @@ testcases/2009-01-15-dircproxy.log.html
 testcases/2009-01-16-dircproxy.log.html
 testcases/index.html
 testcases/latest.log.html
+dist
+tmp
