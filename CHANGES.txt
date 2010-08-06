@@ -2,6 +2,14 @@ Changelog
 =========
 
 
+2.9 (unreleased)
+----------------
+
+* Restructured source tree, made irclogs2html into a package, added setup.py,
+  buildout.cfg, bootstrap.py, Makefile, HACKING.txt; moved old porting test
+  suite into a subdirectory (porting).
+
+
 2.8 (2010-07-22)
 ----------------
 

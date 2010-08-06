@@ -1,0 +1,57 @@
+2005-01-09T02:05:04  <Aiste> mgedmin: ayt?
+2005-01-09T02:09:36  <mgedmin> pong
+2005-01-09T02:09:52  <mgedmin> Aiste, why aren't you asleep at this late hour?
+2005-01-09T02:09:55  <Aiste> I was wodering about those zopes
+2005-01-09T02:09:57  <Aiste> :))
+2005-01-09T02:10:04  <Aiste> cause I just got back from a party :)))
+2005-01-09T02:10:19  <Aiste> and remembered, that I want to set up the demos tomorrow
+2005-01-09T02:10:31  <Aiste> are the z3 instances running?
+2005-01-09T02:10:33  <Aiste> at least one?
+2005-01-09T02:11:27  <mgedmin> https://www.ivija.com/temporary-location-for-zope3/@@manage
+2005-01-09T02:11:52  <mgedmin> except that there is only one user defined
+2005-01-09T02:12:03  <mgedmin> email me a pgp encrypted list of usernames and passwords
+2005-01-09T02:12:23  <mgedmin> (plus access rights: zope.Manager, ivija.Manager, ivija.Accountant)
+2005-01-09T02:20:01  <Aiste> which one is that?
+2005-01-09T02:20:06  <Aiste> ivija.com or compass360?
+2005-01-09T02:20:55  <Aiste> it also says connection timed out... :(
+2005-01-09T02:23:25  *** ryzaja has quit IRC
+2005-01-09T02:26:50  <mgedmin> which one what?
+2005-01-09T02:27:31  <Aiste> which zope is that?
+2005-01-09T02:27:46  <mgedmin> ivija.com
+2005-01-09T02:28:01  <Aiste> ah, ok, then this needs only one admin -- me
+2005-01-09T02:28:10  <Aiste> I sent you an email with a user and passwd
+2005-01-09T02:28:16  <Aiste> and now -- time for bed
+2005-01-09T02:28:19  <Aiste> good night
+2005-01-09T02:28:24  * mgedmin tried https://www.ivija.com/temporary-location-for-zope3/
+2005-01-09T02:28:29  <mgedmin> no timeouts, it works
+2005-01-09T02:28:32  <mgedmin> good night
+2005-01-09T02:28:53  <Aiste> ah, I forgot to accept the certificate :)
+2005-01-09T04:25:33  *** mgedmin has quit IRC
+2005-01-09T07:36:43  *** ryzaja has joined #PoV
+2005-01-09T08:14:57  *** mgedmin has joined #pov
+2005-01-09T08:15:19  * mgedmin has got gprs over bluetooth working again
+2005-01-09T08:17:51  <ryzaja> mgedmin, good morning
+2005-01-09T08:17:59  <mgedmin> good morning, ryzaja
+2005-01-09T08:18:25  <mgedmin> could you tell me the ip of fridge.pov.lt?
+2005-01-09T08:18:35  <mgedmin> dns stopped working for some reason
+2005-01-09T08:20:15  <ryzaja>  ip fridge.pov.lt returns Object "fridge.pov.lt" is unknown, try "ip help"
+2005-01-09T08:20:39  <mgedmin> wow
+2005-01-09T08:21:14  <mgedmin> uh, no, run 'host fridge.pov.lt' to get the ip
+2005-01-09T08:21:32  <mgedmin> nm, I got it: 213.197.143.150
+2005-01-09T08:21:59  <ryzaja>  host fridge.pov.lt
+2005-01-09T08:21:59  <ryzaja> Nameserver not responding
+2005-01-09T08:21:59  <ryzaja> fridge.pov.lt A record not found, try again
+2005-01-09T08:22:21  <ryzaja> :(
+2005-01-09T08:22:24  <ryzaja> host fridge.pov.lt
+2005-01-09T08:22:24  <ryzaja> fridge.pov.lt A record not found, server failure
+2005-01-09T08:22:36  <mgedmin> strange
+2005-01-09T08:22:44  <mgedmin> or maybe not
+2005-01-09T08:44:07  *** ryzaja_ has joined #PoV
+2005-01-09T08:52:28  <mgedmin> b4netas visas be ryšio sėdi visą naktį, tad du pov.lt DNSai nepasiekiami, o trečias (nemunas.sc-uni.ktu.lt) kažko grąžina tuščius atsakymus...
+2005-01-09T08:52:40  *** ryzaja has quit IRC
+2005-01-09T08:52:52  <mgedmin> kai DNSas atsigaus, pasižiūrėk į http://fridge.pov.lt/irclogs/
+2005-01-09T08:52:55  <mgedmin> mano visos nakties darbas
+2005-01-09T09:13:49  <ryzaja_> aga, gerai :) tu kazka dirbai nakti is sestadienio i sekmadieni???
+2005-01-09T09:14:04  *** ryzaja_ is now known as ryzaja
+2005-01-09T09:16:06  <mgedmin> pats produktyviausias darbas!
+2005-01-09T09:17:35  <ryzaja> :)

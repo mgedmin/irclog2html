@@ -39,12 +39,12 @@ def readxchatlogs(infile):
                 t = time.strptime(line[:len('Ddd YY HH:MM:SS'):], '%b %d %H:%M:%S')
             except ValueError:
                 locale.setlocale(locale.LC_TIME, "")
-		try:
-		    t = time.strptime(stamp, '%a %b %d %H:%M:%S %Y')
-		except:
+                try:
+                    t = time.strptime(stamp, '%a %b %d %H:%M:%S %Y')
+                except:
                     warn("Skipping %s" % line.strip())
-		    locale.setlocale(locale.LC_TIME, "C")
-		    continue
+                    locale.setlocale(locale.LC_TIME, "C")
+                    continue
                 locale.setlocale(locale.LC_TIME, "C")
             t = (ymd[0], ) + t[1:]
             if t[:3] < ymd: # new year wraparound
