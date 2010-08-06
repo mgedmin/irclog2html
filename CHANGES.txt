@@ -2,6 +2,12 @@ Changelog
 =========
 
 
+2.9.1 (2010-08-06)
+------------------
+
+* Make sure irclog.css is installed in the right place; logs2html needs it.
+
+
 2.9 (2010-08-06)
 ----------------
 

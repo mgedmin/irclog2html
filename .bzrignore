@@ -15,3 +15,6 @@ testcases/latest.log.html
 dist
 tmp
 testcases/irclog.css
+build
+temp
+distribute-0.6.10.tar.gz
