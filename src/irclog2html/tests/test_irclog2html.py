@@ -139,6 +139,24 @@ def doctest_LogParser_dircproxy_support():
     """
 
 
+def doctest_LogParser_encodings():
+    r"""Tests for LogParser
+
+    I'll define a helper function to test parsing.
+
+        >>> def test(line):
+        ...     for time, what, info in LogParser([line]):
+        ...         print repr(time), what, repr(info)
+
+        >>> test('14:18 <mg> UTF-8: \xc4\x85')
+        '14:18' COMMENT ('mg', u'UTF-8: \u0105')
+
+        >>> test('14:18 <mg> cp1252: \x9a')
+        '14:18' COMMENT ('mg', u'cp1252: \u0161')
+
+    """
+
+
 def doctest_MediaWikiStyle():
     r"""Tests for MediaWikiStyle
 
