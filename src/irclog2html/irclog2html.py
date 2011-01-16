@@ -52,7 +52,7 @@ import urllib
 import optparse
 import shutil
 
-VERSION = "2.9.2dev"
+VERSION = "2.9.2"
 RELEASE = "2011-01-16"
 
 
