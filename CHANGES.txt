@@ -8,6 +8,9 @@ Changelog
 * Support XChat Latin/Unicode hybrid encoding (http://xchat.org/encoding/).
   Fixes LP#703622.
 
+* irclog2html copies irclog.css file into the destination directory.
+  Fixes LP#608727.
+
 
 2.9.1 (2010-08-06)
 ------------------

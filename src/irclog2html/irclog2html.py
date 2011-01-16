@@ -50,9 +50,15 @@ import re
 import sys
 import urllib
 import optparse
+import shutil
 
 VERSION = "2.9.2dev"
 RELEASE = "2011-01-16"
+
+
+# If someone packages this for a Linux distro, they'll want to patch this to
+# something like /usr/share/irclog2html/irclog.css, I imagine
+CSS_FILE = os.path.join(os.path.dirname(__file__), 'irclog.css')
 
 
 #
@@ -812,6 +818,9 @@ def main(argv=sys.argv):
             formatter = style(outfile, colours)
             convert_irc_log(parser, formatter, title or filename,
                             prev, index, next, searchbox=options.searchbox)
+            css_file = os.path.join(os.path.dirname(outfilename), 'irclog.css')
+            if not os.path.exists(css_file) and os.path.exists(CSS_FILE):
+                shutil.copy(CSS_FILE, css_file)
         finally:
             outfile.close()
             infile.close()

@@ -28,10 +28,16 @@ import shutil
 
 import irclog2html
 
-VERSION = "0.3"
-RELEASE = "2010-08-06"
+VERSION = "2.9.2dev"
+RELEASE = "2011-01-16"
+
+# If someone packages this for a Linux distro, they'll want to patch this to
+# something like /usr/share/irclog2html/irclog.css, I imagine
+CSS_FILE = os.path.join(os.path.dirname(__file__), 'irclog.css')
+
 
 DATE_REGEXP = re.compile('^.*(\d\d\d\d)-(\d\d)-(\d\d)')
+
 
 class Error(Exception):
     """Application error."""
@@ -231,9 +237,8 @@ def process(dir, options):
     finally:
         outfile.close()
     css_file = os.path.join(dir, 'irclog.css')
-    if not os.path.exists(css_file):
-        source = os.path.join(os.path.dirname(__file__), 'irclog.css')
-        shutil.copy(source, css_file)
+    if not os.path.exists(css_file) and os.path.exists(CSS_FILE):
+        shutil.copy(CSS_FILE, css_file)
 
 
 def move_symlink(src, dst):
