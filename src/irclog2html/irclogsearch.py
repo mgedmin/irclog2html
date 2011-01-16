@@ -38,8 +38,8 @@ if not logfile_path:
     logfile_path = os.path.dirname(__file__)
 
 
-VERSION = "0.2"
-RELEASE = "2007-04-26"
+VERSION = "2.9.2dev"
+RELEASE = "2011-01-16"
 
 DATE_REGEXP = re.compile('^.*(\d\d\d\d)-(\d\d)-(\d\d)')
 
@@ -138,7 +138,7 @@ def link_from_filename(filename):
 def search_irc_logs(query, stats=None):
     if not stats:
         stats = SearchStats() # will be discarded, but, oh, well
-    query = query.lower()
+    query = query.decode('UTF-8').lower()
     files = glob.glob(os.path.join(logfile_path, '*.log'))
     files.sort()    # ISO-8601 dates sort the right way
     files.reverse() # newest first
@@ -153,7 +153,7 @@ def search_irc_logs(query, stats=None):
             elif event == LogParser.NICKCHANGE:
                 text, oldnick, newnick = info
             else:
-                text = str(info)
+                text = unicode(info)
             stats.lines += 1
             if query in text.lower():
                 stats.matches += 1

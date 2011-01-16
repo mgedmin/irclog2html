@@ -51,8 +51,8 @@ import sys
 import urllib
 import optparse
 
-VERSION = "2.8"
-RELEASE = "2010-07-22"
+VERSION = "2.9.2dev"
+RELEASE = "2011-01-16"
 
 
 #
@@ -81,6 +81,7 @@ class LogParser(object):
         time, NICKCHANGE, (text, oldnick, newnick)
         time, SERVER, text
 
+    Text is a pure ASCII or Unicode string.
     """
 
     COMMENT = Enum('COMMENT')
@@ -109,6 +110,24 @@ class LogParser(object):
         if dircproxy:
             self.NICK_REGEXP = self.DIRCPROXY_NICK_REGEXP
 
+    def decode(self, s):
+        """Convert 8-bit string to Unicode.
+
+        Supports xchat's hybrid Latin/Unicode encoding, as documented here:
+        http://xchat.org/encoding/
+        """
+        try:
+            # Try to be nice and return 8-bit strings if they contain pure
+            # ASCII, primarily because I don't want to clutter my doctests
+            # with u'' prefixes.
+            s.decode('US-ASCII')
+            return s
+        except UnicodeError:
+            try:
+                return s.decode('UTF-8')
+            except UnicodeError:
+                return s.decode('cp1252', 'replace')
+
     def __iter__(self):
         for line in self.infile:
             line = line.rstrip('\r\n')
@@ -117,32 +136,33 @@ class LogParser(object):
 
             m = self.TIME_REGEXP.match(line)
             if m:
-                time = m.group(1)
+                time = self.decode(m.group(1))
                 line = line[len(m.group(0)):]
             else:
                 time = None
 
             m = self.NICK_REGEXP.match(line)
             if m:
-                nick = m.group(1)
-                text = line[len(m.group(0)):]
+                nick = self.decode(m.group(1))
+                text = self.decode(line[len(m.group(0)):])
                 yield time, self.COMMENT, (nick, text)
             elif line.startswith('* ') or line.startswith('*\t'):
-                yield time, self.ACTION, line
+                yield time, self.ACTION, self.decode(line)
             elif self.JOIN_REGEXP.match(line):
-                yield time, self.JOIN, line
+                yield time, self.JOIN, self.decode(line)
             elif self.PART_REGEXP.match(line):
-                yield time, self.PART, line
+                yield time, self.PART, self.decode(line)
             else:
                 m = self.NICK_CHANGE_REGEXP.match(line)
                 if m:
                     oldnick = m.group(1)
                     newnick = m.group(2)
+                    line = self.decode(line)
                     yield time, self.NICKCHANGE, (line, oldnick, newnick)
                 elif self.SERVMSG_REGEXP.match(line):
-                    yield time, self.SERVER, line
+                    yield time, self.SERVER, self.decode(line)
                 else:
-                    yield time, self.OTHER, line
+                    yield time, self.OTHER, self.decode(line)
 
 
 def shorttime(time):
@@ -301,6 +321,7 @@ class AbstractStyle(object):
 
     name = "stylename"
     description = "Single-line description"
+    charset = 'US-ASCII'
 
     def __init__(self, outfile, colours=None):
         """Create a text formatter for writing to outfile.
@@ -314,6 +335,14 @@ class AbstractStyle(object):
         """
         self.outfile = outfile
         self.colours = colours or {}
+
+    def encode(self, s):
+        """Encode a Unicode string into a desired output charset."""
+        return s.encode(self.charset, 'xmlcharrefreplace')
+
+    def escape(self, s):
+        """Encode a Unicode string and escape special HTML characters."""
+        return escape(self.encode(s))
 
     def head(self, title, prev=('', ''), index=('', ''), next=('', ''),
              searchbox=False):
@@ -348,9 +377,9 @@ class SimpleTextStyle(AbstractStyle):
 
     name = "simplett"
     description = __doc__
+    charset = 'iso-8859-1'
 
-    def head(self, title, prev=None, index=None, next=None,
-             charset="iso-8859-1", searchbox=False):
+    def head(self, title, prev=None, index=None, next=None, searchbox=False):
         print >> self.outfile, """\
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
@@ -364,7 +393,7 @@ class SimpleTextStyle(AbstractStyle):
             'VERSION': VERSION,
             'RELEASE': RELEASE,
             'title': escape(title),
-            'charset': charset,
+            'charset': self.charset,
         }
 
     def foot(self):
@@ -374,7 +403,7 @@ class SimpleTextStyle(AbstractStyle):
 </tt></body></html>""" % {'VERSION': VERSION, 'RELEASE': RELEASE},
 
     def servermsg(self, time, what, text):
-        text = escape(text)
+        text = self.escape(text)
         text = createlinks(text)
         colour = self.colours.get(what)
         if colour:
@@ -385,8 +414,8 @@ class SimpleTextStyle(AbstractStyle):
         print >> self.outfile, '%s<br>' % line
 
     def nicktext(self, time, nick, text, htmlcolour):
-        nick = escape(nick)
-        text = escape(text)
+        nick = self.escape(nick)
+        text = self.escape(text)
         text = createlinks(text)
         text = text.replace('  ', '&nbsp;&nbsp;')
         self._nicktext(time, nick, text, htmlcolour)
@@ -412,9 +441,8 @@ class SimpleTableStyle(SimpleTextStyle):
 
     name = "simpletable"
 
-    def head(self, title, prev=None, index=None, next=None,
-             charset="iso-8859-1", searchbox=False):
-        SimpleTextStyle.head(self, title, prev, index, next, charset, searchbox)
+    def head(self, title, prev=None, index=None, next=None, searchbox=False):
+        SimpleTextStyle.head(self, title, prev, index, next, searchbox)
         print >> self.outfile, "<table cellspacing=3 cellpadding=2 border=0>"
 
     def foot(self):
@@ -451,6 +479,7 @@ class XHTMLStyle(AbstractStyle):
 
     name = 'xhtml'
     description = __doc__
+    charset = 'UTF-8'
 
     CLASSMAP = {
         LogParser.ACTION: 'action',
@@ -465,7 +494,7 @@ class XHTMLStyle(AbstractStyle):
     suffix = '</div>'
 
     def head(self, title, prev=('', ''), index=('', ''), next=('', ''),
-             charset="UTF-8", searchbox=False):
+             searchbox=False):
         self.prev = prev
         self.index = index
         self.next = next
@@ -481,7 +510,7 @@ class XHTMLStyle(AbstractStyle):
   <meta name="version" content="%(VERSION)s - %(RELEASE)s" />
 </head>
 <body>""" % {'VERSION': VERSION, 'RELEASE': RELEASE,
-             'title': escape(title), 'charset': charset}
+             'title': self.escape(title), 'charset': self.charset}
         self.heading(title)
         if searchbox:
             self.searchbox()
@@ -489,7 +518,7 @@ class XHTMLStyle(AbstractStyle):
         print >> self.outfile, self.prefix
 
     def heading(self, title):
-        print >> self.outfile, '<h1>%s</h1>' % escape(title)
+        print >> self.outfile, '<h1>%s</h1>' % self.escape(title)
 
     def link(self, url, title):
         # Intentionally not escaping title so that &entities; work
@@ -541,7 +570,7 @@ class XHTMLStyle(AbstractStyle):
         `line` is not escaped.
         `what` is one of LogParser event constants (e.g. LogParser.JOIN).
         """
-        text = escape(text)
+        text = self.escape(text)
         text = createlinks(text)
         if time:
             displaytime = shorttime(time)
@@ -561,8 +590,8 @@ class XHTMLStyle(AbstractStyle):
         `nick` and `text` are not escaped.
         `htmlcolour` is a string ('#rrggbb').
         """
-        nick = escape(nick)
-        text = escape(text)
+        nick = self.escape(nick)
+        text = self.escape(text)
         text = createlinks(text)
         text = text.replace('  ', '&nbsp;&nbsp;')
         if time:
@@ -592,7 +621,7 @@ class XHTMLTableStyle(XHTMLStyle):
     suffix = '</table>'
 
     def servermsg(self, time, what, text, link=''):
-        text = escape(text)
+        text = self.escape(text)
         text = createlinks(text)
         if time:
             displaytime = shorttime(time)
@@ -609,8 +638,8 @@ class XHTMLTableStyle(XHTMLStyle):
                                     % (self.CLASSMAP[what], text))
 
     def nicktext(self, time, nick, text, htmlcolour, link=''):
-        nick = escape(nick)
-        text = escape(text)
+        nick = self.escape(nick)
+        text = self.escape(text)
         text = createlinks(text)
         text = text.replace('  ', '&nbsp;&nbsp;')
         if time:
@@ -642,7 +671,7 @@ class MediaWikiStyle(AbstractStyle):
         print >> self.outfile, ('{|')
 
     def servermsg(self, time, what, text, link=''):
-        text = escape(text)
+        text = self.escape(text)
         # no need to call createlinks, MediaWiki parses links automatically
         if time:
             displaytime = shorttime(time)
@@ -656,8 +685,8 @@ class MediaWikiStyle(AbstractStyle):
                                     % (text))
 
     def nicktext(self, time, nick, text, htmlcolour, link=''):
-        nick = escape(nick)
-        text = escape(text)
+        nick = self.escape(nick)
+        text = self.escape(text)
         # no need to call createlinks, MediaWiki parses links automatically
         if time:
             displaytime = shorttime(time)
