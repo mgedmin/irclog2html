@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-2.9.2 (unreleased)
+2.9.2 (2011-01-16)
 ------------------
 
 * Support XChat Latin/Unicode hybrid encoding (http://xchat.org/encoding/).

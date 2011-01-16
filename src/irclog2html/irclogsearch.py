@@ -38,7 +38,7 @@ if not logfile_path:
     logfile_path = os.path.dirname(__file__)
 
 
-VERSION = "2.9.2dev"
+VERSION = "2.9.2"
 RELEASE = "2011-01-16"
 
 DATE_REGEXP = re.compile('^.*(\d\d\d\d)-(\d\d)-(\d\d)')

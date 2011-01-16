@@ -12,7 +12,7 @@ long_description = read('README.txt') + '\n\n' + read('CHANGES.txt')
 
 setup(
     name='irclog2html',
-    version='2.9.2dev',
+    version='2.9.2',
     author='Marius Gedminas',
     author_email='marius@gedmin.as',
     license='GPL',

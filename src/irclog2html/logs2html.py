@@ -28,7 +28,7 @@ import shutil
 
 import irclog2html
 
-VERSION = "2.9.2dev"
+VERSION = "2.9.2"
 RELEASE = "2011-01-16"
 
 # If someone packages this for a Linux distro, they'll want to patch this to
