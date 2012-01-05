@@ -99,13 +99,13 @@ class LogFile:
         irclog2html.main(argv)
 
 
-def find_log_files(directory):
+def find_log_files(directory, pattern='*.log'):
     """Find all IRC log files in a given directory.
 
     Returns a sorted list of LogFile objects (oldest first).
     """
     logfiles = []
-    for filename in glob.glob(os.path.join(directory, '*.log')):
+    for filename in glob.glob(os.path.join(directory, pattern)):
         logfiles.append((filename, LogFile(filename)))
     logfiles.sort() # ISO 8601 dates sort the way we need them
     return [log for filename, log in logfiles]
@@ -189,6 +189,9 @@ def main(argv=sys.argv):
                       help="include a search box")
     parser.add_option('--dircproxy', action='store_true', default=False,
                       help="dircproxy log file support (strips leading + or - from messages; off by default)")
+    parser.add_option('-g', '--glob-pattern', dest="pattern", default="*.log",
+                      help="glob pattern that finds log files to be processed"
+                      " (default: *.log)")
     options, args = parser.parse_args(argv[1:])
     if len(args) != 1:
         parser.error("incorrect number of arguments")
@@ -207,7 +210,7 @@ def process(dir, options):
         extra_args += ['-S']
     if options.dircproxy:
         extra_args += ['--dircproxy']
-    logfiles = find_log_files(dir)
+    logfiles = find_log_files(dir, options.pattern)
     logfiles.reverse() # newest first
     for n, logfile in enumerate(logfiles):
         if n > 0:
