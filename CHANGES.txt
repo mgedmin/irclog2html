@@ -5,6 +5,8 @@ Changelog
 2.9.3 (unreleased)
 ------------------
 
+* New option: --glob-pattern.  Patch by Albertas Agejevas.
+
 
 2.9.2 (2011-01-16)
 ------------------
