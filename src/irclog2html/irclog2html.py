@@ -294,7 +294,7 @@ URL_REGEXP = re.compile(r'((http|https|ftp|gopher|news)://[^ \'")>]*)')
 
 def createlinks(text):
     """Replace possible URLs with links."""
-    return URL_REGEXP.sub(r'<a href="\1">\1</a>', text)
+    return URL_REGEXP.sub(r'<a href="\1" rel="nofollow">\1</a>', text)
 
 def escape(s):
     """Replace ampersands, pointies, control characters.
