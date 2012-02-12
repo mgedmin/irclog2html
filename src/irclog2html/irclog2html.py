@@ -38,7 +38,7 @@ was written by Jeff Waugh and is available at www.perkypants.org
 #
 #   irclog2html.py understands ISO 8601 timestamps (YYYY-MM-DDTHH:MM:SS)
 #
-#   New options: --title, --{prev,index,next}-{url,title}
+#   New options: --title, --{prev,index,next}-{url,title} and many more
 #
 #   New styles: xhtml, xhtmltable, mediawiki
 #
@@ -53,8 +53,7 @@ import optparse
 import shutil
 import shlex
 
-VERSION = "2.10.0dev"
-RELEASE = "2012-02-12"
+from _version import __version__ as VERSION, __date__ as RELEASE
 
 
 # If someone packages this for a Linux distro, they'll want to patch this to
