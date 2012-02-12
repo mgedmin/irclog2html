@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-2.10.0 (unreleased)
+2.10.0 (2012-02-12)
 -------------------
 
 * New option: --glob-pattern.  Patch by Albertas Agejevas.
