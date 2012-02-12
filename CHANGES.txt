@@ -11,6 +11,8 @@ Changelog
 * Links in logs are marked with rel="nofollow".  Patch by Matt Wheeler.
   Fixes LP#914553.
 
+* New option: --version.
+
 
 2.9.2 (2011-01-16)
 ------------------

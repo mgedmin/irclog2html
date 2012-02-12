@@ -52,7 +52,7 @@ import urllib
 import optparse
 import shutil
 
-VERSION = "2.9.2"
+VERSION = "2.9.3dev"
 RELEASE = "2011-01-16"
 
 
@@ -745,6 +745,7 @@ def main(argv=sys.argv):
     progname = os.path.basename(argv[0])
     parser = optparse.OptionParser("usage: %prog [options] filename",
                                    prog=progname,
+                                   version=VERSION,
                                    description="Colourises and converts IRC"
                                                " logs to HTML format for easy"
                                                " web reading.")
