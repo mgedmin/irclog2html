@@ -173,6 +173,9 @@ def main(argv=sys.argv):
                                    description="Colourises and converts all IRC"
                                                " logs to HTML format for easy"
                                                " web reading.")
+    parser.add_option('-c', '--config', action='callback', type='str',
+                      metavar='FILE', callback=irclog2html.do_config_file,
+                      help="read options from a config file")
     parser.add_option('-s', '--style', dest="style", default="xhtmltable",
                       help="format log according to specific style"
                            " (default: xhtmltable); passes the style name"
