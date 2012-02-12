@@ -51,9 +51,10 @@ import sys
 import urllib
 import optparse
 import shutil
+import shlex
 
-VERSION = "2.9.3dev"
-RELEASE = "2011-01-16"
+VERSION = "2.10.0dev"
+RELEASE = "2012-02-12"
 
 
 # If someone packages this for a Linux distro, they'll want to patch this to
@@ -741,14 +742,33 @@ COLOURS = [
 ]
 
 
+def do_config_file(option, opt_str, value, parser):
+    """Read options from a config file and feed them back to optparse."""
+    options = []
+    try:
+        for line in open(value):
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
+            options.extend(shlex.split(line))
+        # Note: you can cause an infinite loop if you have a config file that
+        # includes itself!
+        parser.rargs[:0] = options
+    except IOError, e:
+        raise optparse.OptionValueError("can't read config file: %s" % e)
+
+
 def main(argv=sys.argv):
     progname = os.path.basename(argv[0])
-    parser = optparse.OptionParser("usage: %prog [options] filename",
+    parser = optparse.OptionParser("usage: %prog [options] filename [...]",
                                    prog=progname,
                                    version=VERSION,
                                    description="Colourises and converts IRC"
                                                " logs to HTML format for easy"
                                                " web reading.")
+    parser.add_option('-c', '--config', action='callback', type='str',
+                      metavar='FILE', callback=do_config_file,
+                      help="read options from a config file")
     parser.add_option('--dircproxy', action='store_true', default=False,
                       help="dircproxy log file support (strips leading + or - from messages; off by default)")
     parser.add_option('-s', '--style', dest="style", default="xhtmltable",

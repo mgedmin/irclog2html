@@ -2,8 +2,8 @@ Changelog
 =========
 
 
-2.9.3 (unreleased)
-------------------
+2.10.0 (unreleased)
+-------------------
 
 * New option: --glob-pattern.  Patch by Albertas Agejevas.
   Fixes LP#912310.
@@ -12,6 +12,8 @@ Changelog
   Fixes LP#914553.
 
 * New option: --version.
+
+* New option: -c, --config=FILE.
 
 
 2.9.2 (2011-01-16)
