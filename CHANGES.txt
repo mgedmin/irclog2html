@@ -6,6 +6,7 @@ Changelog
 ------------------
 
 * New option: --glob-pattern.  Patch by Albertas Agejevas.
+  Fixes LP#912310.
 
 * Links in logs are marked with rel="nofollow".  Patch by Matt Wheeler.
   Fixes LP#914553.
