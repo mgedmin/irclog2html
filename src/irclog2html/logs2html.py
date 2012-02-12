@@ -168,6 +168,7 @@ def write_index(outfile, title, logfiles, searchbox=False, latest_log_link=None)
 def main(argv=sys.argv):
     progname = os.path.basename(argv[0])
     parser = optparse.OptionParser("usage: %prog [options] directory",
+                                   version=VERSION,
                                    prog=progname,
                                    description="Colourises and converts all IRC"
                                                " logs to HTML format for easy"
