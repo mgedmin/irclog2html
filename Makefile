@@ -26,6 +26,10 @@ else
 	bin/test $(TESTFLAGS)
 endif
 
+.PHONY: test-all-pythons
+test-all-pythons: bin/tox
+	bin/tox
+
 .PHONY: dist
 dist:
 	$(PYTHON) setup.py sdist
@@ -91,7 +95,7 @@ bin/buildout: bootstrap.py
 	$(PYTHON) bootstrap.py
 
 
-scripts = bin/test bin/irclog2html bin/logs2html bin/irclogsearch
+scripts = bin/test bin/irclog2html bin/logs2html bin/irclogsearch bin/tox
 $(scripts): bin/buildout buildout.cfg setup.py
 	bin/buildout
 	touch -c $(scripts)
