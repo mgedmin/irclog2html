@@ -3,16 +3,23 @@ import os
 from setuptools import setup
 
 
+here = os.path.dirname(__file__)
+
+
 def read(filename):
-    here = os.path.dirname(__file__)
     return open(os.path.join(here, filename)).read()
 
 
 long_description = read('README.txt') + '\n\n' + read('CHANGES.txt')
 
+version_file = os.path.join(here, 'src/irclog2html/_version.py')
+d = {}
+execfile(version_file, d)
+version = d['__version__']
+
 setup(
     name='irclog2html',
-    version='2.9.3dev',
+    version=version,
     author='Marius Gedminas',
     author_email='marius@gedmin.as',
     license='GPL',
@@ -21,7 +28,7 @@ setup(
     description='Convert IRC logs to HTML',
     long_description=long_description,
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: System Administrators',
         'License :: OSI Approved :: GNU General Public License (GPL)',
         'Operating System :: OS Independent',
@@ -36,5 +43,5 @@ setup(
         logs2html = irclog2html.logs2html:main
         irclogsearch = irclog2html.irclogsearch:main
     """,
-    zip_safe = False,
+    zip_safe=False,
 )

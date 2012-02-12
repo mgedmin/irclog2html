@@ -11,7 +11,7 @@ Looks for *.log in a given directory.  Needs an ISO 8601 date (YYYY-MM-DD) in
 the filename.
 """
 
-# Copyright (c) 2005--2010  Marius Gedminas 
+# Copyright (c) 2005--2012  Marius Gedminas 
 # latest.log.html symlink suggested by Chris Foster
 #
 # Released under the terms of the GNU GPL
@@ -28,8 +28,8 @@ import shutil
 
 import irclog2html
 
-VERSION = "2.9.2"
-RELEASE = "2011-01-16"
+VERSION = irclog2html.VERSION
+RELEASE = irclog2html.RELEASE
 
 # If someone packages this for a Linux distro, they'll want to patch this to
 # something like /usr/share/irclog2html/irclog.css, I imagine

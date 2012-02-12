@@ -2,7 +2,7 @@ PYTHON = python
 PAGER = less -RFX
 TESTFLAGS = -vc
 
-FILE_WITH_VERSION = setup.py
+FILE_WITH_VERSION = src/irclog2html/_version.py
 FILE_WITH_CHANGELOG = CHANGES.txt
 VCS_STATUS = bzr status
 VCS_EXPORT = bzr export
@@ -91,6 +91,7 @@ bin/buildout: bootstrap.py
 	$(PYTHON) bootstrap.py
 
 
-bin/test bin/irclog2html bin/logs2html bin/irclogsearch: bin/buildout buildout.cfg setup.py
+scripts = bin/test bin/irclog2html bin/logs2html bin/irclogsearch
+$(scripts): bin/buildout buildout.cfg setup.py
 	bin/buildout
-	touch $@
+	touch -c $(scripts)
