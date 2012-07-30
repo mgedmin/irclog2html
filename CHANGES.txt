@@ -2,8 +2,11 @@ Changelog
 =========
 
 
-2.10.1 (unreleased)
+2.11.0 (unreleased)
 -------------------
+
+* irclogsearch can be told about the filename pattern of log files via an
+  environment variable (IRCLOG_GLOB).  Patch by Jonathan Kinred
 
 
 2.10.0 (2012-02-12)
