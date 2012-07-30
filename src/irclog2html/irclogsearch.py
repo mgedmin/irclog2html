@@ -2,15 +2,17 @@
 """
 Search IRC logs (a CGI script).
 
-Expects to find *.log in the directory specified by the IRCLOG_LOCATION
-environment variable.  Expects the filenames to contain a ISO 8601 date
-(YYYY-MM-DD).
+Expects to find logs matching the IRCLOG_GLOB pattern (default: *.log)
+in the directory specified by the IRCLOG_LOCATION environment variable.
+Expects the filenames to contain a ISO 8601 date (YYYY-MM-DD).
 
 Apache configuration example:
 
   ScriptAlias /irclogs/search /path/to/irclogsearch.py
   <Location /irclogs/search>
     SetEnv IRCLOG_LOCATION /path/to/irclog/files/
+    # Uncomment the following if your log files use a different format
+    #SetEnv IRCLOG_GLOB "*.log.????-??-??"
   </Location>
 
 """
@@ -38,6 +40,9 @@ logfile_path = os.getenv('IRCLOG_LOCATION')
 if not logfile_path:
     logfile_path = os.path.dirname(__file__)
 
+logfile_pattern = os.getenv('IRCLOG_GLOB')
+if not logfile_pattern:
+    logfile_pattern = '*.log'
 
 DATE_REGEXP = re.compile('^.*(\d\d\d\d)-(\d\d)-(\d\d)')
 
@@ -137,7 +142,7 @@ def search_irc_logs(query, stats=None):
     if not stats:
         stats = SearchStats() # will be discarded, but, oh, well
     query = query.decode('UTF-8').lower()
-    files = glob.glob(os.path.join(logfile_path, '*.log'))
+    files = glob.glob(os.path.join(logfile_path, logfile_pattern))
     files.sort()    # ISO-8601 dates sort the right way
     files.reverse() # newest first
     for filename in files:

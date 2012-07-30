@@ -69,6 +69,8 @@ it work::
   ScriptAlias /my-irclog/search /usr/local/bin/irclogsearch
   <Location /my-irclog/search>
     SetEnv IRCLOG_LOCATION "/var/www/my-irclog/"
+    # Uncomment the following if your log files use a different format
+    #SetEnv IRCLOG_GLOB "*.log.????-??-??"
   </Location>
 
 
