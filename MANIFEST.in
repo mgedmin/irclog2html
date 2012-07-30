@@ -2,6 +2,7 @@ include bootstrap.py
 include buildout.cfg
 include *.txt
 include tox.ini
+include Makefile
 include src/irclog2html/irclog.css
 include src/irclog2html/tests/*.py
 include porting/*.txt
