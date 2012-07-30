@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-2.11.0 (unreleased)
+2.11.0 (2012-07-30)
 -------------------
 
 * irclogsearch can be told about the filename pattern of log files via an
