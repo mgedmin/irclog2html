@@ -7,8 +7,8 @@ Usage: logs2html.py pathname
 Needs irclog2html.py.  Produces an index page and a number of HTML-formatted
 log files with navigational links.
 
-Looks for *.log in a given directory.  Needs an ISO 8601 date (YYYY-MM-DD) in
-the filename.
+Looks for *.log in a given directory.  Needs an ISO 8601 date (YYYY-MM-DD or
+YYYYMMDD) in the filename.
 """
 
 # Copyright (c) 2005--2012  Marius Gedminas 
@@ -36,7 +36,7 @@ RELEASE = irclog2html.RELEASE
 CSS_FILE = os.path.join(os.path.dirname(__file__), 'irclog.css')
 
 
-DATE_REGEXP = re.compile('^.*(\d\d\d\d)-(\d\d)-(\d\d)')
+DATE_REGEXP = re.compile('^.*(\d\d\d\d)-?(\d\d)-?(\d\d)')
 
 
 class Error(Exception):

@@ -5,6 +5,9 @@ Changelog
 2.11.1 (unreleased)
 -------------------
 
+* logs2html also accepts filenames that contain YYYYMMDD dates (in addition to
+  YYYY-MM-DD).  Patch by Holger Just.  Fixes LP#1031642.
+
 
 2.11.0 (2012-07-30)
 -------------------
