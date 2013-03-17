@@ -4,6 +4,7 @@ python:
     - 2.7
 install:
     - pip install zope.testrunner --use-mirrors
+    - pip install -e .
 script:
     - zope-testrunner --test-path=src
 notifications:
