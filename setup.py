@@ -35,6 +35,8 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: Implementation :: CPython',
+        'Programming Language :: Python :: Implementation :: PyPy',
     ],
     packages=['irclog2html'],
     package_dir={'': 'src'},
