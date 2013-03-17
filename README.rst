@@ -83,3 +83,8 @@ Bug tracker: https://bugs.launchpad.net/irclog2html or
 https://github.com/mgedmin/irclog2html/issues
 
 Licence: GPL v2 or later (http://www.gnu.org/copyleft/gpl.html)
+
+|buildstatus|_
+
+.. |buildstatus| image:: https://api.travis-ci.org/mgedmin/check-manifest.png?branch=master
+.. _buildstatus: https://travis-ci.org/mgedmin/check-manifest
