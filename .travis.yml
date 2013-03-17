@@ -1,0 +1,10 @@
+language: python
+python:
+    - 2.6
+    - 2.7
+install:
+    - pip install zope.testrunner --use-mirrors
+script:
+    - zope-testrunner --test-path=src
+notifications:
+    email: false
