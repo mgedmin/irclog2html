@@ -11,6 +11,10 @@ To run the test suite, use::
 
     make test
 
+or (even better) ::
+
+    detox
+
 The testcases directory contains some sample logs, so you can try ::
 
     bin/logs2html testcases
@@ -27,7 +31,8 @@ But I don't have make!
 
 Don't worry, feel free to use buildout directly::
 
-    python bootstrap.py
+    virtualenv python
+    python/bin/python bootstrap.py
     bin/buildout
     bin/test
     bin/irclog2html --help
