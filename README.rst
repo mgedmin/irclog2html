@@ -86,5 +86,5 @@ Licence: GPL v2 or later (http://www.gnu.org/copyleft/gpl.html)
 
 |buildstatus|_
 
-.. |buildstatus| image:: https://api.travis-ci.org/mgedmin/check-manifest.png?branch=master
-.. _buildstatus: https://travis-ci.org/mgedmin/check-manifest
+.. |buildstatus| image:: https://api.travis-ci.org/mgedmin/irclog2html.png?branch=master
+.. _buildstatus: https://travis-ci.org/mgedmin/irclog2html
