@@ -6,7 +6,7 @@ FILE_WITH_VERSION = src/irclog2html/_version.py
 FILE_WITH_CHANGELOG = CHANGES.txt
 VCS_STATUS = git status --porcelain
 VCS_EXPORT = git archive --format=tar --prefix=tmp/tree/ HEAD | tar -xf -
-VCS_TAG = git tag -a
+VCS_TAG = git tag
 VCS_COMMIT_AND_PUSH = git commit -a -m "Post-release version bump" && git push && git push --tags
 
 
