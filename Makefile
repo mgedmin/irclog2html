@@ -4,10 +4,10 @@ TESTFLAGS = -vc
 
 FILE_WITH_VERSION = src/irclog2html/_version.py
 FILE_WITH_CHANGELOG = CHANGES.txt
-VCS_STATUS = bzr status
-VCS_EXPORT = bzr export
-VCS_TAG = bzr tag
-VCS_COMMIT_AND_PUSH = bzr ci -m "Post-release version bump" && bzr push
+VCS_STATUS = git status --porcelain
+VCS_EXPORT = git archive --format=tar --prefix=tmp/tree/ HEAD | tar -xf -
+VCS_TAG = git tag -a
+VCS_COMMIT_AND_PUSH = git commit -a -m "Post-release version bump" && git push && git push --tags
 
 
 .PHONY: default
@@ -45,7 +45,7 @@ endif
 	pkg_and_version=`$(PYTHON) setup.py --name`-`$(PYTHON) setup.py --version` && \
 	rm -rf tmp && \
 	mkdir tmp && \
-	$(VCS_EXPORT) tmp/tree && \
+	$(VCS_EXPORT) && \
 	cd tmp && \
 	tar xvzf ../dist/$$pkg_and_version.tar.gz && \
 	diff -ur $$pkg_and_version tree -x PKG-INFO -x setup.cfg -x '*.egg-info' && \
