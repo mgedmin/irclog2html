@@ -8,6 +8,8 @@ Changelog
 
 * Drop support for Python 2.4 and 2.5.
 
+* Fix URL linkifier to not include trailing punctuation (LP#1155906).
+
 
 2.11.1 (2013-03-17)
 -------------------

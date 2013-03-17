@@ -11,7 +11,7 @@ This is a Python port (+ improvements) of irclog2html.pl Version 2.1, which
 was written by Jeff Waugh and is available at www.perkypants.org
 """
 
-# Copyright (c) 2005--2010, Marius Gedminas 
+# Copyright (c) 2005--2013, Marius Gedminas 
 # Copyright (c) 2000, Jeffrey W. Waugh
 
 # Python port:
@@ -290,10 +290,24 @@ class NickColourizer:
 # HTML
 #
 
-URL_REGEXP = re.compile(r'((http|https|ftp|gopher|news)://[^ \'")>]*)')
+URL_REGEXP = re.compile(r'((http|https|ftp|gopher|news)://([.,]*([^ \'")>&.,]|&amp;))*)')
 
 def createlinks(text):
-    """Replace possible URLs with links."""
+    """Replace possible URLs with links.
+
+        >>> createlinks('check out &lt;http://example.com/a?b=c&amp;c=d#e&gt;!')
+        'check out &lt;<a href="http://example.com/a?b=c&amp;c=d#e" rel="nofollow">http://example.com/a?b=c&amp;c=d#e</a>&gt;!'
+
+        >>> createlinks('http://example.com/a,')
+        '<a href="http://example.com/a" rel="nofollow">http://example.com/a</a>,'
+
+        >>> createlinks('http://example.com/a.')
+        '<a href="http://example.com/a" rel="nofollow">http://example.com/a</a>.'
+
+        >>> createlinks('http://example.com/a.b')
+        '<a href="http://example.com/a.b" rel="nofollow">http://example.com/a.b</a>'
+
+    """
     return URL_REGEXP.sub(r'<a href="\1" rel="nofollow">\1</a>', text)
 
 def escape(s):
