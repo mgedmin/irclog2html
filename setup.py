@@ -10,7 +10,7 @@ def read(filename):
     return open(os.path.join(here, filename)).read()
 
 
-long_description = read('README.txt') + '\n\n' + read('CHANGES.txt')
+long_description = read('README.rst') + '\n\n' + read('CHANGES.rst')
 
 version_file = os.path.join(here, 'src/irclog2html/_version.py')
 d = {}
