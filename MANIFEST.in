@@ -10,3 +10,4 @@ include porting/*.py
 include porting/*.pl
 include porting/testcases/*.log
 include testcases/*.log
+include .gitignore

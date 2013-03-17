@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-2.11.1 (unreleased)
+2.11.1 (2013-03-17)
 -------------------
 
 * logs2html also accepts filenames that contain YYYYMMDD dates (in addition to
