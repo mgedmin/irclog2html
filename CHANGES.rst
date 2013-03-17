@@ -4,7 +4,9 @@ Changelog
 2.12.0 (unreleased)
 -------------------
 
-* No changes yet.
+* Moved to Github.
+
+* Drop support for Python 2.4 and 2.5.
 
 
 2.11.1 (2013-03-17)
