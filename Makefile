@@ -91,8 +91,11 @@ clean:
 	rm -f testcases/*.html testcases/*.css
 
 
-bin/buildout: bootstrap.py
-	$(PYTHON) bootstrap.py
+python:
+	virtualenv -p $(PYTHON) python
+
+bin/buildout: python bootstrap.py
+	python/bin/python bootstrap.py
 
 
 scripts = bin/test bin/irclog2html bin/logs2html bin/irclogsearch bin/tox
