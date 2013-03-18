@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.12.0 (unreleased)
+2.12.0 (2013-03-18)
 -------------------
 
 * Moved to Github.
