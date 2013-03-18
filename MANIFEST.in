@@ -5,9 +5,12 @@ include tox.ini
 include Makefile
 include src/irclog2html/irclog.css
 include src/irclog2html/tests/*.py
+include src/irclog2html/tests/*.cfg
+include src/irclog2html/tests/*.log
 include porting/*.txt
 include porting/*.py
 include porting/*.pl
 include porting/testcases/*.log
 include testcases/*.log
 include .gitignore
+include .travis.yml

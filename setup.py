@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import re
 from setuptools import setup
 
 
@@ -7,14 +8,14 @@ here = os.path.dirname(__file__)
 
 
 def read(filename):
-    return open(os.path.join(here, filename)).read()
+    with open(os.path.join(here, filename)) as f:
+        return f.read()
 
 
 long_description = read('README.rst') + '\n\n' + read('CHANGES.rst')
 
 version_file = os.path.join(here, 'src/irclog2html/_version.py')
-d = {}
-execfile(version_file, d)
+d = dict(re.findall('''(__version__) *= *'([^']*)''', read(version_file)))
 version = d['__version__']
 
 setup(
@@ -35,6 +36,8 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],

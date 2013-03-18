@@ -6,6 +6,8 @@ Changelog
 
 * Moved to Github.
 
+* Add support for Python 3.3.
+
 * Drop support for Python 2.4 and 2.5.
 
 * Fix URL linkifier to not include trailing punctuation (LP#1155906).

@@ -6,7 +6,12 @@ Split xchat2 log file into daily log files suitable as input for logs2html.py.
 Usage: xchatlogsplit.py filename
 
 XXX code is ugly
+
+This is more of an example than a real script, although I have used it to
+restore some actual IRC chat log history from my xchat logs.
 """
+
+from __future__ import print_function
 
 import sys
 import time
@@ -76,7 +81,7 @@ def main(argv=sys.argv):
             if os.path.exists(outfilename):
                 sys.exit("refusing to overwrite %s" % outfilename)
             outfile = open(outfilename, "a")
-        print >> outfile, line,
+        print(line, end=' ', file=outfile)
     if outfile: outfile.close()
 
 if __name__ == '__main__':

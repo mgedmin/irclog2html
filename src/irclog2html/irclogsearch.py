@@ -22,29 +22,41 @@ Apache configuration example:
 # Released under the terms of the GNU GPL
 # http://www.gnu.org/copyleft/gpl.html
 
+from __future__ import print_function
+
 import cgi
 import sys
 import os
 import re
 import glob
-import urllib
 import datetime
 import time
 
 import cgitb; cgitb.enable()
 
-from irclog2html import LogParser, XHTMLTableStyle, NickColourizer
-from irclog2html import VERSION, RELEASE
+try:
+    from urllib import quote
+except ImportError:
+    from urllib.parse import quote
 
-logfile_path = os.getenv('IRCLOG_LOCATION')
-if not logfile_path:
-    logfile_path = os.path.dirname(__file__)
+from .irclog2html import LogParser, XHTMLTableStyle, NickColourizer
+from .irclog2html import VERSION, RELEASE
 
-logfile_pattern = os.getenv('IRCLOG_GLOB')
-if not logfile_pattern:
-    logfile_pattern = '*.log'
+
+try:
+    unicode
+except NameError:
+    # Python 3.x
+    unicode = str
+
+
+# Overwritten at the start of main()
+logfile_path = os.getenv('IRCLOG_LOCATION') or os.path.dirname(__file__)
+logfile_pattern = os.getenv('IRCLOG_GLOB') or '*.log'
+
 
 DATE_REGEXP = re.compile('^.*(\d\d\d\d)-(\d\d)-(\d\d)')
+
 
 HEADER = """\
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -96,12 +108,14 @@ class SearchResult(object):
 class SearchResultFormatter(object):
     """Formatter of search results."""
 
-    def __init__(self):
-        self.style = XHTMLTableStyle(sys.stdout)
+    def __init__(self, stream=None):
+        if stream is None:
+            stream = getattr(sys.stdout, 'buffer', sys.stdout)
+        self.style = XHTMLTableStyle(stream)
         self.nick_colour = NickColourizer()
 
     def print_prefix(self):
-        print self.style.prefix
+        print(self.style.prefix)
 
     def print_html(self, result):
         link = urlescape(result.link)
@@ -118,11 +132,12 @@ class SearchResultFormatter(object):
             self.style.servermsg(result.time, result.event, text, link)
 
     def print_suffix(self):
-        print self.style.suffix
+        print(self.style.suffix)
 
 
 def urlescape(link):
-    return cgi.escape(urllib.quote(link), True)
+    return cgi.escape(quote(link), True)
+
 
 def date_from_filename(filename):
     basename = os.path.basename(filename)
@@ -138,18 +153,20 @@ def link_from_filename(filename):
     return basename + '.html'
 
 
-def search_irc_logs(query, stats=None):
+def search_irc_logs(query, stats=None, where=None):
+    if where is None:
+        where = logfile_path
     if not stats:
         stats = SearchStats() # will be discarded, but, oh, well
-    query = query.decode('UTF-8').lower()
-    files = glob.glob(os.path.join(logfile_path, logfile_pattern))
+    query = query.lower()
+    files = glob.glob(os.path.join(where, logfile_pattern))
     files.sort()    # ISO-8601 dates sort the right way
     files.reverse() # newest first
     for filename in files:
         date = date_from_filename(filename)
         link = link_from_filename(filename)
         stats.files += 1
-        for time, event, info in LogParser(file(filename)):
+        for time, event, info in LogParser(open(filename, 'rb')):
             if event == LogParser.COMMENT:
                 nick, text = info
                 text = nick + ' ' + text
@@ -164,42 +181,42 @@ def search_irc_logs(query, stats=None):
 
 
 def print_search_form():
-    print "Content-Type: text/html; charset=UTF-8"
-    print
-    print HEADER
-    print "<h1>Search IRC logs</h1>"
-    print '<form action="" method="get">'
-    print '<input type="text" name="q" />'
-    print '<input type="submit" />'
-    print '</form>'
-    print FOOTER
+    print("Content-Type: text/html; charset=UTF-8")
+    print()
+    print(HEADER)
+    print("<h1>Search IRC logs</h1>")
+    print('<form action="" method="get">')
+    print('<input type="text" name="q" />')
+    print('<input type="submit" />')
+    print('</form>')
+    print(FOOTER)
 
 
-def print_search_results(query):
-    print "Content-Type: text/html; charset=UTF-8"
-    print
-    print HEADER
-    print "<h1>IRC log search results for %s</h1>" % cgi.escape(query)
-    print '<form action="" method="get">'
-    print '<input type="text" name="q" value="%s" />' % cgi.escape(query, True)
-    print '<input type="submit" />'
-    print '</form>'
+def print_search_results(query, where=None):
+    print("Content-Type: text/html; charset=UTF-8")
+    print()
+    print(HEADER)
+    print("<h1>IRC log search results for %s</h1>" % cgi.escape(query))
+    print('<form action="" method="get">')
+    print('<input type="text" name="q" value="%s" />' % cgi.escape(query, True))
+    print('<input type="submit" />')
+    print('</form>')
     started = time.time()
     date = None
     prev_result = None
     formatter = SearchResultFormatter()
     stats = SearchStats()
-    for result in search_irc_logs(query, stats):
+    for result in search_irc_logs(query, stats, where=where):
         if date != result.date:
             if prev_result:
                 formatter.print_suffix()
                 prev_result = None
             if date:
-                print "  </li>"
+                print("  </li>")
             else:
-                print '<ul class="searchresults">'
-            print '  <li><a href="%s">%s</a>:' % (urlescape(result.link),
-                                        result.date.strftime('%Y-%m-%d (%A)'))
+                print('<ul class="searchresults">')
+            print('  <li><a href="%s">%s</a>:' % (urlescape(result.link),
+                                        result.date.strftime('%Y-%m-%d (%A)')))
             date = result.date
         if not prev_result:
             formatter.print_prefix()
@@ -208,20 +225,25 @@ def print_search_results(query):
     if prev_result:
         formatter.print_suffix()
     if date:
-        print "  </li>"
-        print "</ul>"
+        print("  </li>")
+        print("</ul>")
     total_time = time.time() - started
-    print "<p>%d matches in %d log files with %d lines (%.1f seconds).</p>" % (
-                stats.matches, stats.files, stats.lines, total_time)
-    print FOOTER
+    print("<p>%d matches in %d log files with %d lines (%.1f seconds).</p>" % (
+                stats.matches, stats.files, stats.lines, total_time))
+    print(FOOTER)
 
 
 def main():
+    global logfile_path, logfile_pattern
+    logfile_path = os.getenv('IRCLOG_LOCATION') or os.path.dirname(__file__)
+    logfile_pattern = os.getenv('IRCLOG_GLOB') or '*.log'
     form = cgi.FieldStorage()
-    if not form.has_key("q"):
+    if "q" not in form:
         print_search_form()
         return
     search_text = form["q"].value
+    if isinstance(search_text, bytes):
+        search_text = search_text.decode('UTF-8')
     print_search_results(search_text)
 
 

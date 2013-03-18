@@ -45,15 +45,28 @@ was written by Jeff Waugh and is available at www.perkypants.org
 #   New default style: xhtmltable
 #
 
+from __future__ import print_function, unicode_literals
+
+import io
+import optparse
 import os
 import re
-import sys
-import urllib
-import optparse
-import shutil
 import shlex
+import shutil
+import sys
 
-from _version import __version__ as VERSION, __date__ as RELEASE
+try:
+    from urllib import quote
+except ImportError:
+    from urllib.parse import quote
+
+from ._version import __version__ as VERSION, __date__ as RELEASE
+
+try:
+    unicode
+except NameError:
+    # Python 3.x
+    unicode = str
 
 
 # If someone packages this for a Linux distro, they'll want to patch this to
@@ -122,64 +135,60 @@ class LogParser(object):
         Supports xchat's hybrid Latin/Unicode encoding, as documented here:
         http://xchat.org/encoding/
         """
-        try:
-            # Try to be nice and return 8-bit strings if they contain pure
-            # ASCII, primarily because I don't want to clutter my doctests
-            # with u'' prefixes.
-            s.decode('US-ASCII')
+        if isinstance(s, unicode):
+            # Accept input that's already Unicode, for convenience
             return s
+        try:
+            return s.decode('UTF-8')
         except UnicodeError:
-            try:
-                return s.decode('UTF-8')
-            except UnicodeError:
-                return s.decode('cp1252', 'replace')
+            return s.decode('cp1252', 'replace')
 
     def __iter__(self):
         for line in self.infile:
-            line = line.rstrip('\r\n')
+            line = self.decode(line).rstrip('\r\n')
             if not line:
                 continue
 
             m = self.TIME_REGEXP.match(line)
             if m:
-                time = self.decode(m.group(1))
+                time = m.group(1)
                 line = line[len(m.group(0)):]
             else:
                 time = None
 
             m = self.NICK_REGEXP.match(line)
             if m:
-                nick = self.decode(m.group(1))
-                text = self.decode(line[len(m.group(0)):])
+                nick = m.group(1)
+                text = line[len(m.group(0)):]
                 yield time, self.COMMENT, (nick, text)
             elif line.startswith('* ') or line.startswith('*\t'):
-                yield time, self.ACTION, self.decode(line)
+                yield time, self.ACTION, line
             elif self.JOIN_REGEXP.match(line):
-                yield time, self.JOIN, self.decode(line)
+                yield time, self.JOIN, line
             elif self.PART_REGEXP.match(line):
-                yield time, self.PART, self.decode(line)
+                yield time, self.PART, line
             else:
                 m = self.NICK_CHANGE_REGEXP.match(line)
                 if m:
                     oldnick = m.group(1)
                     newnick = m.group(2)
-                    line = self.decode(line)
+                    line = line
                     yield time, self.NICKCHANGE, (line, oldnick, newnick)
                 elif self.SERVMSG_REGEXP.match(line):
-                    yield time, self.SERVER, self.decode(line)
+                    yield time, self.SERVER, line
                 else:
-                    yield time, self.OTHER, self.decode(line)
+                    yield time, self.OTHER, line
 
 
 def shorttime(time):
     """Strip date and seconds from time.
 
-        >>> shorttime('12:45:17')
-        '12:45'
-        >>> shorttime('12:45')
-        '12:45'
-        >>> shorttime('2005-02-04T12:45')
-        '12:45'
+        >>> print(shorttime('12:45:17'))
+        12:45
+        >>> print(shorttime('12:45'))
+        12:45
+        >>> print(shorttime('2005-02-04T12:45'))
+        12:45
 
     """
     if 'T' in time:
@@ -239,7 +248,7 @@ class ColourChooser:
             n = 1
         r, g, b = self.rgb[i % len(self.rgb)]
         m = self.rgbmin + (self.rgbmax - self.rgbmin) * float(n - i) / n
-        r, g, b = map(int, (r * m, g * m, b * m))
+        r, g, b = [int(c * m) for c in [r, g, b]]
         assert 0 <= r < 256
         assert 0 <= g < 256
         assert 0 <= b < 256
@@ -292,36 +301,38 @@ class NickColourizer:
 
 URL_REGEXP = re.compile(r'((http|https|ftp|gopher|news)://([.,]*([^ \'")>&.,]|&amp;))*)')
 
+
 def createlinks(text):
     """Replace possible URLs with links.
 
-        >>> createlinks('check out &lt;http://example.com/a?b=c&amp;c=d#e&gt;!')
-        'check out &lt;<a href="http://example.com/a?b=c&amp;c=d#e" rel="nofollow">http://example.com/a?b=c&amp;c=d#e</a>&gt;!'
+        >>> print(createlinks('check out &lt;http://example.com/a?b=c&amp;c=d#e&gt;!'))
+        check out &lt;<a href="http://example.com/a?b=c&amp;c=d#e" rel="nofollow">http://example.com/a?b=c&amp;c=d#e</a>&gt;!
 
-        >>> createlinks('http://example.com/a,')
-        '<a href="http://example.com/a" rel="nofollow">http://example.com/a</a>,'
+        >>> print(createlinks('http://example.com/a,'))
+        <a href="http://example.com/a" rel="nofollow">http://example.com/a</a>,
 
-        >>> createlinks('http://example.com/a.')
-        '<a href="http://example.com/a" rel="nofollow">http://example.com/a</a>.'
+        >>> print(createlinks('http://example.com/a.'))
+        <a href="http://example.com/a" rel="nofollow">http://example.com/a</a>.
 
-        >>> createlinks('http://example.com/a.b')
-        '<a href="http://example.com/a.b" rel="nofollow">http://example.com/a.b</a>'
+        >>> print(createlinks('http://example.com/a.b'))
+        <a href="http://example.com/a.b" rel="nofollow">http://example.com/a.b</a>
 
     """
     return URL_REGEXP.sub(r'<a href="\1" rel="nofollow">\1</a>', text)
 
+
 def escape(s):
     """Replace ampersands, pointies, control characters.
 
-        >>> escape('Hello & <world>')
-        'Hello &amp; &lt;world&gt;'
-        >>> escape('Hello & <world>')
-        'Hello &amp; &lt;world&gt;'
+        >>> print(escape('Hello & <world>'))
+        Hello &amp; &lt;world&gt;
+        >>> print(escape('Hello & <world>'))
+        Hello &amp; &lt;world&gt;
 
     Control characters (ASCII 0 to 31) are stripped away
 
-        >>> escape(''.join([chr(x) for x in range(32)]))
-        ''
+        >>> print(escape('[%s]' % ''.join([chr(x) for x in range(32)])))
+        []
 
     """
     s = s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
@@ -343,7 +354,7 @@ class AbstractStyle(object):
     description = "Single-line description"
     charset = 'US-ASCII'
 
-    def __init__(self, outfile, colours=None):
+    def __init__(self, outfile, colours=None, charset=None):
         """Create a text formatter for writing to outfile.
 
         `colours` may have the following attributes:
@@ -353,16 +364,12 @@ class AbstractStyle(object):
            nickchange
            action
         """
-        self.outfile = outfile
+        if charset is not None:
+            self.charset = charset
+        self.outfile = io.TextIOWrapper(outfile, encoding=self.charset,
+                                        errors='xmlcharrefreplace',
+                                        line_buffering=True)
         self.colours = colours or {}
-
-    def encode(self, s):
-        """Encode a Unicode string into a desired output charset."""
-        return s.encode(self.charset, 'xmlcharrefreplace')
-
-    def escape(self, s):
-        """Encode a Unicode string and escape special HTML characters."""
-        return escape(self.encode(s))
 
     def head(self, title, prev=('', ''), index=('', ''), next=('', ''),
              searchbox=False):
@@ -400,7 +407,7 @@ class SimpleTextStyle(AbstractStyle):
     charset = 'iso-8859-1'
 
     def head(self, title, prev=None, index=None, next=None, searchbox=False):
-        print >> self.outfile, """\
+        print("""\
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
@@ -414,16 +421,16 @@ class SimpleTextStyle(AbstractStyle):
             'RELEASE': RELEASE,
             'title': escape(title),
             'charset': self.charset,
-        }
+        }, file=self.outfile)
 
     def foot(self):
-        print >> self.outfile, """
+        print("""
 <br>Generated by irclog2html.py %(VERSION)s by <a href="mailto:marius@pov.lt">Marius Gedminas</a>
  - find it at <a href="http://mg.pov.lt/irclog2html/">mg.pov.lt</a>!
-</tt></body></html>""" % {'VERSION': VERSION, 'RELEASE': RELEASE},
+</tt></body></html>""" % {'VERSION': VERSION, 'RELEASE': RELEASE}, end=' ', file=self.outfile)
 
     def servermsg(self, time, what, text):
-        text = self.escape(text)
+        text = escape(text)
         text = createlinks(text)
         colour = self.colours.get(what)
         if colour:
@@ -431,17 +438,17 @@ class SimpleTextStyle(AbstractStyle):
         self._servermsg(text)
 
     def _servermsg(self, line):
-        print >> self.outfile, '%s<br>' % line
+        print('%s<br>' % line, file=self.outfile)
 
     def nicktext(self, time, nick, text, htmlcolour):
-        nick = self.escape(nick)
-        text = self.escape(text)
+        nick = escape(nick)
+        text = escape(text)
         text = createlinks(text)
         text = text.replace('  ', '&nbsp;&nbsp;')
         self._nicktext(time, nick, text, htmlcolour)
 
     def _nicktext(self, time, nick, text, htmlcolour):
-        print >> self.outfile, '&lt;%s&gt; %s<br>' % (nick, text)
+        print('&lt;%s&gt; %s<br>' % (nick, text), file=self.outfile)
 
 
 class TextStyle(SimpleTextStyle):
@@ -451,9 +458,9 @@ class TextStyle(SimpleTextStyle):
     description = __doc__
 
     def _nicktext(self, time, nick, text, htmlcolour):
-        print >> self.outfile, ('<font color="%s">&lt;%s&gt;</font>'
-                                ' <font color="#000000">%s</font><br>'
-                                % (htmlcolour, nick, text))
+        print('<font color="%s">&lt;%s&gt;</font>'
+              ' <font color="#000000">%s</font><br>'
+              % (htmlcolour, nick, text), file=self.outfile)
 
 
 class SimpleTableStyle(SimpleTextStyle):
@@ -463,21 +470,21 @@ class SimpleTableStyle(SimpleTextStyle):
 
     def head(self, title, prev=None, index=None, next=None, searchbox=False):
         SimpleTextStyle.head(self, title, prev, index, next, searchbox)
-        print >> self.outfile, "<table cellspacing=3 cellpadding=2 border=0>"
+        print("<table cellspacing=3 cellpadding=2 border=0>", file=self.outfile)
 
     def foot(self):
-        print >> self.outfile, "</table>"
+        print("</table>", file=self.outfile)
         SimpleTextStyle.foot(self)
 
     def _servermsg(self, line):
-        print >> self.outfile, ('<tr><td colspan=2><tt>%s</tt></td></tr>'
-                                % line)
+        print('<tr><td colspan=2><tt>%s</tt></td></tr>' % line,
+              file=self.outfile)
 
     def _nicktext(self, time, nick, text, htmlcolour):
-        print >> self.outfile, ('<tr bgcolor="#eeeeee"><th><font color="%s">'
-                                '<tt>%s</tt></font></th>'
-                                '<td width="100%%"><tt>%s</tt></td></tr>'
-                                % (htmlcolour, nick, text))
+        print('<tr bgcolor="#eeeeee"><th><font color="%s">'
+              '<tt>%s</tt></font></th>'
+              '<td width="100%%"><tt>%s</tt></td></tr>'
+              % (htmlcolour, nick, text), file=self.outfile)
 
 
 class TableStyle(SimpleTableStyle):
@@ -487,11 +494,11 @@ class TableStyle(SimpleTableStyle):
     description = __doc__
 
     def _nicktext(self, time, nick, text, htmlcolour):
-        print >> self.outfile, ('<tr><th bgcolor="%s"><font color="#ffffff">'
-                                '<tt>%s</tt></font></th>'
-                                '<td width="100%%" bgcolor="#eeeeee"><tt><font'
-                                ' color="%s">%s</font></tt></td></tr>'
-                                % (htmlcolour, nick, htmlcolour, text))
+        print('<tr><th bgcolor="%s"><font color="#ffffff">'
+              '<tt>%s</tt></font></th>'
+              '<td width="100%%" bgcolor="#eeeeee"><tt><font'
+                 ' color="%s">%s</font></tt></td></tr>'
+              % (htmlcolour, nick, htmlcolour, text), file=self.outfile)
 
 
 class XHTMLStyle(AbstractStyle):
@@ -518,7 +525,7 @@ class XHTMLStyle(AbstractStyle):
         self.prev = prev
         self.index = index
         self.next = next
-        print >> self.outfile, """\
+        print("""\
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
           "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
@@ -530,35 +537,36 @@ class XHTMLStyle(AbstractStyle):
   <meta name="version" content="%(VERSION)s - %(RELEASE)s" />
 </head>
 <body>""" % {'VERSION': VERSION, 'RELEASE': RELEASE,
-             'title': self.escape(title), 'charset': self.charset}
+             'title': escape(title), 'charset': self.charset},
+              file=self.outfile)
         self.heading(title)
         if searchbox:
             self.searchbox()
         self.navbar(prev, index, next)
-        print >> self.outfile, self.prefix
+        print(self.prefix, file=self.outfile)
 
     def heading(self, title):
-        print >> self.outfile, '<h1>%s</h1>' % self.escape(title)
+        print('<h1>%s</h1>' % escape(title), file=self.outfile)
 
     def link(self, url, title):
         # Intentionally not escaping title so that &entities; work
         if url:
-            print >> self.outfile, ('<a href="%s">%s</a>'
-                                    % (escape(urllib.quote(url)),
-                                       title or escape(url))),
+            print('<a href="%s">%s</a>'
+                  % (escape(quote(url)), title or escape(url)),
+                  end=' ', file=self.outfile)
         elif title:
-            print >> self.outfile, ('<span class="disabled">%s</span>'
-                                    % title),
+            print('<span class="disabled">%s</span>' % title,
+                  end=' ', file=self.outfile)
 
     def searchbox(self):
-        print >> self.outfile, """
+        print("""
 <div class="searchbox">
 <form action="search" method="get">
 <input type="text" name="q" id="searchtext" />
 <input type="submit" value="Search" id="searchbutton" />
 </form>
 </div>
-"""
+""", file=self.outfile)
     def navbar(self, prev, index, next):
         prev_title, prev_url = prev
         index_title, index_url = index
@@ -566,22 +574,22 @@ class XHTMLStyle(AbstractStyle):
         if not (prev_title or index_title or next_title or
                 prev_url or index_url or next_url):
             return
-        print >> self.outfile, '<div class="navigation">',
+        print('<div class="navigation">', end=' ', file=self.outfile)
         self.link(prev_url, prev_title)
         self.link(index_url, index_title)
         self.link(next_url, next_title)
-        print >> self.outfile, '</div>'
+        print('</div>', file=self.outfile)
 
     def foot(self):
-        print >> self.outfile, self.suffix
+        print(self.suffix, file=self.outfile)
         self.navbar(self.prev, self.index, self.next)
-        print >> self.outfile, """
+        print("""
 <div class="generatedby">
 <p>Generated by irclog2html.py %(VERSION)s by <a href="mailto:marius@pov.lt">Marius Gedminas</a>
  - find it at <a href="http://mg.pov.lt/irclog2html/">mg.pov.lt</a>!</p>
 </div>
 </body>
-</html>""" % {'VERSION': VERSION, 'RELEASE': RELEASE}
+</html>""" % {'VERSION': VERSION, 'RELEASE': RELEASE}, file=self.outfile)
 
     def servermsg(self, time, what, text):
         """Output a generic server message.
@@ -590,18 +598,18 @@ class XHTMLStyle(AbstractStyle):
         `line` is not escaped.
         `what` is one of LogParser event constants (e.g. LogParser.JOIN).
         """
-        text = self.escape(text)
+        text = escape(text)
         text = createlinks(text)
         if time:
             displaytime = shorttime(time)
-            print >> self.outfile, ('<p id="t%s" class="%s">'
-                                    '<a href="#t%s" class="time">%s</a> '
-                                    '%s</p>'
-                                    % (time, self.CLASSMAP[what], time,
-                                       displaytime, text))
+            print('<p id="t%s" class="%s">'
+                  '<a href="#t%s" class="time">%s</a> '
+                  '%s</p>'
+                  % (time, self.CLASSMAP[what], time, displaytime, text),
+                  file=self.outfile)
         else:
-            print >> self.outfile, ('<p class="%s">%s</p>'
-                                    % (self.CLASSMAP[what], text))
+            print('<p class="%s">%s</p>' % (self.CLASSMAP[what], text),
+                  file=self.outfile)
 
     def nicktext(self, time, nick, text, htmlcolour):
         """Output a comment uttered by someone.
@@ -610,25 +618,25 @@ class XHTMLStyle(AbstractStyle):
         `nick` and `text` are not escaped.
         `htmlcolour` is a string ('#rrggbb').
         """
-        nick = self.escape(nick)
-        text = self.escape(text)
+        nick = escape(nick)
+        text = escape(text)
         text = createlinks(text)
         text = text.replace('  ', '&nbsp;&nbsp;')
         if time:
             displaytime = shorttime(time)
-            print >> self.outfile, ('<p id="t%s" class="comment">'
-                                    '<a href="#t%s" class="time">%s</a> '
-                                    '<span class="nick" style="color: %s">'
-                                    '&lt;%s&gt;</span>'
-                                    ' <span class="text">%s</span></p>'
-                                    % (time, time, displaytime, htmlcolour, nick,
-                                       text))
+            print('<p id="t%s" class="comment">'
+                  '<a href="#t%s" class="time">%s</a> '
+                  '<span class="nick" style="color: %s">'
+                  '&lt;%s&gt;</span>'
+                  ' <span class="text">%s</span></p>'
+                  % (time, time, displaytime, htmlcolour, nick, text),
+                  file=self.outfile)
         else:
-            print >> self.outfile, ('<p class="comment">'
-                                    '<span class="nick" style="color: %s">'
-                                    '&lt;%s&gt;</span>'
-                                    ' <span class="text">%s</span></p>'
-                                    % (htmlcolour, nick, text))
+            print('<p class="comment">'
+                  '<span class="nick" style="color: %s">'
+                  '&lt;%s&gt;</span>'
+                  ' <span class="text">%s</span></p>'
+                  % (htmlcolour, nick, text), file=self.outfile)
 
 
 class XHTMLTableStyle(XHTMLStyle):
@@ -641,43 +649,43 @@ class XHTMLTableStyle(XHTMLStyle):
     suffix = '</table>'
 
     def servermsg(self, time, what, text, link=''):
-        text = self.escape(text)
+        text = escape(text)
         text = createlinks(text)
         if time:
             displaytime = shorttime(time)
-            print >> self.outfile, ('<tr id="t%s">'
-                                    '<td class="%s" colspan="2">%s</td>'
-                                    '<td><a href="%s#t%s" class="time">%s</a></td>'
-                                    '</tr>'
-                                    % (time, self.CLASSMAP[what], text,
-                                       link, time, displaytime))
+            print('<tr id="t%s">'
+                  '<td class="%s" colspan="2">%s</td>'
+                  '<td><a href="%s#t%s" class="time">%s</a></td>'
+                  '</tr>'
+                  % (time, self.CLASSMAP[what], text, link, time, displaytime),
+                  file=self.outfile)
         else:
-            print >> self.outfile, ('<tr>'
-                                    '<td class="%s" colspan="3">%s</td>'
-                                    '</tr>'
-                                    % (self.CLASSMAP[what], text))
+            print('<tr>'
+                  '<td class="%s" colspan="3">%s</td>'
+                  '</tr>'
+                  % (self.CLASSMAP[what], text), file=self.outfile)
 
     def nicktext(self, time, nick, text, htmlcolour, link=''):
-        nick = self.escape(nick)
-        text = self.escape(text)
+        nick = escape(nick)
+        text = escape(text)
         text = createlinks(text)
         text = text.replace('  ', '&nbsp;&nbsp;')
         if time:
             displaytime = shorttime(time)
-            print >> self.outfile, ('<tr id="t%s">'
-                                    '<th class="nick" style="background: %s">%s</th>'
-                                    '<td class="text" style="color: %s">%s</td>'
-                                    '<td class="time">'
-                                    '<a href="%s#t%s" class="time">%s</a></td>'
-                                    '</tr>'
-                                    % (time, htmlcolour, nick, htmlcolour, text,
-                                       link, time, displaytime))
+            print('<tr id="t%s">'
+                  '<th class="nick" style="background: %s">%s</th>'
+                  '<td class="text" style="color: %s">%s</td>'
+                  '<td class="time">'
+                  '<a href="%s#t%s" class="time">%s</a></td>'
+                  '</tr>'
+                  % (time, htmlcolour, nick, htmlcolour, text,
+                     link, time, displaytime), file=self.outfile)
         else:
-            print >> self.outfile, ('<tr>'
-                                    '<th class="nick" style="background: %s">%s</th>'
-                                    '<td class="text" colspan="2" style="color: %s">%s</td>'
-                                    '</tr>'
-                                    % (htmlcolour, nick, htmlcolour, text))
+            print('<tr>'
+                  '<th class="nick" style="background: %s">%s</th>'
+                  '<td class="text" colspan="2" style="color: %s">%s</td>'
+                  '</tr>'
+                  % (htmlcolour, nick, htmlcolour, text), file=self.outfile)
 
 
 class MediaWikiStyle(AbstractStyle):
@@ -688,46 +696,45 @@ class MediaWikiStyle(AbstractStyle):
 
     def head(self, title, prev=('', ''), index=('', ''), next=('', ''),
              searchbox=False):
-        print >> self.outfile, ('{|')
+        print('{|', file=self.outfile)
 
     def servermsg(self, time, what, text, link=''):
-        text = self.escape(text)
+        text = escape(text)
         # no need to call createlinks, MediaWiki parses links automatically
         if time:
             displaytime = shorttime(time)
-            print >> self.outfile, ('|- id="t%s"\n'
-                                    '| colspan="2" | %s\n'
-                                    '|| [[#t%s|%s]]'
-                                    % (time, text, time, displaytime))
+            print('|- id="t%s"\n'
+                  '| colspan="2" | %s\n'
+                  '|| [[#t%s|%s]]'
+                  % (time, text, time, displaytime), file=self.outfile)
         else:
-            print >> self.outfile, ('|-\n'
-                                    '| colspan="3" | %s'
-                                    % (text))
+            print('|-\n'
+                  '| colspan="3" | %s' % text, file=self.outfile)
 
     def nicktext(self, time, nick, text, htmlcolour, link=''):
-        nick = self.escape(nick)
-        text = self.escape(text)
+        nick = escape(nick)
+        text = escape(text)
         # no need to call createlinks, MediaWiki parses links automatically
         if time:
             displaytime = shorttime(time)
-            print >> self.outfile, ('|- id="t%s"\n'
-                                    '! style="background-color: %s" | %s\n'
-                                    '| style="color: %s" | %s\n'
-                                    '|| [[#t%s|%s]] '
-                                    % (time, htmlcolour, nick, htmlcolour, text,
-                                       time, displaytime))
+            print('|- id="t%s"\n'
+                  '! style="background-color: %s" | %s\n'
+                  '| style="color: %s" | %s\n'
+                  '|| [[#t%s|%s]] '
+                  % (time, htmlcolour, nick, htmlcolour, text,
+                     time, displaytime), file=self.outfile)
         else:
-            print >> self.outfile, ('|-\n'
-                                    '| style="background-color: %s" | %s\n'
-                                    '| style="color: %s" colspan="2" | %s '
-                                    % (htmlcolour, nick, htmlcolour, text))
+            print('|-\n'
+                  '| style="background-color: %s" | %s\n'
+                  '| style="color: %s" colspan="2" | %s '
+                  % (htmlcolour, nick, htmlcolour, text), file=self.outfile)
 
     def foot(self):
-        print >> self.outfile, ('|}\n\nGenerated by irclog2html.py %(VERSION)s '
-                                'by [mailto:marius@pov.lt Marius Gedminas] - '
-                                'find it at [http://mg.pov.lt/irclog2html '
-                                'mg.pov.lt]!'
-                                 % {'VERSION': VERSION})
+        print('|}\n\nGenerated by irclog2html.py %(VERSION)s '
+              'by [mailto:marius@pov.lt Marius Gedminas] - '
+              'find it at [http://mg.pov.lt/irclog2html '
+              'mg.pov.lt]!'
+              % {'VERSION': VERSION}, file=self.outfile)
 
 
 #
@@ -759,19 +766,20 @@ def do_config_file(option, opt_str, value, parser):
     """Read options from a config file and feed them back to optparse."""
     options = []
     try:
-        for line in open(value):
-            line = line.strip()
-            if not line or line.startswith('#'):
-                continue
-            options.extend(shlex.split(line))
+        with open(value) as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith('#'):
+                    continue
+                options.extend(shlex.split(line))
         # Note: you can cause an infinite loop if you have a config file that
-        # includes itself!
+        # includes itself!  Well, cause a RuntimeError actually.
         parser.rargs[:0] = options
-    except IOError, e:
+    except IOError as e:
         raise optparse.OptionValueError("can't read config file: %s" % e)
 
 
-def main(argv=sys.argv):
+def parse_args(argv=sys.argv):
     progname = os.path.basename(argv[0])
     parser = optparse.OptionParser("usage: %prog [options] filename [...]",
                                    prog=progname,
@@ -811,24 +819,29 @@ def main(argv=sys.argv):
                           help="select %s colour (default: %s)"
                                % (name, default))
     options, args = parser.parse_args(argv[1:])
+    return parser, options, args
+
+
+def main(argv=sys.argv):
+    parser, options, args = parse_args(argv)
     if options.style == "help":
-        print "The following styles are available for use with irclog2html.py:"
+        print("The following styles are available for use with irclog2html.py:")
         for style in STYLES:
-            print
-            print "  %s" % style.name
-            print "    %s" % style.description
-        print
+            print()
+            print("  %s" % style.name)
+            print("    %s" % style.description)
+        print()
         return
     for style in STYLES:
         if style.name == options.style:
             break
     else:
-        parser.error("unknown style: %s" % style)
+        parser.error("unknown style: %s" % options.style)
     colours = {}
     for name, default, what in COLOURS:
         colours[what] = getattr(options, 'colour_%s' % name)
     if not args:
-        parser.error("required parameter missing")
+        parser.error("please specify a filename")
     title = options.title
     prev = (options.prev_title, options.prev_url)
     index = (options.index_title, options.index_url)
@@ -836,17 +849,17 @@ def main(argv=sys.argv):
 
     for filename in args:
         try:
-            infile = open(filename)
-        except EnvironmentError, e:
+            infile = io.open(filename, 'rb')
+        except EnvironmentError as e:
             sys.exit("%s: cannot open %s for reading: %s"
-                     % (progname, filename, e))
+                     % (parser.prog, filename, e))
         outfilename = filename + ".html"
         try:
-            outfile = open(outfilename, "w")
-        except EnvironmentError, e:
+            outfile = io.open(outfilename, "wb")
+        except EnvironmentError as e:
             infile.close()
             sys.exit("%s: cannot open %s for writing: %s"
-                     % (progname, outfilename, e))
+                     % (parser.prog, outfilename, e))
         try:
             parser = LogParser(infile, dircproxy=options.dircproxy)
             formatter = style(outfile, colours)
