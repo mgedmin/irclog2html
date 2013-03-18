@@ -324,10 +324,8 @@ def createlinks(text):
 def escape(s):
     """Replace ampersands, pointies, control characters.
 
-        >>> print(escape('Hello & <world>'))
-        Hello &amp; &lt;world&gt;
-        >>> print(escape('Hello & <world>'))
-        Hello &amp; &lt;world&gt;
+        >>> print(escape('"Hello" & <world>'))
+        &quot;Hello&quot; &amp; &lt;world&gt;
 
     Control characters (ASCII 0 to 31) are stripped away
 
@@ -335,7 +333,7 @@ def escape(s):
         []
 
     """
-    s = s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+    s = s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
     return ''.join([c for c in s if ord(c) > 0x1F])
 
 

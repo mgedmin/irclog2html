@@ -39,7 +39,7 @@ try:
 except ImportError:
     from urllib.parse import quote
 
-from .irclog2html import LogParser, XHTMLTableStyle, NickColourizer
+from .irclog2html import LogParser, XHTMLTableStyle, NickColourizer, escape
 from .irclog2html import VERSION, RELEASE
 
 
@@ -70,7 +70,7 @@ HEADER = """\
   <meta name="version" content="%(VERSION)s - %(RELEASE)s" />
 </head>
 <body>""" % {'VERSION': VERSION, 'RELEASE': RELEASE,
-             'title': cgi.escape("Search IRC logs"), 'charset': 'UTF-8'}
+             'title': escape("Search IRC logs"), 'charset': 'UTF-8'}
 
 FOOTER = """
 <div class="generatedby">
@@ -136,7 +136,7 @@ class SearchResultFormatter(object):
 
 
 def urlescape(link):
-    return cgi.escape(quote(link), True)
+    return escape(quote(link))
 
 
 def date_from_filename(filename):
@@ -153,6 +153,12 @@ def link_from_filename(filename):
     return basename + '.html'
 
 
+def parse_log_file(filename):
+    with open(filename, 'rb') as f:
+        for row in LogParser(f):
+            yield row
+
+
 def search_irc_logs(query, stats=None, where=None):
     if where is None:
         where = logfile_path
@@ -166,7 +172,7 @@ def search_irc_logs(query, stats=None, where=None):
         date = date_from_filename(filename)
         link = link_from_filename(filename)
         stats.files += 1
-        for time, event, info in LogParser(open(filename, 'rb')):
+        for time, event, info in parse_log_file(filename):
             if event == LogParser.COMMENT:
                 nick, text = info
                 text = nick + ' ' + text
@@ -196,9 +202,9 @@ def print_search_results(query, where=None):
     print("Content-Type: text/html; charset=UTF-8")
     print()
     print(HEADER)
-    print("<h1>IRC log search results for %s</h1>" % cgi.escape(query))
+    print("<h1>IRC log search results for %s</h1>" % escape(query))
     print('<form action="" method="get">')
-    print('<input type="text" name="q" value="%s" />' % cgi.escape(query, True))
+    print('<input type="text" name="q" value="%s" />' % escape(query))
     print('<input type="submit" />')
     print('</form>')
     started = time.time()
