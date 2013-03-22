@@ -1,5 +1,6 @@
 import datetime
 import doctest
+import io
 import os
 import shutil
 import sys
@@ -9,7 +10,7 @@ import unittest
 from irclog2html.irclogsearch import (
     Error, SearchResult, SearchResultFormatter, LogParser,
     date_from_filename, link_from_filename, search_irc_logs,
-    print_search_form, print_search_results, main)
+    print_search_form, print_search_results, rewrap_stdout, main)
 
 
 try:
@@ -106,7 +107,7 @@ def doctest_date_from_filename():
 def doctest_link_from_filename():
     """Test for link_from_filename
 
-        >>> link_from_filename('/path/channel-2013-03-18.log')
+        >>> str(link_from_filename('/path/channel-2013-03-18.log'))
         'channel-2013-03-18.log.html'
 
     """
@@ -236,6 +237,7 @@ def doctest_main_prints_form():
     """Test for main
 
         >>> os.environ.pop('QUERY_STRING', None)
+        >>> sys.stdout = io.TextIOWrapper(BytesIOWrapper(sys.stdout)) # it's gonna be rewrapped
         >>> main()
         Content-Type: text/html; charset=UTF-8
         <BLANKLINE>
@@ -270,7 +272,7 @@ def doctest_main_searches():
     """Test for main
 
         >>> tmpdir = set_up_sample()
-        >>> sys.stdout.buffer = BytesIOWrapper(sys.stdout)
+        >>> sys.stdout = io.TextIOWrapper(BytesIOWrapper(sys.stdout)) # it's gonna be rewrapped
         >>> os.environ['QUERY_STRING'] = 'q=povbot'
         >>> os.environ['IRCLOG_LOCATION'] = tmpdir
         >>> os.environ['IRCLOG_GLOB'] = '*.log'

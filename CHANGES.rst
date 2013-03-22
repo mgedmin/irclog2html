@@ -4,7 +4,8 @@ Changelog
 2.12.1 (unreleased)
 -------------------
 
-* No changes yet.
+* Fix AttributeError in irclogsearch on Python 2.7
+  (https://github.com/mgedmin/irclog2html/issues/1).
 
 
 2.12.0 (2013-03-18)

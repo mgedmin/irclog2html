@@ -22,14 +22,15 @@ Apache configuration example:
 # Released under the terms of the GNU GPL
 # http://www.gnu.org/copyleft/gpl.html
 
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 import cgi
-import sys
+import datetime
+import glob
+import io
 import os
 import re
-import glob
-import datetime
+import sys
 import time
 
 import cgitb; cgitb.enable()
@@ -105,12 +106,31 @@ class SearchResult(object):
         self.info = info
 
 
+class StdoutWrapper(object):
+    # Because I can't wrap sys.stdout with io.TextIOWrapper on Python 2
+
+    def __init__(self, stream):
+        self.stream = stream
+        self.flush = stream.flush
+        self.write = stream.write
+        self.closed = False
+
+    def readable(self):
+        return False
+
+    def writable(self):
+        return True
+
+    def seekable(self):
+        return False
+
+
 class SearchResultFormatter(object):
     """Formatter of search results."""
 
     def __init__(self, stream=None):
         if stream is None:
-            stream = getattr(sys.stdout, 'buffer', sys.stdout)
+            stream = sys.stdout.buffer
         self.style = XHTMLTableStyle(stream)
         self.nick_colour = NickColourizer()
 
@@ -188,7 +208,7 @@ def search_irc_logs(query, stats=None, where=None):
 
 def print_search_form():
     print("Content-Type: text/html; charset=UTF-8")
-    print()
+    print("")
     print(HEADER)
     print("<h1>Search IRC logs</h1>")
     print('<form action="" method="get">')
@@ -200,7 +220,7 @@ def print_search_form():
 
 def print_search_results(query, where=None):
     print("Content-Type: text/html; charset=UTF-8")
-    print()
+    print("")
     print(HEADER)
     print("<h1>IRC log search results for %s</h1>" % escape(query))
     print('<form action="" method="get">')
@@ -239,11 +259,24 @@ def print_search_results(query, where=None):
     print(FOOTER)
 
 
+def rewrap_stdout():
+    # XXX: shouldn't replace sys.stdout, should pass the output stream to
+    # the functions that want to print stuff
+    if hasattr(sys.stdout, 'buffer'):
+        stream = sys.stdout.buffer # Python 3
+    else:
+        stream = StdoutWrapper(sys.stdout) # Python 2
+    sys.stdout = io.TextIOWrapper(stream, 'ascii',
+                                  errors='xmlcharrefreplace',
+                                  line_buffering=True)
+
+
 def main():
     global logfile_path, logfile_pattern
     logfile_path = os.getenv('IRCLOG_LOCATION') or os.path.dirname(__file__)
     logfile_pattern = os.getenv('IRCLOG_GLOB') or '*.log'
     form = cgi.FieldStorage()
+    rewrap_stdout()
     if "q" not in form:
         print_search_form()
         return
