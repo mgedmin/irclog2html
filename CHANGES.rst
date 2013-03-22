@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.12.1 (unreleased)
+2.12.1 (2013-03-22)
 -------------------
 
 * Fix AttributeError in irclogsearch on Python 2.7
