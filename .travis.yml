@@ -5,9 +5,11 @@ python:
     - 3.3
     - pypy
 install:
-    - pip install zope.testrunner --use-mirrors
+    - pip install zope.testrunner coverage coveralls --use-mirrors
     - pip install -e .
 script:
-    - zope-testrunner --test-path=src
+    - coverage run zope-testrunner --test-path=src
+after_script:
+    - coveralls
 notifications:
     email: false
