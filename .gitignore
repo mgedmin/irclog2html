@@ -16,3 +16,4 @@ distribute-0.6.10.tar.gz
 python/
 *.pyc
 __pycache__/
+.coverage
