@@ -140,7 +140,7 @@ class LogParser(object):
             # Accept input that's already Unicode, for convenience
             return s
         else:
-            _, charset = chardet.detect(s)
+            charset = chardet.detect(s)['encoding']
             return s.decode(charset, 'replace')
 
     def __iter__(self):
