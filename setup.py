@@ -51,4 +51,5 @@ setup(
         irclogsearch = irclog2html.irclogsearch:main
     """,
     zip_safe=False,
+    install_requires=['chardet'],
 )

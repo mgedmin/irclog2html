@@ -11,7 +11,7 @@ This is a Python port (+ improvements) of irclog2html.pl Version 2.1, which
 was written by Jeff Waugh and is available at www.perkypants.org
 """
 
-# Copyright (c) 2005--2013, Marius Gedminas 
+# Copyright (c) 2005--2013, Marius Gedminas
 # Copyright (c) 2000, Jeffrey W. Waugh
 
 # Python port:
@@ -139,9 +139,7 @@ class LogParser(object):
         if isinstance(s, unicode):
             # Accept input that's already Unicode, for convenience
             return s
-        try:
-            return s.decode('UTF-8')
-        except UnicodeError:
+        else:
             charset = chardet.detect(s)
             return s.decode(charset, 'replace')
 
