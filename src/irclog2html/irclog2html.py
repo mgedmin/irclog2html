@@ -846,11 +846,19 @@ def main(argv=sys.argv):
     next = (options.next_title, options.next_url)
 
     for filename in args:
+        # We're dealing with text here.  Why open the file in binary mode?
+        # Simple: the Latin/Unicode hybrid encoding monstrosity described
+        # at http://xchat.org/encoding/#hybrid.  Python doesn't support this
+        # natively, so we have to do the decoding ourselves.
         try:
             infile = io.open(filename, 'rb')
         except EnvironmentError as e:
             sys.exit("%s: cannot open %s for reading: %s"
                      % (parser.prog, filename, e))
+        # The above argument does not apply on the output side.  However we
+        # currently handle encoding in our style classes, and they have
+        # different default charsets, so it's simpler to just give a binary
+        # file to the style class and let it deal with all the details.
         outfilename = filename + ".html"
         try:
             outfile = io.open(outfilename, "wb")
