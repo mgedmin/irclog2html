@@ -30,6 +30,11 @@ endif
 test-all-pythons: bin/tox
 	bin/tox
 
+.PHONY: coverage
+coverage: bin/tox
+	bin/tox -e coverage --develop
+	.tox/coverage/bin/coverage report
+
 .PHONY: dist
 dist:
 	$(PYTHON) setup.py sdist
