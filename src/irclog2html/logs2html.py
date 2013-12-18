@@ -13,7 +13,10 @@ YYYYMMDD) in the filename.
 
 from __future__ import print_function
 
-# Copyright (c) 2005--2013  Marius Gedminas 
+from operator import attrgetter
+
+
+# Copyright (c) 2005--2013  Marius Gedminas
 # latest.log.html symlink suggested by Chris Foster
 #
 # Released under the terms of the GNU GPL
@@ -63,7 +66,7 @@ class LogFile:
             raise Error("File name does not contain a YYYY-MM-DD date: %s"
                         % filename)
         self.date = datetime.date(*map(int, m.groups()))
-        self.link = basename + ".html"
+        self.link = irclog2html.pick_output_filename(basename)
         self.title = self.date.strftime('%Y-%m-%d (%A)')
 
     def __eq__(self, other):
@@ -119,11 +122,12 @@ def find_log_files(directory, pattern='*.log'):
 
     Returns a sorted list of LogFile objects (oldest first).
     """
-    logfiles = []
-    for filename in glob.glob(os.path.join(directory, pattern)):
-        logfiles.append((filename, LogFile(filename)))
-    logfiles.sort() # ISO 8601 dates sort the way we need them
-    return [log for filename, log in logfiles]
+    pattern = os.path.join(directory, pattern)
+    # ISO 8601 dates sort the way we need them
+    return sorted([LogFile(filename)
+                   for filename in glob.glob(pattern)
+                                   + glob.glob(pattern + '.gz')],
+                  key=attrgetter('filename'))
 
 
 def write_index(outfile, title, logfiles, searchbox=False, latest_log_link=None):

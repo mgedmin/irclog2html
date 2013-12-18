@@ -1,16 +1,17 @@
 import datetime
 import doctest
+import gzip
 import io
 import os
 import shutil
 import sys
 import tempfile
 import unittest
+from contextlib import closing
 
 from irclog2html.irclogsearch import (
-    Error, SearchResult, SearchResultFormatter, LogParser,
-    date_from_filename, link_from_filename, search_irc_logs,
-    print_search_form, print_search_results, rewrap_stdout, main)
+    SearchResult, SearchResultFormatter, LogParser, search_irc_logs,
+    print_search_form, print_search_results, main)
 
 
 try:
@@ -91,32 +92,16 @@ def doctest_SearchResultFormatter():
     """
 
 
-def doctest_date_from_filename():
-    """Test for date_from_filename
-
-        >>> date_from_filename('/path/to/channel-2013-03-18.log')
-        datetime.date(2013, 3, 18)
-
-        >>> try: date_from_filename('/path/to/channel-nodate.log')
-        ... except Error as e: print("Error: %s" % e.args[0])
-        Error: File name does not contain a YYYY-MM-DD date: /path/to/channel-nodate.log
-
-    """
-
-
-def doctest_link_from_filename():
-    """Test for link_from_filename
-
-        >>> str(link_from_filename('/path/channel-2013-03-18.log'))
-        'channel-2013-03-18.log.html'
-
-    """
+def gzip_copy(src, dst):
+    with open(src, 'rb') as fi:
+        with closing(gzip.open(dst, 'wb')) as fo:
+            shutil.copyfileobj(fi, fo)
 
 
 def set_up_sample():
     tmpdir = tempfile.mkdtemp(prefix='irclog2html-test-')
-    shutil.copy(os.path.join(here, 'sample.log'),
-                os.path.join(tmpdir, 'sample-2013-03-17.log'))
+    gzip_copy(os.path.join(here, 'sample.log'),
+              os.path.join(tmpdir, 'sample-2013-03-17.log.gz'))
     shutil.copy(os.path.join(here, 'sample.log'),
                 os.path.join(tmpdir, 'sample-2013-03-18.log'))
     return tmpdir

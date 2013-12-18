@@ -1,10 +1,11 @@
 Changelog
 =========
 
-2.12.2 (unreleased)
+2.13.0 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Handle gzipped files transparently
+  (https://github.com/mgedmin/irclog2html/issues/5).
 
 
 2.12.1 (2013-03-22)

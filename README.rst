@@ -20,7 +20,7 @@ Quick usage for a single log file::
 Mass-conversion of logs (one file per day, with YYYY-MM-DD in the filename)
 with next/prev links, with mtime checks, usable from cron::
 
-  logs2html directory/            (looks for *.log, produces *.log.html)
+  logs2html directory/     (looks for *.log and *.log.gz, produces *.log.html)
 
 
 Configuration files
@@ -71,6 +71,7 @@ it work::
     SetEnv IRCLOG_LOCATION "/var/www/my-irclog/"
     # Uncomment the following if your log files use a different format
     #SetEnv IRCLOG_GLOB "*.log.????-??-??"
+    # (this will also automatically handle *.log.????-??-??.gz)
   </Location>
 
 

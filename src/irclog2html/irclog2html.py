@@ -11,7 +11,7 @@ This is a Python port (+ improvements) of irclog2html.pl Version 2.1, which
 was written by Jeff Waugh and is available at www.perkypants.org
 """
 
-# Copyright (c) 2005--2013, Marius Gedminas 
+# Copyright (c) 2005--2013, Marius Gedminas
 # Copyright (c) 2000, Jeffrey W. Waugh
 
 # Python port:
@@ -47,6 +47,7 @@ was written by Jeff Waugh and is available at www.perkypants.org
 
 from __future__ import print_function, unicode_literals
 
+import gzip
 import io
 import optparse
 import os
@@ -178,6 +179,18 @@ class LogParser(object):
                     yield time, self.SERVER, line
                 else:
                     yield time, self.OTHER, line
+
+
+def open_log_file(filename):
+    """Open a log file for parsing."""
+    # We're dealing with text here.  Why open the file in binary mode?
+    # Simple: the Latin/Unicode hybrid encoding monstrosity described
+    # at http://xchat.org/encoding/#hybrid.  Python doesn't support this
+    # natively, so we have to do the decoding ourselves.
+    if filename.endswith('.gz'):
+        return gzip.open(filename, 'rb')
+    else:
+        return io.open(filename, 'rb')
 
 
 def shorttime(time):
@@ -820,6 +833,14 @@ def parse_args(argv=sys.argv):
     return parser, options, args
 
 
+def pick_output_filename(input_filename):
+    """Pick a filename for the output file."""
+    if input_filename.endswith('.gz'):
+        return input_filename[:-len('.gz')] + ".html"
+    else:
+        return input_filename + ".html"
+
+
 def main(argv=sys.argv):
     parser, options, args = parse_args(argv)
     if options.style == "help":
@@ -846,20 +867,16 @@ def main(argv=sys.argv):
     next = (options.next_title, options.next_url)
 
     for filename in args:
-        # We're dealing with text here.  Why open the file in binary mode?
-        # Simple: the Latin/Unicode hybrid encoding monstrosity described
-        # at http://xchat.org/encoding/#hybrid.  Python doesn't support this
-        # natively, so we have to do the decoding ourselves.
         try:
-            infile = io.open(filename, 'rb')
+            infile = open_log_file(filename)
         except EnvironmentError as e:
             sys.exit("%s: cannot open %s for reading: %s"
                      % (parser.prog, filename, e))
-        # The above argument does not apply on the output side.  However we
-        # currently handle encoding in our style classes, and they have
-        # different default charsets, so it's simpler to just give a binary
-        # file to the style class and let it deal with all the details.
-        outfilename = filename + ".html"
+        # Why open the output file in binary mode?  We currently handle
+        # encoding in our style classes, and they have different default
+        # charsets, so it's simpler to just give a binary file to the
+        # style class and let it deal with all the details.
+        outfilename = pick_output_filename(filename)
         try:
             outfile = io.open(outfilename, "wb")
         except EnvironmentError as e:

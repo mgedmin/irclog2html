@@ -17,7 +17,7 @@ Apache configuration example:
 
 """
 
-# Copyright (c) 2006, Marius Gedminas 
+# Copyright (c) 2006-2013, Marius Gedminas
 #
 # Released under the terms of the GNU GPL
 # http://www.gnu.org/copyleft/gpl.html
@@ -25,13 +25,12 @@ Apache configuration example:
 from __future__ import print_function, unicode_literals
 
 import cgi
-import datetime
-import glob
 import io
 import os
 import re
 import sys
 import time
+from contextlib import closing
 
 import cgitb; cgitb.enable()
 
@@ -40,8 +39,9 @@ try:
 except ImportError:
     from urllib.parse import quote
 
-from .irclog2html import LogParser, XHTMLTableStyle, NickColourizer, escape
-from .irclog2html import VERSION, RELEASE
+from .irclog2html import (LogParser, XHTMLTableStyle, NickColourizer,
+                          escape, open_log_file, VERSION, RELEASE)
+from .logs2html import find_log_files
 
 
 try:
@@ -159,22 +159,8 @@ def urlescape(link):
     return escape(quote(link))
 
 
-def date_from_filename(filename):
-    basename = os.path.basename(filename)
-    m = DATE_REGEXP.match(basename)
-    if not m:
-        raise Error("File name does not contain a YYYY-MM-DD date: %s"
-                    % filename)
-    return datetime.date(*map(int, m.groups()))
-
-
-def link_from_filename(filename):
-    basename = os.path.basename(filename)
-    return basename + '.html'
-
-
 def parse_log_file(filename):
-    with open(filename, 'rb') as f:
+    with closing(open_log_file(filename)) as f:
         for row in LogParser(f):
             yield row
 
@@ -185,14 +171,13 @@ def search_irc_logs(query, stats=None, where=None):
     if not stats:
         stats = SearchStats() # will be discarded, but, oh, well
     query = query.lower()
-    files = glob.glob(os.path.join(where, logfile_pattern))
-    files.sort()    # ISO-8601 dates sort the right way
+    files = find_log_files(where, logfile_pattern)
     files.reverse() # newest first
-    for filename in files:
-        date = date_from_filename(filename)
-        link = link_from_filename(filename)
+    for f in files:
+        date = f.date
+        link = f.link
         stats.files += 1
-        for time, event, info in parse_log_file(filename):
+        for time, event, info in parse_log_file(f.filename):
             if event == LogParser.COMMENT:
                 nick, text = info
                 text = nick + ' ' + text
@@ -203,7 +188,7 @@ def search_irc_logs(query, stats=None, where=None):
             stats.lines += 1
             if query in text.lower():
                 stats.matches += 1
-                yield SearchResult(filename, link, date, time, event, info)
+                yield SearchResult(f.filename, link, date, time, event, info)
 
 
 def print_search_form():
