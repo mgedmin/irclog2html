@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.13.0 (unreleased)
+2.13.0 (2013-12-18)
 -------------------
 
 - Handle gzipped files transparently
