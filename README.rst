@@ -80,10 +80,13 @@ Misc
 
 Website: http://mg.pov.lt/irclog2html/
 
-Bug tracker: https://bugs.launchpad.net/irclog2html or
-https://github.com/mgedmin/irclog2html/issues
+Bug tracker:
+https://github.com/mgedmin/irclog2html/issues or
+https://bugs.launchpad.net/irclog2html
 
 Licence: GPL v2 or later (http://www.gnu.org/copyleft/gpl.html)
+
+If you want to leave a tip, see https://www.gittip.com/mgedmin/
 
 |buildstatus|_ |coverage|_
 
