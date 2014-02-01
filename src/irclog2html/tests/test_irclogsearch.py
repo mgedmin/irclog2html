@@ -312,8 +312,10 @@ def doctest_main_searches():
 
 
 def test_suite():
+    optionflags = (doctest.ELLIPSIS | doctest.REPORT_NDIFF |
+                   doctest.NORMALIZE_WHITESPACE)
     return unittest.TestSuite([
-        doctest.DocTestSuite(optionflags=doctest.ELLIPSIS | doctest.REPORT_NDIFF),
+        doctest.DocTestSuite(optionflags=optionflags),
     ])
 
 
