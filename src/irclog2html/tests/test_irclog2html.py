@@ -777,7 +777,7 @@ def doctest_main_can_handle_output_errors():
         >>> open(outfilename, 'w').close()
         >>> os.chmod(outfilename, 0o444)
         >>> run(os.path.join(tmpdir, 'sample.log'))
-        SystemExit("irclog2html: cannot open .../sample.log.html for writing: [Errno 13] Permission denied: .../sample.log.html'")
+        SystemExit("irclog2html: cannot open ...sample.log.html for writing: [Errno 13] Permission denied: ...sample.log.html'")
         >>> os.chmod(outfilename, 0o644)
         >>> shutil.rmtree(tmpdir)
 
