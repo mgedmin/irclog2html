@@ -126,6 +126,10 @@ class TestLogFile(TestCase):
                           self.LogFile('somechannel-20130318.log')])
 
     def test_move_symlink(self):
+        if not hasattr(os, 'symlink'):
+            if not hasattr(self, 'skipTest'): # Python 2.6
+                return
+            self.skipTest("platform does not support symlinks")
         move_symlink('somechannel-20130316.log.html',
                      self.filename('latest.log.html'))
         self.assertEqual(os.readlink(self.filename('latest.log.html')),
@@ -293,8 +297,9 @@ def doctest_main_extra_args():
 
 def test_suite():
     return unittest.TestSuite([
-                doctest.DocTestSuite(optionflags=doctest.ELLIPSIS | doctest.REPORT_NDIFF),
-                unittest.makeSuite(TestLogFile)])
+        doctest.DocTestSuite(optionflags=doctest.ELLIPSIS | doctest.REPORT_NDIFF),
+        unittest.makeSuite(TestLogFile),
+    ])
 
 
 if __name__ == '__main__':

@@ -270,6 +270,9 @@ def move_symlink(src, dst):
 
     ``dst`` is the name of the symlink.
     """
+    if not hasattr(os, "symlink"):
+        # No symlinks on Windows
+        return
     try:
         os.unlink(dst)
     except OSError:
