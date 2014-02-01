@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.13.1 (unreleased)
+2.13.1 (2014-02-01)
 -------------------
 
 - Add support for Windows (e.g. refrain from creating latest.log.html
