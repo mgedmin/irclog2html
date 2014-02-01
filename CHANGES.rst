@@ -4,6 +4,9 @@ Changelog
 2.13.1 (unreleased)
 -------------------
 
+- Add support for Windows (e.g. refrain from creating latest.log.html
+  symlinks).
+
 
 2.13.0 (2013-12-18)
 -------------------

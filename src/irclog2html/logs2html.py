@@ -245,7 +245,7 @@ def process(dir, options):
             logfile.generate(options.style, options.prefix, prev, next,
                              extra_args)
     latest_log_link = None
-    if logfiles:
+    if logfiles and hasattr(os, "symlink"):
         latest_log_link = 'latest.log.html'
         move_symlink(logfiles[0].link, os.path.join(dir, latest_log_link))
     outfilename = os.path.join(dir, 'index.html')
@@ -270,9 +270,6 @@ def move_symlink(src, dst):
 
     ``dst`` is the name of the symlink.
     """
-    if not hasattr(os, "symlink"):
-        # No symlinks on Windows
-        return
     try:
         os.unlink(dst)
     except OSError:
