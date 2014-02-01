@@ -150,7 +150,8 @@ class TestLogFile(TestCase):
                                        style='xhtmltable', title='IRC logs'))
         process(self.tmpdir, options)
         self.assertTrue(os.path.exists(self.filename('index.html')))
-        self.assertTrue(os.path.exists(self.filename('latest.log.html')))
+        if hasattr(os, 'symlink'):
+            self.assertTrue(os.path.exists(self.filename('latest.log.html')))
         self.assertTrue(os.path.exists(self.filename('irclog.css')))
         self.assertTrue(os.path.exists(
             self.filename('somechannel-20130316.log.html')))
@@ -168,7 +169,8 @@ class TestLogFile(TestCase):
                                        style='xhtmltable', title='IRC logs'))
         process(self.tmpdir, options)
         self.assertTrue(os.path.exists(self.filename('index.html')))
-        self.assertTrue(os.path.exists(self.filename('latest.log.html')))
+        if hasattr(os, 'symlink'):
+            self.assertTrue(os.path.exists(self.filename('latest.log.html')))
         self.assertTrue(os.path.exists(self.filename('irclog.css')))
 
     def test_process_handles_write_errors(self):
@@ -189,7 +191,8 @@ class TestLogFile(TestCase):
         self.create('somechannel-20130318.log')
         main(['logs2html', self.tmpdir])
         self.assertTrue(os.path.exists(self.filename('index.html')))
-        self.assertTrue(os.path.exists(self.filename('latest.log.html')))
+        if hasattr(os, 'symlink'):
+            self.assertTrue(os.path.exists(self.filename('latest.log.html')))
         self.assertTrue(os.path.exists(self.filename('irclog.css')))
         self.assertTrue(os.path.exists(
             self.filename('somechannel-20130316.log.html')))
