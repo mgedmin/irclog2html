@@ -773,10 +773,12 @@ def doctest_main_can_handle_output_errors():
         >>> tmpdir = tempfile.mkdtemp(prefix='irclog2html-test-')
         >>> _ = shutil.copyfile(os.path.join(here, 'sample.log'),
         ...                     os.path.join(tmpdir, 'sample.log'))
-        >>> os.chmod(tmpdir, 0o555)
+        >>> outfilename = os.path.join(tmpdir, 'sample.log.html')
+        >>> open(outfilename, 'w').close()
+        >>> os.chmod(outfilename, 0o444)
         >>> run(os.path.join(tmpdir, 'sample.log'))
         SystemExit("irclog2html: cannot open .../sample.log.html for writing: [Errno 13] Permission denied: .../sample.log.html'")
-        >>> os.chmod(tmpdir, 0o755)
+        >>> os.chmod(outfilename, 0o644)
         >>> shutil.rmtree(tmpdir)
 
     """
