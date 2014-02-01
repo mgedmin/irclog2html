@@ -25,7 +25,7 @@ class TestCase(unittest.TestCase):
         if self.tmpdir:
             try:
                 shutil.rmtree(self.tmpdir)
-            except Exception, e:
+            except Exception as e:
                 sys.stderr.write(
                     "\nAn error happened while cleaning up %s:\n%s: %s\n"
                     % (self.tmpdir, e.__class__.__name__, e))
