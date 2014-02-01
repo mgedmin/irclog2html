@@ -23,7 +23,13 @@ class TestCase(unittest.TestCase):
 
     def tearDown(self):
         if self.tmpdir:
-            shutil.rmtree(self.tmpdir)
+            try:
+                shutil.rmtree(self.tmpdir)
+            except Exception, e:
+                sys.stderr.write(
+                    "An error happened while cleaning up %s:\n%s: %s\n"
+                    % (self.tmpdir, e.__class__.__name__, e))
+                sys.stderr.flush()
 
     def filename(self, filename):
         if self.tmpdir is None:
