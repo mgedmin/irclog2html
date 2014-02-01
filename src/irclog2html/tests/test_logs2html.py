@@ -27,7 +27,7 @@ class TestCase(unittest.TestCase):
                 shutil.rmtree(self.tmpdir)
             except Exception, e:
                 sys.stderr.write(
-                    "An error happened while cleaning up %s:\n%s: %s\n"
+                    "\nAn error happened while cleaning up %s:\n%s: %s\n"
                     % (self.tmpdir, e.__class__.__name__, e))
                 sys.stderr.flush()
 
@@ -189,6 +189,9 @@ class TestLogFile(TestCase):
                                        style='xhtmltable', title='IRC logs'))
         os.chmod(self.filename('index.html'), 0o444)
         self.assertRaises(Error, process, self.tmpdir, options)
+        # shutil.rmtree() on Windows can't handle read-only files.
+        # Restore the permissions so that our tearDown() can succeed.
+        os.chmod(self.filename('index.html'), 0o644)
 
     def test_main(self):
         self.create('somechannel-20130316.log')
