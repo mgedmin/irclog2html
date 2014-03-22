@@ -55,6 +55,7 @@ import re
 import shlex
 import shutil
 import sys
+import chardet
 
 try:
     from urllib import quote
@@ -139,10 +140,9 @@ class LogParser(object):
         if isinstance(s, unicode):
             # Accept input that's already Unicode, for convenience
             return s
-        try:
-            return s.decode('UTF-8')
-        except UnicodeError:
-            return s.decode('cp1252', 'replace')
+        else:
+            charset = chardet.detect(s)['encoding']
+            return s.decode(charset, 'replace')
 
     def __iter__(self):
         for line in self.infile:
