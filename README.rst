@@ -86,8 +86,6 @@ https://bugs.launchpad.net/irclog2html
 
 Licence: GPL v2 or later (http://www.gnu.org/copyleft/gpl.html)
 
-If you want to leave a tip, see https://www.gittip.com/mgedmin/
-
 |buildstatus|_ |coverage|_
 
 .. |buildstatus| image:: https://api.travis-ci.org/mgedmin/irclog2html.png?branch=master
