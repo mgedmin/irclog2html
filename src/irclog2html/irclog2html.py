@@ -824,6 +824,8 @@ def parse_args(argv=sys.argv):
     parser.add_option('-S', '--searchbox', action="store_true", dest="searchbox",
                       default=False,
                       help="include a search box")
+    parser.add_option('-o', '--output-file', dest="output_file",
+                      default=None, help="destination output file (default: <input-file-name>.html)")
     for name, default, what in COLOURS:
         parser.add_option('--color-%s' % name, '--colour-%s' % name,
                           dest="colour_%s" % name, default=default,
@@ -876,7 +878,7 @@ def main(argv=sys.argv):
         # encoding in our style classes, and they have different default
         # charsets, so it's simpler to just give a binary file to the
         # style class and let it deal with all the details.
-        outfilename = pick_output_filename(filename)
+        outfilename = options.output_file if options.output_file else pick_output_filename(filename)
         try:
             outfile = io.open(outfilename, "wb")
         except EnvironmentError as e:
