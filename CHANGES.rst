@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.13.2 (unreleased)
+2.14.0 (2014-12-12)
 -------------------
 
 - Add -o option to specify the output file name.  Patch by Moises Silva
