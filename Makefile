@@ -32,8 +32,7 @@ test-all-pythons: bin/tox
 
 .PHONY: coverage
 coverage: bin/tox
-	bin/tox -e coverage --develop
-	.tox/coverage/bin/coverage report
+	bin/tox -e coverage
 
 .PHONY: dist
 dist:
@@ -99,11 +98,15 @@ clean:
 python:
 	virtualenv -p $(PYTHON) python
 
+python/bin/virtualenv:
+	python/bin/pip install -U setuptools virtualenv
+
 bin/buildout: python bootstrap.py
 	python/bin/python bootstrap.py
+	touch -c $@
 
 
 scripts = bin/test bin/irclog2html bin/logs2html bin/irclogsearch bin/tox
-$(scripts): bin/buildout buildout.cfg setup.py
+$(scripts): bin/buildout buildout.cfg setup.py python/bin/virtualenv
 	bin/buildout
 	touch -c $(scripts)
