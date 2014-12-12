@@ -808,6 +808,52 @@ def doctest_main_can_handle_missing_file():
     """
 
 
+def doctest_main_complains_if_single_output_file_for_multiple_input_files_is_given():
+    """Test for main
+
+        >>> run('chan1.log', 'chan2.log', '-o', 'output.html')
+        Usage: irclog2html [options] filename [...]
+        <BLANKLINE>
+        irclog2html: error: -o must be a directory when processing multiple files
+        SystemExit(2)
+
+    """
+
+
+def doctest_main_output_file():
+    """Test for main
+
+        >>> tmpdir = tempfile.mkdtemp(prefix='irclog2html-test-')
+        >>> fn = os.path.join(here, 'sample.log')
+        >>> outfn = os.path.join(tmpdir, 'output.html')
+        >>> run(fn, '-o', outfn)
+        >>> with io.open(outfn, encoding='UTF-8') as f:
+        ...     print(f.read())
+        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+        ...
+        >>> shutil.rmtree(tmpdir)
+
+    """
+
+
+def doctest_main_output_directory():
+    """Test for main
+
+        >>> tmpdir = tempfile.mkdtemp(prefix='irclog2html-test-')
+        >>> fn = os.path.join(here, 'sample.log')
+        >>> run(fn, '-o', tmpdir)
+        >>> outfn = os.path.join(tmpdir, 'sample.log.html')
+        >>> with io.open(outfn, encoding='UTF-8') as f:
+        ...     print(f.read())
+        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+        ...
+        >>> shutil.rmtree(tmpdir)
+
+    """
+
+
 def test_suite():
     optionflags = doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS | doctest.REPORT_NDIFF
     return unittest.TestSuite([

@@ -4,6 +4,9 @@ Changelog
 2.13.2 (unreleased)
 -------------------
 
+- Add -o option to specify the output file name.  Patch by Moises Silva
+  (https://github.com/mgedmin/irclog2html/pull/7).
+
 
 2.13.1 (2014-02-01)
 -------------------

@@ -11,7 +11,7 @@ This is a Python port (+ improvements) of irclog2html.pl Version 2.1, which
 was written by Jeff Waugh and is available at www.perkypants.org
 """
 
-# Copyright (c) 2005--2013, Marius Gedminas
+# Copyright (c) 2005--2014, Marius Gedminas
 # Copyright (c) 2000, Jeffrey W. Waugh
 
 # Python port:
@@ -824,8 +824,9 @@ def parse_args(argv=sys.argv):
     parser.add_option('-S', '--searchbox', action="store_true", dest="searchbox",
                       default=False,
                       help="include a search box")
-    parser.add_option('-o', '--output-file', dest="output_file",
-                      default=None, help="destination output file (default: <input-file-name>.html)")
+    parser.add_option('-o', '--output-file',
+                      help="destination output file or directory"
+                           " (default: <input-file-name>.html)")
     for name, default, what in COLOURS:
         parser.add_option('--color-%s' % name, '--colour-%s' % name,
                           dest="colour_%s" % name, default=default,
@@ -868,6 +869,8 @@ def main(argv=sys.argv):
     index = (options.index_title, options.index_url)
     next = (options.next_title, options.next_url)
 
+    if len(args) > 1 and options.output_file and not os.path.isdir(options.output_file):
+        parser.error("-o must be a directory when processing multiple files")
     for filename in args:
         try:
             infile = open_log_file(filename)
@@ -878,7 +881,13 @@ def main(argv=sys.argv):
         # encoding in our style classes, and they have different default
         # charsets, so it's simpler to just give a binary file to the
         # style class and let it deal with all the details.
-        outfilename = options.output_file if options.output_file else pick_output_filename(filename)
+        if not options.output_file:
+            outfilename = pick_output_filename(filename)
+        elif os.path.isdir(options.output_file):
+            outfilename = os.path.join(options.output_file,
+                os.path.basename(pick_output_filename(filename)))
+        else:
+            outfilename = options.output_file
         try:
             outfile = io.open(outfilename, "wb")
         except EnvironmentError as e:
