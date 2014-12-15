@@ -102,6 +102,7 @@ python/bin/virtualenv:
 	python/bin/pip install -U setuptools virtualenv
 
 bin/buildout: python bootstrap.py
+	python/bin/pip install -U setuptools
 	python/bin/python bootstrap.py
 	touch -c $@
 
