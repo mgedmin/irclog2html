@@ -88,9 +88,9 @@ Licence: GPL v2 or later (http://www.gnu.org/copyleft/gpl.html)
 
 |buildstatus|_ |coverage|_
 
-.. |buildstatus| image:: https://api.travis-ci.org/mgedmin/irclog2html.png?branch=master
+.. |buildstatus| image:: https://api.travis-ci.org/mgedmin/irclog2html.svg?branch=master
 .. _buildstatus: https://travis-ci.org/mgedmin/irclog2html
 
-.. |coverage| image:: https://coveralls.io/repos/mgedmin/irclog2html/badge.png?branch=master
+.. |coverage| image:: https://coveralls.io/repos/mgedmin/irclog2html/badge.svg?branch=master
 .. _coverage: https://coveralls.io/r/mgedmin/irclog2html
 
