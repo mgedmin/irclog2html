@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Search IRC logs (a CGI script).
+Search IRC logs (a CGI script and a WSGI app).
 
 Expects to find logs matching the IRCLOG_GLOB pattern (default: *.log)
 in the directory specified by the IRCLOG_LOCATION environment variable.
@@ -191,11 +191,12 @@ def search_irc_logs(query, stats=None, where=None):
                 yield SearchResult(f.filename, link, date, time, event, info)
 
 
-def print_search_form(stream=None):
+def print_search_form(stream=None, headers=True):
     if stream is None:
         stream = sys.stdout
-    print("Content-Type: text/html; charset=UTF-8", file=stream)
-    print("", file=stream)
+    if headers:
+        print("Content-Type: text/html; charset=UTF-8", file=stream)
+        print("", file=stream)
     print(HEADER, file=stream)
     print("<h1>Search IRC logs</h1>", file=stream)
     print('<form action="" method="get">', file=stream)
@@ -205,11 +206,12 @@ def print_search_form(stream=None):
     print(FOOTER, file=stream)
 
 
-def print_search_results(query, where=None, stream=None):
+def print_search_results(query, where=None, stream=None, headers=True):
     if stream is None:
         stream = sys.stdout
-    print("Content-Type: text/html; charset=UTF-8", file=stream)
-    print("", file=stream)
+    if headers:
+        print("Content-Type: text/html; charset=UTF-8", file=stream)
+        print("", file=stream)
     print(HEADER, file=stream)
     print("<h1>IRC log search results for %s</h1>" % escape(query), file=stream)
     print('<form action="" method="get">', file=stream)
@@ -251,6 +253,8 @@ def print_search_results(query, where=None, stream=None):
           file=stream)
     print(FOOTER, file=stream)
 
+    return formatter # destroying it closes the stream, breaking the result
+
 
 def rewrap_stdout():
     if hasattr(sys.stdout, 'buffer'):
@@ -262,7 +266,36 @@ def rewrap_stdout():
                             line_buffering=True)
 
 
+def wsgi(environ, start_response):
+    """WSGI application"""
+    global logfile_path, logfile_pattern
+    logfile_path = environ.get('IRCLOG_LOCATION', os.path.dirname(__file__))
+    logfile_pattern = environ.get('IRCLOG_GLOB', '*.log')
+    form = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ)
+    stream = io.TextIOWrapper(io.BytesIO(), 'ascii',
+                              errors='xmlcharrefreplace',
+                              line_buffering=True)
+    start_response("200 Ok", [("Content-Type", "text/html; charset=UTF-8")])
+    if "q" not in form:
+        print_search_form(stream, headers=False)
+    else:
+        search_text = form["q"].value
+        if isinstance(search_text, bytes):
+            search_text = search_text.decode('UTF-8')
+        fmt = print_search_results(search_text, stream=stream, headers=False)
+
+    return [stream.buffer.getvalue()]
+
+
+def serve():
+    from wsgiref.simple_server import make_server
+    srv = make_server('localhost', 8080, wsgi)
+    print("Started at http://localhost:8080/")
+    srv.serve_forever()
+
+
 def main():
+    """CGI script"""
     global logfile_path, logfile_pattern
     logfile_path = os.getenv('IRCLOG_LOCATION') or os.path.dirname(__file__)
     logfile_pattern = os.getenv('IRCLOG_GLOB') or '*.log'

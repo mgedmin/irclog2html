@@ -168,7 +168,7 @@ def doctest_print_search_results():
 
         >>> tmpdir = set_up_sample()
         >>> sys.stdout.buffer = BytesIOWrapper(sys.stdout)
-        >>> print_search_results('povbot', where=tmpdir)
+        >>> fmt = print_search_results('povbot', where=tmpdir)
         Content-Type: text/html; charset=UTF-8
         <BLANKLINE>
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
