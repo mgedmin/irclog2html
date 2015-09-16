@@ -129,13 +129,13 @@ class SearchResultFormatter(object):
     """Formatter of search results."""
 
     def __init__(self, stream=None):
-        if stream is None:
-            stream = sys.stdout.buffer
-        self.style = XHTMLTableStyle(stream)
+        self.stream = stream
+        bstream = stream.buffer
+        self.style = XHTMLTableStyle(bstream)
         self.nick_colour = NickColourizer()
 
     def print_prefix(self):
-        print(self.style.prefix)
+        print(self.style.prefix, file=self.stream)
 
     def print_html(self, result):
         link = urlescape(result.link)
@@ -152,7 +152,7 @@ class SearchResultFormatter(object):
             self.style.servermsg(result.time, result.event, text, link)
 
     def print_suffix(self):
-        print(self.style.suffix)
+        print(self.style.suffix, file=self.stream)
 
 
 def urlescape(link):
@@ -191,31 +191,36 @@ def search_irc_logs(query, stats=None, where=None):
                 yield SearchResult(f.filename, link, date, time, event, info)
 
 
-def print_search_form():
-    print("Content-Type: text/html; charset=UTF-8")
-    print("")
-    print(HEADER)
-    print("<h1>Search IRC logs</h1>")
-    print('<form action="" method="get">')
-    print('<input type="text" name="q" />')
-    print('<input type="submit" />')
-    print('</form>')
-    print(FOOTER)
+def print_search_form(stream=None):
+    if stream is None:
+        stream = sys.stdout
+    print("Content-Type: text/html; charset=UTF-8", file=stream)
+    print("", file=stream)
+    print(HEADER, file=stream)
+    print("<h1>Search IRC logs</h1>", file=stream)
+    print('<form action="" method="get">', file=stream)
+    print('<input type="text" name="q" />', file=stream)
+    print('<input type="submit" />', file=stream)
+    print('</form>', file=stream)
+    print(FOOTER, file=stream)
 
 
-def print_search_results(query, where=None):
-    print("Content-Type: text/html; charset=UTF-8")
-    print("")
-    print(HEADER)
-    print("<h1>IRC log search results for %s</h1>" % escape(query))
-    print('<form action="" method="get">')
-    print('<input type="text" name="q" value="%s" />' % escape(query))
-    print('<input type="submit" />')
-    print('</form>')
+def print_search_results(query, where=None, stream=None):
+    if stream is None:
+        stream = sys.stdout
+    print("Content-Type: text/html; charset=UTF-8", file=stream)
+    print("", file=stream)
+    print(HEADER, file=stream)
+    print("<h1>IRC log search results for %s</h1>" % escape(query), file=stream)
+    print('<form action="" method="get">', file=stream)
+    print('<input type="text" name="q" value="%s" />' % escape(query),
+          file=stream)
+    print('<input type="submit" />', file=stream)
+    print('</form>', file=stream)
     started = time.time()
     date = None
     prev_result = None
-    formatter = SearchResultFormatter()
+    formatter = SearchResultFormatter(stream)
     stats = SearchStats()
     for result in search_irc_logs(query, stats, where=where):
         if date != result.date:
@@ -223,11 +228,13 @@ def print_search_results(query, where=None):
                 formatter.print_suffix()
                 prev_result = None
             if date:
-                print("  </li>")
+                print("  </li>", file=stream)
             else:
-                print('<ul class="searchresults">')
-            print('  <li><a href="%s">%s</a>:' % (urlescape(result.link),
-                                        result.date.strftime('%Y-%m-%d (%A)')))
+                print('<ul class="searchresults">', file=stream)
+            print('  <li><a href="%s">%s</a>:' %
+                  (urlescape(result.link),
+                   result.date.strftime('%Y-%m-%d (%A)')),
+                  file=stream)
             date = result.date
         if not prev_result:
             formatter.print_prefix()
@@ -236,24 +243,23 @@ def print_search_results(query, where=None):
     if prev_result:
         formatter.print_suffix()
     if date:
-        print("  </li>")
-        print("</ul>")
+        print("  </li>", file=stream)
+        print("</ul>", file=stream)
     total_time = time.time() - started
     print("<p>%d matches in %d log files with %d lines (%.1f seconds).</p>" % (
-                stats.matches, stats.files, stats.lines, total_time))
-    print(FOOTER)
+                stats.matches, stats.files, stats.lines, total_time),
+          file=stream)
+    print(FOOTER, file=stream)
 
 
 def rewrap_stdout():
-    # XXX: shouldn't replace sys.stdout, should pass the output stream to
-    # the functions that want to print stuff
     if hasattr(sys.stdout, 'buffer'):
         stream = sys.stdout.buffer # Python 3
     else:
         stream = StdoutWrapper(sys.stdout) # Python 2
-    sys.stdout = io.TextIOWrapper(stream, 'ascii',
-                                  errors='xmlcharrefreplace',
-                                  line_buffering=True)
+    return io.TextIOWrapper(stream, 'ascii',
+                            errors='xmlcharrefreplace',
+                            line_buffering=True)
 
 
 def main():
@@ -261,14 +267,14 @@ def main():
     logfile_path = os.getenv('IRCLOG_LOCATION') or os.path.dirname(__file__)
     logfile_pattern = os.getenv('IRCLOG_GLOB') or '*.log'
     form = cgi.FieldStorage()
-    rewrap_stdout()
+    stream = rewrap_stdout()
     if "q" not in form:
-        print_search_form()
+        print_search_form(stream)
         return
     search_text = form["q"].value
     if isinstance(search_text, bytes):
         search_text = search_text.decode('UTF-8')
-    print_search_results(search_text)
+    print_search_results(search_text, stream=stream)
 
 
 if __name__ == '__main__':

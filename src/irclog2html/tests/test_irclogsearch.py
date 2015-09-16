@@ -64,7 +64,8 @@ def myrepr(o):
 def doctest_SearchResultFormatter():
     """Test for SearchResultFormatter
 
-        >>> srf = SearchResultFormatter(BytesIOWrapper(sys.stdout))
+        >>> sys.stdout.buffer = BytesIOWrapper(sys.stdout)
+        >>> srf = SearchResultFormatter(sys.stdout)
         >>> srf.print_prefix()
         <table class="irclog">
 
