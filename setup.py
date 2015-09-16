@@ -42,6 +42,7 @@ setup(
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
+    extras_require=dict(test=["mock"]),
     packages=['irclog2html'],
     package_dir={'': 'src'},
     include_package_data=True,
