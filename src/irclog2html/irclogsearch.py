@@ -51,11 +51,6 @@ except NameError:
     unicode = str
 
 
-# Overwritten at the start of main()
-logfile_path = os.getenv('IRCLOG_LOCATION') or os.path.dirname(__file__)
-logfile_pattern = os.getenv('IRCLOG_GLOB') or '*.log'
-
-
 DATE_REGEXP = re.compile('^.*(\d\d\d\d)-(\d\d)-(\d\d)')
 
 
@@ -165,9 +160,11 @@ def parse_log_file(filename):
             yield row
 
 
-def search_irc_logs(query, stats=None, where=None):
+def search_irc_logs(query, stats=None, where=None, logfile_pattern=None):
     if where is None:
-        where = logfile_path
+        where = os.path.dirname(__file__)
+    if logfile_pattern is None:
+            logfile_pattern = "*.log"
     if not stats:
         stats = SearchStats() # will be discarded, but, oh, well
     query = query.lower()
@@ -208,7 +205,8 @@ def print_search_form(stream=None):
     print(FOOTER, file=stream)
 
 
-def print_search_results(query, where=None, stream=None):
+def print_search_results(query, where=None, logfile_pattern=None,
+                         stream=None):
     if stream is None:
         stream = sys.stdout
     print(HEADER, file=stream)
@@ -223,7 +221,8 @@ def print_search_results(query, where=None, stream=None):
     prev_result = None
     formatter = SearchResultFormatter(stream)
     stats = SearchStats()
-    for result in search_irc_logs(query, stats, where=where):
+    for result in search_irc_logs(query, stats, where=where,
+                                  logfile_pattern=logfile_pattern):
         if date != result.date:
             if prev_result:
                 formatter.print_suffix()
@@ -265,14 +264,15 @@ def rewrap_stdout():
                             line_buffering=True)
 
 
-def search_page(stream, form):
+def search_page(stream, form, where, logfile_pattern):
     if "q" not in form:
         print_search_form(stream)
     else:
         search_text = form["q"].value
         if isinstance(search_text, bytes):
             search_text = search_text.decode('UTF-8')
-        return print_search_results(search_text, stream=stream)
+        return print_search_results(search_text, stream=stream, where=where,
+                                    logfile_pattern=logfile_pattern)
 
 
 def get_path(environ):
@@ -283,9 +283,8 @@ def get_path(environ):
 
 def wsgi(environ, start_response):
     """WSGI application"""
-    global logfile_path, logfile_pattern
-    logfile_path = environ.get('IRCLOG_LOCATION', os.path.dirname(__file__))
-    logfile_pattern = environ.get('IRCLOG_GLOB', '*.log')
+    logfile_path = environ.get('IRCLOG_LOCATION')
+    logfile_pattern = environ.get('IRCLOG_GLOB')
     form = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ)
     stream = io.TextIOWrapper(io.BytesIO(), 'ascii',
                               errors='xmlcharrefreplace',
@@ -296,7 +295,7 @@ def wsgi(environ, start_response):
 
     path = get_path(environ)
     if path == 'search':
-        fmt = search_page(stream, form)
+        fmt = search_page(stream, form, logfile_path, logfile_pattern)
         result = [stream.buffer.getvalue()]
     else:
         if path.endswith('css'):
@@ -321,13 +320,12 @@ def serve():
 
 def main():
     """CGI script"""
-    global logfile_path, logfile_pattern
-    logfile_path = os.getenv('IRCLOG_LOCATION') or os.path.dirname(__file__)
-    logfile_pattern = os.getenv('IRCLOG_GLOB') or '*.log'
+    logfile_path = os.getenv('IRCLOG_LOCATION')
+    logfile_pattern = os.getenv('IRCLOG_GLOB')
     form = cgi.FieldStorage()
     stream = rewrap_stdout()
     print_cgi_headers(stream)
-    search_page(stream, form)
+    search_page(stream, form, logfile_path, logfile_pattern)
 
 
 if __name__ == '__main__':
