@@ -265,6 +265,16 @@ def rewrap_stdout():
                             line_buffering=True)
 
 
+def search_page(stream, form):
+    if "q" not in form:
+        print_search_form(stream)
+    else:
+        search_text = form["q"].value
+        if isinstance(search_text, bytes):
+            search_text = search_text.decode('UTF-8')
+        return print_search_results(search_text, stream=stream)
+
+
 def wsgi(environ, start_response):
     """WSGI application"""
     global logfile_path, logfile_pattern
@@ -277,14 +287,7 @@ def wsgi(environ, start_response):
     status = str("200 Ok")
     headers = [(str("Content-Type"), str("text/html; charset=UTF-8"))]
     start_response(status, headers)
-    if "q" not in form:
-        print_search_form(stream)
-    else:
-        search_text = form["q"].value
-        if isinstance(search_text, bytes):
-            search_text = search_text.decode('UTF-8')
-        fmt = print_search_results(search_text, stream=stream)
-
+    fmt = search_page(stream, form)
     return [stream.buffer.getvalue()]
 
 
@@ -303,13 +306,7 @@ def main():
     form = cgi.FieldStorage()
     stream = rewrap_stdout()
     print_cgi_headers(stream)
-    if "q" not in form:
-        print_search_form(stream)
-        return
-    search_text = form["q"].value
-    if isinstance(search_text, bytes):
-        search_text = search_text.decode('UTF-8')
-    print_search_results(search_text, stream=stream)
+    search_page(stream, form)
 
 
 if __name__ == '__main__':
