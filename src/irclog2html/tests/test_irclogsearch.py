@@ -108,6 +108,8 @@ def set_up_sample():
               os.path.join(tmpdir, 'sample-2013-03-17.log.gz'))
     shutil.copy(os.path.join(here, 'sample.log'),
                 os.path.join(tmpdir, 'sample-2013-03-18.log'))
+    with open(os.path.join(tmpdir, "index.html"), "w") as f:
+        f.write("This is the index")
     return tmpdir
 
 
@@ -252,6 +254,90 @@ def doctest_search_page():
         >>> patcher.stop()
 
     """
+
+
+def doctest_get_path():
+    """Test for get_path.
+
+    This function decides whether to search or to display a file based
+    on URL path:
+
+        >>> get_path(dict(PATH_INFO='/search'))
+        'search'
+
+        >>> get_path(dict(PATH_INFO='/#channel-2015-05-05.log.html'))
+        '#channel-2015-05-05.log.html'
+
+    When there is no file name, we show the index:
+
+        >>> get_path(dict(PATH_INFO='/'))
+        'index.html'
+
+    Since we give access to files, we have to protect against FS traversal:
+
+        >>> get_path(dict(PATH_INFO='/../../etc/passwd'))
+        'passwd'
+
+    """
+
+def doctest_wsgi():
+    """Test for the wsgi entry point
+
+        >>> tmpdir = set_up_sample()
+        >>> start_response = mock.MagicMock()
+
+        >>> environ = {
+        ...     'IRCLOG_LOCATION': tmpdir,
+        ...     'PATH_INFO': "/",
+        ...     'wsgi.input': None,
+        ... }
+
+    When accessing the root, we get the index:
+
+        >>> wsgi(environ, start_response)
+        [b'This is the index']
+        >>> start_response.call_args
+        call('200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
+
+    Accessing the search page:
+
+        >>> environ['PATH_INFO'] = '/search'
+        >>> wsgi(environ, start_response)
+        [b'<!DOCTYPE html PUBLIC...<title>Search IRC logs</title>...
+        >>> start_response.call_args
+        call('200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
+
+    Searching the logs:
+
+        >>> environ['PATH_INFO'] = '/search'
+        >>> environ['QUERY_STRING'] = 'q=bot'
+        >>> wsgi(environ, start_response)
+        [b'...<p>10 matches in 2 log files with 20 lines (... seconds).</p>...
+        >>> start_response.call_args
+        call('200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
+
+    Retrieving log files:
+
+        >>> environ['PATH_INFO'] = '/sample-2013-03-18.log'
+        >>> del environ['QUERY_STRING']
+        >>> wsgi(environ, start_response)
+        [b'2005-01-08T23:33:54 *** povbot has joined #pov...
+        >>> start_response.call_args
+        call('200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
+
+    Accessing non-existing files:
+
+        >>> environ['PATH_INFO'] = '/../../../etc/passwd'
+        >>> wsgi(environ, start_response)
+        [b'Not found']
+        >>> start_response.call_args
+        call('404 Not Found', [('Content-Type', 'text/html; charset=UTF-8')])
+
+    Clean up:
+
+        >>> clean_up_sample(tmpdir)
+    """
+
 
 def doctest_main_prints_form():
     """Test for main
