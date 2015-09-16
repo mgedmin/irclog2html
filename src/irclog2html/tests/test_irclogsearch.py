@@ -1,3 +1,4 @@
+import cgi
 import datetime
 import doctest
 import gzip
@@ -9,9 +10,11 @@ import tempfile
 import unittest
 from contextlib import closing
 
+import mock
+
 from irclog2html.irclogsearch import (
     SearchResult, SearchResultFormatter, LogParser, search_irc_logs,
-    print_search_form, print_search_results, main)
+    print_search_form, print_search_results, search_page, get_path, wsgi, main)
 
 
 try:
@@ -214,6 +217,41 @@ def doctest_print_search_results():
 
     """
 
+
+def doctest_search_page():
+    """Test search_page
+    Let's mock the dependency functions:
+
+        >>> patcher = mock.patch.multiple("irclog2html.irclogsearch",
+        ...                               print_search_form=mock.DEFAULT,
+        ...                               print_search_results=mock.DEFAULT)
+
+        >>> values = patcher.start()
+        >>> values['print_search_results'].return_value = "Formatter"
+
+    When there is a 'q' param in the GET query, the logs are searched:
+
+        >>> form = cgi.FieldStorage(
+        ...     environ={'QUERY_STRING': 'q=123', 'HTTP_METHOD': 'GET'})
+        >>> search_page("The stream", form, "/logs", "#dev*.logs")
+        'Formatter'
+        >>> values['print_search_results'].call_args
+        call('123', logfile_pattern='#dev*.logs',
+             stream='The stream', where='/logs')
+
+    When there is no query, the search form is displayed:
+
+        >>> form = cgi.FieldStorage(environ={
+        ...     'HTTP_METHOD': 'GET', 'QUERY_STRING': ''})
+        >>> search_page("The stream", form, "/logs", "#dev*.logs")
+        >>> values['print_search_form'].call_args
+        call('The stream')
+
+    Clean up:
+
+        >>> patcher.stop()
+
+    """
 
 def doctest_main_prints_form():
     """Test for main
