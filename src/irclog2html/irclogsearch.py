@@ -275,7 +275,9 @@ def wsgi(environ, start_response):
     stream = io.TextIOWrapper(io.BytesIO(), 'ascii',
                               errors='xmlcharrefreplace',
                               line_buffering=True)
-    start_response("200 Ok", [("Content-Type", "text/html; charset=UTF-8")])
+    status = str("200 Ok")
+    headers = [(str("Content-Type"), str("text/html; charset=UTF-8"))]
+    start_response(status, headers)
     if "q" not in form:
         print_search_form(stream, headers=False)
     else:
