@@ -191,12 +191,14 @@ def search_irc_logs(query, stats=None, where=None):
                 yield SearchResult(f.filename, link, date, time, event, info)
 
 
-def print_search_form(stream=None, headers=True):
+def print_cgi_headers(stream):
+    print("Content-Type: text/html; charset=UTF-8", file=stream)
+    print("", file=stream)
+
+
+def print_search_form(stream=None):
     if stream is None:
         stream = sys.stdout
-    if headers:
-        print("Content-Type: text/html; charset=UTF-8", file=stream)
-        print("", file=stream)
     print(HEADER, file=stream)
     print("<h1>Search IRC logs</h1>", file=stream)
     print('<form action="" method="get">', file=stream)
@@ -206,12 +208,9 @@ def print_search_form(stream=None, headers=True):
     print(FOOTER, file=stream)
 
 
-def print_search_results(query, where=None, stream=None, headers=True):
+def print_search_results(query, where=None, stream=None):
     if stream is None:
         stream = sys.stdout
-    if headers:
-        print("Content-Type: text/html; charset=UTF-8", file=stream)
-        print("", file=stream)
     print(HEADER, file=stream)
     print("<h1>IRC log search results for %s</h1>" % escape(query), file=stream)
     print('<form action="" method="get">', file=stream)
@@ -279,12 +278,12 @@ def wsgi(environ, start_response):
     headers = [(str("Content-Type"), str("text/html; charset=UTF-8"))]
     start_response(status, headers)
     if "q" not in form:
-        print_search_form(stream, headers=False)
+        print_search_form(stream)
     else:
         search_text = form["q"].value
         if isinstance(search_text, bytes):
             search_text = search_text.decode('UTF-8')
-        fmt = print_search_results(search_text, stream=stream, headers=False)
+        fmt = print_search_results(search_text, stream=stream)
 
     return [stream.buffer.getvalue()]
 
@@ -303,6 +302,7 @@ def main():
     logfile_pattern = os.getenv('IRCLOG_GLOB') or '*.log'
     form = cgi.FieldStorage()
     stream = rewrap_stdout()
+    print_cgi_headers(stream)
     if "q" not in form:
         print_search_form(stream)
         return

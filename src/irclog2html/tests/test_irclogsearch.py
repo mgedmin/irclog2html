@@ -134,8 +134,6 @@ def doctest_print_search_form():
     """Test for print_search_form
 
         >>> print_search_form()
-        Content-Type: text/html; charset=UTF-8
-        <BLANKLINE>
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
                   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
         <html>
@@ -169,8 +167,6 @@ def doctest_print_search_results():
         >>> tmpdir = set_up_sample()
         >>> sys.stdout.buffer = BytesIOWrapper(sys.stdout)
         >>> fmt = print_search_results('povbot', where=tmpdir)
-        Content-Type: text/html; charset=UTF-8
-        <BLANKLINE>
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
                   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
         <html>
