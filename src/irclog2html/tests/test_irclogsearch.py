@@ -4,6 +4,7 @@ import doctest
 import gzip
 import io
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -11,6 +12,7 @@ import unittest
 from contextlib import closing
 
 import mock
+from zope.testing import renormalizing
 
 from irclog2html.irclogsearch import (
     SearchResult, SearchResultFormatter, LogParser, search_irc_logs,
@@ -432,11 +434,19 @@ def doctest_main_searches():
     """
 
 
+checker = None
+if sys.version_info[0] == 2:
+    checker = renormalizing.RENormalizing([
+        (re.compile(r"^\['"), r"[b'"),
+        (re.compile(r"u('.*?')"), r"\1"),
+    ])
+
+
 def test_suite():
     optionflags = (doctest.ELLIPSIS | doctest.REPORT_NDIFF |
                    doctest.NORMALIZE_WHITESPACE)
     return unittest.TestSuite([
-        doctest.DocTestSuite(optionflags=optionflags),
+        doctest.DocTestSuite(optionflags=optionflags, checker=checker),
     ])
 
 
