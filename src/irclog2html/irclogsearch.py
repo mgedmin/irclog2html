@@ -275,6 +275,12 @@ def search_page(stream, form):
         return print_search_results(search_text, stream=stream)
 
 
+def get_path(environ):
+    path = environ.get('PATH_INFO', '/')
+    path = path.split('/')[-1]  # is this enough to protect from FS traversal?
+    return path if path else 'index.html'
+
+
 def wsgi(environ, start_response):
     """WSGI application"""
     global logfile_path, logfile_pattern
@@ -284,12 +290,27 @@ def wsgi(environ, start_response):
     stream = io.TextIOWrapper(io.BytesIO(), 'ascii',
                               errors='xmlcharrefreplace',
                               line_buffering=True)
-    status = str("200 Ok")
-    headers = [(str("Content-Type"), str("text/html; charset=UTF-8"))]
-    start_response(status, headers)
-    fmt = search_page(stream, form)
-    return [stream.buffer.getvalue()]
 
+    status = str("200 Ok")
+    content_type = str("text/html; charset=UTF-8")
+
+    path = get_path(environ)
+    if path == 'search':
+        fmt = search_page(stream, form)
+        result = [stream.buffer.getvalue()]
+    else:
+        if path.endswith('css'):
+            content_type = str("text/css")
+        try:
+            with open(os.path.join(logfile_path, path), "rb") as f:
+                result = [f.read()]
+        except IOError:
+            status = str("404 Not Found")
+            result = [b"Not found"]
+
+    headers = [(str("Content-Type"), content_type)]
+    start_response(status, headers)
+    return result
 
 def serve():
     from wsgiref.simple_server import make_server
