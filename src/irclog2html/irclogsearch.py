@@ -299,8 +299,10 @@ def wsgi(environ, start_response):
         fmt = search_page(stream, form, logfile_path, logfile_pattern)
         result = [stream.buffer.getvalue()]
     else:
-        if path.endswith('css'):
+        if path.endswith('.css'):
             content_type = str("text/css")
+        if path.endswith('.log') or path.endswith('.txt'):
+            content_type = str("text/plain")
         try:
             with open(os.path.join(logfile_path, path), "rb") as f:
                 result = [f.read()]

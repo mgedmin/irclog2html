@@ -328,7 +328,7 @@ def doctest_wsgi():
         >>> wsgi(environ, start_response)
         [b'2005-01-08T23:33:54 *** povbot has joined #pov...
         >>> start_response.assert_called_once_with(
-        ...    '200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
+        ...    '200 Ok', [('Content-Type', 'text/plain')])
 
     Accessing non-existing files:
 
