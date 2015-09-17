@@ -39,7 +39,7 @@ except ImportError:
     from urllib.parse import quote
 
 from .irclog2html import (LogParser, XHTMLTableStyle, NickColourizer,
-                          escape, open_log_file, VERSION, RELEASE)
+                          escape, open_log_file, VERSION, RELEASE, CSS_FILE)
 from .logs2html import find_log_files
 
 
@@ -305,6 +305,14 @@ def wsgi(environ, start_response):
     elif path == 'search':
         fmt = search_page(stream, form, logfile_path, logfile_pattern)
         result = [stream.buffer.getvalue()]
+    elif path == 'irclog.css':
+        content_type = str("text/css")
+        try:
+            with open(CSS_FILE, "rb") as f:
+                result = [f.read()]
+        except IOError:
+            status = str("404 Not Found")
+            result = [b"Not found"]
     else:
         if path.endswith('.css'):
             content_type = str("text/css")
