@@ -1,8 +1,11 @@
 Changelog
 =========
 
-2.14.1 (unreleased)
+2.15.0 (unreleased)
 -------------------
+
+- irclogsearch can now be deployed via WSGI.  Contributed by Albertas Agejevas
+  (https://github.com/mgedmin/irclog2html/pull/9).
 
 
 2.14.0 (2014-12-12)
