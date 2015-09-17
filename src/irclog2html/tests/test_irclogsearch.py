@@ -239,17 +239,16 @@ def doctest_search_page():
         ...     environ={'QUERY_STRING': 'q=123', 'HTTP_METHOD': 'GET'})
         >>> search_page("The stream", form, "/logs", "#dev*.logs")
         'Formatter'
-        >>> values['print_search_results'].call_args
-        call('123', logfile_pattern='#dev*.logs',
-             stream='The stream', where='/logs')
+        >>> values['print_search_results'].assert_called_once_with(
+        ...     '123', logfile_pattern='#dev*.logs',
+        ...     stream='The stream', where='/logs')
 
     When there is no query, the search form is displayed:
 
         >>> form = cgi.FieldStorage(environ={
         ...     'HTTP_METHOD': 'GET', 'QUERY_STRING': ''})
         >>> search_page("The stream", form, "/logs", "#dev*.logs")
-        >>> values['print_search_form'].call_args
-        call('The stream')
+        >>> values['print_search_form'].assert_called_once_with('The stream')
 
     Clean up:
 
@@ -298,42 +297,46 @@ def doctest_wsgi():
 
         >>> wsgi(environ, start_response)
         [b'This is the index']
-        >>> start_response.call_args
-        call('200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
+        >>> start_response.assert_called_once_with(
+        ...     '200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
 
     Accessing the search page:
 
         >>> environ['PATH_INFO'] = '/search'
+        >>> start_response = mock.MagicMock()
         >>> wsgi(environ, start_response)
         [b'<!DOCTYPE html PUBLIC...<title>Search IRC logs</title>...
-        >>> start_response.call_args
-        call('200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
+        >>> start_response.assert_called_once_with(
+        ...    '200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
 
     Searching the logs:
 
         >>> environ['PATH_INFO'] = '/search'
         >>> environ['QUERY_STRING'] = 'q=bot'
+        >>> start_response = mock.MagicMock()
         >>> wsgi(environ, start_response)
         [b'...<p>10 matches in 2 log files with 20 lines (... seconds).</p>...
-        >>> start_response.call_args
-        call('200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
+        >>> start_response.assert_called_once_with(
+        ...    '200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
 
     Retrieving log files:
 
         >>> environ['PATH_INFO'] = '/sample-2013-03-18.log'
         >>> del environ['QUERY_STRING']
+        >>> start_response = mock.MagicMock()
         >>> wsgi(environ, start_response)
         [b'2005-01-08T23:33:54 *** povbot has joined #pov...
-        >>> start_response.call_args
-        call('200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
+        >>> start_response.assert_called_once_with(
+        ...    '200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
 
     Accessing non-existing files:
 
         >>> environ['PATH_INFO'] = '/../../../etc/passwd'
+        >>> start_response = mock.MagicMock()
         >>> wsgi(environ, start_response)
         [b'Not found']
-        >>> start_response.call_args
-        call('404 Not Found', [('Content-Type', 'text/html; charset=UTF-8')])
+        >>> start_response.assert_called_once_with(
+        ...    '404 Not Found', [('Content-Type', 'text/html; charset=UTF-8')])
 
     Clean up:
 
