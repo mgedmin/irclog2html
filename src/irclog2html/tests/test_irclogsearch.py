@@ -274,10 +274,9 @@ def doctest_get_path():
         >>> get_path(dict(PATH_INFO='/'))
         'index.html'
 
-    Since we give access to files, we have to protect against FS traversal:
+    Any slashes other than the leading one result in None:
 
         >>> get_path(dict(PATH_INFO='/../../etc/passwd'))
-        'passwd'
 
     """
 
@@ -332,7 +331,7 @@ def doctest_wsgi():
 
     Accessing non-existing files:
 
-        >>> environ['PATH_INFO'] = '/../../../etc/passwd'
+        >>> environ['PATH_INFO'] = '/./sample-2013-03-18.log'
         >>> start_response = mock.MagicMock()
         >>> wsgi(environ, start_response)
         [b'Not found']

@@ -277,8 +277,10 @@ def search_page(stream, form, where, logfile_pattern):
 
 def get_path(environ):
     path = environ.get('PATH_INFO', '/')
-    path = path.split('/')[-1]  # is this enough to protect from FS traversal?
-    return path if path else 'index.html'
+    path = path[1:]  # Remove the leading slash
+    if '/' in path:
+        return None
+    return path if path != '' else 'index.html'
 
 
 def wsgi(environ, start_response):
@@ -295,7 +297,10 @@ def wsgi(environ, start_response):
     content_type = str("text/html; charset=UTF-8")
 
     path = get_path(environ)
-    if path == 'search':
+    if path is None:
+        status = str("404 Not Found")
+        result = [b"Not found"]
+    elif path == 'search':
         fmt = search_page(stream, form, logfile_path, logfile_pattern)
         result = [stream.buffer.getvalue()]
     else:
