@@ -191,6 +191,11 @@ def doctest_LogParser_encodings():
         >>> test(b'14:18 <mg> cp1252: \x9a')
         '14:18' COMMENT ('mg', 'cp1252: \u0161')
 
+    For convenience, Unicode is also accepted
+
+        >>> test(u'14:18 <mg> hello, \u2603')
+        '14:18' COMMENT ('mg', 'hello, \u2603')
+
     """
 
 
