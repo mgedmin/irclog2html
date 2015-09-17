@@ -218,7 +218,7 @@ def shorttime(time):
 class ColourChooser:
     """Choose distinguishable colours."""
 
-    def __init__(self, rgbmin=240, rgbmax=125, rgb=None, a=0.95, b=0.5):
+    def __init__(self, rgbmin=240, rgbmax=125, a=0.95, b=0.5):
         """Define a range of colours available for choosing.
 
         `rgbmin` and `rgbmax` define the outmost range of colour depth (note
@@ -237,16 +237,9 @@ class ColourChooser:
         assert 0 <= rgbmax < 256
         self.rgbmin = rgbmin
         self.rgbmax = rgbmax
-        if not rgb:
-            assert 0 <= a <= 1.0
-            assert 0 <= b <= 1.0
-            rgb = [(a,b,b), (b,a,b), (b,b,a), (a,a,b), (a,b,a), (b,a,a)]
-        else:
-            for r, g, b in rgb:
-                assert 0 <= r <= 1.0
-                assert 0 <= g <= 1.0
-                assert 0 <= b <= 1.0
-        self.rgb = rgb
+        assert 0 <= a <= 1.0
+        assert 0 <= b <= 1.0
+        self.rgb = [(a,b,b), (b,a,b), (b,b,a), (a,a,b), (a,b,a), (b,a,a)]
 
     def choose(self, i, n):
         """Choose a colour.
@@ -271,7 +264,7 @@ class ColourChooser:
 class NickColourizer:
     """Choose distinguishable colours for nicknames."""
 
-    def __init__(self, maxnicks=30, colour_chooser=None, default_colours=None):
+    def __init__(self, maxnicks=30, colour_chooser=None):
         """Create a colour chooser for nicknames.
 
         If you know how many different nicks there might be, specify that
@@ -279,10 +272,6 @@ class NickColourizer:
 
         If you really want to, you can specify a colour chooser.  Default is
         ColourChooser().
-
-        If you want, you can specify default colours for certain nicknames
-        (`default_colours` is a mapping of nicknames to HTML colours, that is
-        '#rrggbb' strings).
         """
         if colour_chooser is None:
             colour_chooser = ColourChooser()
@@ -290,8 +279,6 @@ class NickColourizer:
         self.nickcount = 0
         self.maxnicks = maxnicks
         self.nick_colour = {}
-        if default_colours:
-            self.nick_colour.update(default_colours)
 
     def __getitem__(self, nick):
         colour = self.nick_colour.get(nick)
@@ -365,7 +352,7 @@ class AbstractStyle(object):
     description = "Single-line description"
     charset = 'US-ASCII'
 
-    def __init__(self, outfile, colours=None, charset=None):
+    def __init__(self, outfile, colours=None):
         """Create a text formatter for writing to outfile.
 
         `colours` may have the following attributes:
@@ -375,8 +362,6 @@ class AbstractStyle(object):
            nickchange
            action
         """
-        if charset is not None:
-            self.charset = charset
         self.outfile = io.TextIOWrapper(outfile, encoding=self.charset,
                                         errors='xmlcharrefreplace',
                                         line_buffering=True)
