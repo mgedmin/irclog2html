@@ -17,7 +17,7 @@ Apache configuration example:
 
 """
 
-# Copyright (c) 2006-2013, Marius Gedminas
+# Copyright (c) 2006-2013, Marius Gedminas and contributors
 #
 # Released under the terms of the GNU GPL
 # http://www.gnu.org/copyleft/gpl.html
@@ -39,7 +39,7 @@ except ImportError:
     from urllib.parse import quote
 
 from .irclog2html import (LogParser, XHTMLTableStyle, NickColourizer,
-                          escape, open_log_file, VERSION, RELEASE, CSS_FILE)
+                          escape, open_log_file, VERSION, RELEASE)
 from .logs2html import find_log_files
 
 
@@ -275,75 +275,6 @@ def search_page(stream, form, where, logfile_pattern):
             search_text = search_text.decode('UTF-8')
         return print_search_results(search_text, stream=stream, where=where,
                                     logfile_pattern=logfile_pattern)
-
-
-def get_path(environ):
-    path = environ.get('PATH_INFO', '/')
-    path = path[1:]  # Remove the leading slash
-    if '/' in path or '\\' in path:
-        return None
-    return path if path != '' else 'index.html'
-
-
-def wsgi(environ, start_response):
-    """WSGI application"""
-    logfile_path = environ.get('IRCLOG_LOCATION') or DEFAULT_LOGFILE_PATH
-    logfile_pattern = environ.get('IRCLOG_GLOB') or DEFAULT_LOGFILE_PATTERN
-    form = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ)
-    stream = io.TextIOWrapper(io.BytesIO(), 'ascii',
-                              errors='xmlcharrefreplace',
-                              line_buffering=True)
-
-    status = "200 Ok"
-    content_type = "text/html; charset=UTF-8"
-    headers = {}
-
-    path = get_path(environ)
-    if path is None:
-        status = "404 Not Found"
-        result = [b"Not found"]
-    elif path == 'search':
-        fmt = search_page(stream, form, logfile_path, logfile_pattern)
-        result = [stream.buffer.getvalue()]
-    elif path == 'irclog.css':
-        content_type = "text/css"
-        try:
-            with open(CSS_FILE, "rb") as f:
-                result = [f.read()]
-        except IOError:
-            status = "404 Not Found"
-            result = [b"Not found"]
-    else:
-        if path.endswith('.css'):
-            content_type = "text/css"
-        if path.endswith('.log') or path.endswith('.txt'):
-            content_type = "text/plain"
-        try:
-            with open(os.path.join(logfile_path, path), "rb") as f:
-                result = [f.read()]
-        except IOError:
-            if path == 'index.html':
-                # no index? redirect to search page
-                status = "302 Found"
-                result = [b"Try /search"]
-                headers['Location'] = '/search'
-            else:
-                status = "404 Not Found"
-                result = [b"Not found"]
-
-    headers["Content-Type"] = content_type
-    # We need str() for Python 2 because of unicode_literals
-    headers = sorted((str(k), str(v)) for k, v in headers.items())
-    start_response(str(status), headers)
-    return result
-
-
-def serve():  # pragma: nocover
-    """Simple web server for manual testing"""
-    from wsgiref.simple_server import make_server
-    srv = make_server('localhost', 8080, wsgi)
-    print("Started at http://localhost:8080/")
-    srv.serve_forever()
 
 
 def main():
