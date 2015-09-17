@@ -10,7 +10,7 @@ from contextlib import closing
 import mock
 from zope.testing import renormalizing
 
-from irclog2html.irclogserver import get_path, wsgi
+from irclog2html.irclogserver import get_path, application
 
 
 here = os.path.dirname(__file__)
@@ -63,8 +63,8 @@ def doctest_get_path():
     """
 
 
-def doctest_wsgi():
-    r"""Test for the wsgi entry point
+def doctest_application():
+    r"""Test for the WSGI entry point
 
         >>> tmpdir = set_up_sample()
         >>> start_response = mock.MagicMock()
@@ -77,7 +77,7 @@ def doctest_wsgi():
 
     When accessing the root, we get the index:
 
-        >>> wsgi(environ, start_response)
+        >>> application(environ, start_response)
         [b'This is the index']
         >>> start_response.assert_called_once_with(
         ...     '200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
@@ -87,7 +87,7 @@ def doctest_wsgi():
 
         >>> environ['PATH_INFO'] = '/irclog.css'
         >>> start_response = mock.MagicMock()
-        >>> wsgi(environ, start_response)
+        >>> application(environ, start_response)
         [b'...div.searchbox {...']
         >>> start_response.assert_called_once_with(
         ...     '200 Ok', [('Content-Type', 'text/css')])
@@ -96,7 +96,7 @@ def doctest_wsgi():
 
         >>> environ['PATH_INFO'] = '/font.css'
         >>> start_response = mock.MagicMock()
-        >>> wsgi(environ, start_response)
+        >>> application(environ, start_response)
         [b'* { font: comic sans; }']
         >>> start_response.assert_called_once_with(
         ...     '200 Ok', [('Content-Type', 'text/css')])
@@ -105,7 +105,7 @@ def doctest_wsgi():
 
         >>> environ['PATH_INFO'] = '/search'
         >>> start_response = mock.MagicMock()
-        >>> wsgi(environ, start_response)
+        >>> application(environ, start_response)
         [b'<!DOCTYPE html PUBLIC...<title>Search IRC logs</title>...
         >>> start_response.assert_called_once_with(
         ...    '200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
@@ -115,7 +115,7 @@ def doctest_wsgi():
         >>> environ['PATH_INFO'] = '/search'
         >>> environ['QUERY_STRING'] = 'q=bot'
         >>> start_response = mock.MagicMock()
-        >>> wsgi(environ, start_response)
+        >>> application(environ, start_response)
         [b'...<p>10 matches in 2 log files with 20 lines (... seconds).</p>...
         >>> start_response.assert_called_once_with(
         ...    '200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
@@ -125,7 +125,7 @@ def doctest_wsgi():
         >>> environ['PATH_INFO'] = '/sample-2013-03-18.log'
         >>> del environ['QUERY_STRING']
         >>> start_response = mock.MagicMock()
-        >>> wsgi(environ, start_response)
+        >>> application(environ, start_response)
         [b'2005-01-08T23:33:54 *** povbot has joined #pov...
         >>> start_response.assert_called_once_with(
         ...    '200 Ok', [('Content-Type', 'text/plain')])
@@ -134,7 +134,7 @@ def doctest_wsgi():
 
         >>> environ['PATH_INFO'] = '/./index.html'
         >>> start_response = mock.MagicMock()
-        >>> wsgi(environ, start_response)
+        >>> application(environ, start_response)
         [b'Not found']
         >>> start_response.assert_called_once_with(
         ...    '404 Not Found', [('Content-Type', 'text/html; charset=UTF-8')])
@@ -143,7 +143,7 @@ def doctest_wsgi():
 
         >>> environ['PATH_INFO'] = '/.\\index.html'
         >>> start_response = mock.MagicMock()
-        >>> wsgi(environ, start_response)
+        >>> application(environ, start_response)
         [b'Not found']
         >>> start_response.assert_called_once_with(
         ...    '404 Not Found', [('Content-Type', 'text/html; charset=UTF-8')])
@@ -152,7 +152,7 @@ def doctest_wsgi():
 
         >>> environ['PATH_INFO'] = '/nonexistent'
         >>> start_response = mock.MagicMock()
-        >>> wsgi(environ, start_response)
+        >>> application(environ, start_response)
         [b'Not found']
         >>> start_response.assert_called_once_with(
         ...    '404 Not Found', [('Content-Type', 'text/html; charset=UTF-8')])

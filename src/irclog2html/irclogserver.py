@@ -40,7 +40,7 @@ def get_path(environ):
     return path if path != '' else 'index.html'
 
 
-def wsgi(environ, start_response):
+def application(environ, start_response):
     """WSGI application"""
     logfile_path = environ.get('IRCLOG_LOCATION') or DEFAULT_LOGFILE_PATH
     logfile_pattern = environ.get('IRCLOG_GLOB') or DEFAULT_LOGFILE_PATTERN
@@ -66,7 +66,7 @@ def wsgi(environ, start_response):
         try:
             with open(CSS_FILE, "rb") as f:
                 result = [f.read()]
-        except IOError:
+        except IOError:  # pragma: nocover
             status = "404 Not Found"
             result = [b"Not found"]
     else:
@@ -97,7 +97,7 @@ def wsgi(environ, start_response):
 def main():  # pragma: nocover
     """Simple web server for manual testing"""
     from wsgiref.simple_server import make_server
-    srv = make_server('localhost', 8080, wsgi)
+    srv = make_server('localhost', 8080, application)
     print("Started at http://localhost:8080/")
     srv.serve_forever()
 
