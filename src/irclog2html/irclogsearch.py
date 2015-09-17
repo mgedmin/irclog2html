@@ -294,39 +294,47 @@ def wsgi(environ, start_response):
                               errors='xmlcharrefreplace',
                               line_buffering=True)
 
-    # We need str() for Python2 because of unicode_literals
-    status = str("200 Ok")
-    content_type = str("text/html; charset=UTF-8")
+    status = "200 Ok"
+    content_type = "text/html; charset=UTF-8"
+    headers = {}
 
     path = get_path(environ)
     if path is None:
-        status = str("404 Not Found")
+        status = "404 Not Found"
         result = [b"Not found"]
     elif path == 'search':
         fmt = search_page(stream, form, logfile_path, logfile_pattern)
         result = [stream.buffer.getvalue()]
     elif path == 'irclog.css':
-        content_type = str("text/css")
+        content_type = "text/css"
         try:
             with open(CSS_FILE, "rb") as f:
                 result = [f.read()]
         except IOError:
-            status = str("404 Not Found")
+            status = "404 Not Found"
             result = [b"Not found"]
     else:
         if path.endswith('.css'):
-            content_type = str("text/css")
+            content_type = "text/css"
         if path.endswith('.log') or path.endswith('.txt'):
-            content_type = str("text/plain")
+            content_type = "text/plain"
         try:
             with open(os.path.join(logfile_path, path), "rb") as f:
                 result = [f.read()]
         except IOError:
-            status = str("404 Not Found")
-            result = [b"Not found"]
+            if path == 'index.html':
+                # no index? redirect to search page
+                status = "302 Found"
+                result = [b"Try /search"]
+                headers['Location'] = '/search'
+            else:
+                status = "404 Not Found"
+                result = [b"Not found"]
 
-    headers = [(str("Content-Type"), content_type)]
-    start_response(status, headers)
+    headers["Content-Type"] = content_type
+    # We need str() for Python 2 because of unicode_literals
+    headers = sorted((str(k), str(v)) for k, v in headers.items())
+    start_response(str(status), headers)
     return result
 
 
