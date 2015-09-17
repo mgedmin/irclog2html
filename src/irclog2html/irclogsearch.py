@@ -162,11 +162,8 @@ def parse_log_file(filename):
             yield row
 
 
-def search_irc_logs(query, stats=None, where=None, logfile_pattern=None):
-    if not where:
-        where = DEFAULT_LOGFILE_PATH
-    if not logfile_pattern:
-        logfile_pattern = DEFAULT_LOGFILE_PATTERN
+def search_irc_logs(query, stats=None, where=DEFAULT_LOGFILE_PATH,
+                    logfile_pattern=DEFAULT_LOGFILE_PATTERN):
     if not stats:
         stats = SearchStats() # will be discarded, but, oh, well
     query = query.lower()
@@ -207,7 +204,8 @@ def print_search_form(stream=None):
     print(FOOTER, file=stream)
 
 
-def print_search_results(query, where=None, logfile_pattern=None,
+def print_search_results(query, where=DEFAULT_LOGFILE_PATH,
+                         logfile_pattern=DEFAULT_LOGFILE_PATTERN,
                          stream=None):
     if stream is None:
         stream = sys.stdout
@@ -223,7 +221,7 @@ def print_search_results(query, where=None, logfile_pattern=None,
     prev_result = None
     formatter = SearchResultFormatter(stream)
     stats = SearchStats()
-    for result in search_irc_logs(query, stats, where=where,
+    for result in search_irc_logs(query, stats=stats, where=where,
                                   logfile_pattern=logfile_pattern):
         if date != result.date:
             if prev_result:
