@@ -164,7 +164,7 @@ def search_irc_logs(query, stats=None, where=None, logfile_pattern=None):
     if where is None:
         where = os.path.dirname(__file__)
     if logfile_pattern is None:
-            logfile_pattern = "*.log"
+        logfile_pattern = "*.log"
     if not stats:
         stats = SearchStats() # will be discarded, but, oh, well
     query = query.lower()
@@ -290,6 +290,7 @@ def wsgi(environ, start_response):
                               errors='xmlcharrefreplace',
                               line_buffering=True)
 
+    # We need str() for Python2 because of unicode_literals
     status = str("200 Ok")
     content_type = str("text/html; charset=UTF-8")
 
@@ -310,6 +311,7 @@ def wsgi(environ, start_response):
     headers = [(str("Content-Type"), content_type)]
     start_response(status, headers)
     return result
+
 
 def serve():
     from wsgiref.simple_server import make_server

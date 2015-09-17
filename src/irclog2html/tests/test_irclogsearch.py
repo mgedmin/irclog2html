@@ -281,6 +281,7 @@ def doctest_get_path():
 
     """
 
+
 def doctest_wsgi():
     """Test for the wsgi entry point
 
