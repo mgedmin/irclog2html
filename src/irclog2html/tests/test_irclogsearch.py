@@ -1,17 +1,22 @@
+import cgi
 import datetime
 import doctest
 import gzip
 import io
 import os
+import re
 import shutil
 import sys
 import tempfile
 import unittest
 from contextlib import closing
 
+import mock
+from zope.testing import renormalizing
+
 from irclog2html.irclogsearch import (
     SearchResult, SearchResultFormatter, LogParser, search_irc_logs,
-    print_search_form, print_search_results, main)
+    print_search_form, print_search_results, search_page, get_path, wsgi, main)
 
 
 try:
@@ -64,7 +69,8 @@ def myrepr(o):
 def doctest_SearchResultFormatter():
     """Test for SearchResultFormatter
 
-        >>> srf = SearchResultFormatter(BytesIOWrapper(sys.stdout))
+        >>> sys.stdout.buffer = BytesIOWrapper(sys.stdout)
+        >>> srf = SearchResultFormatter(sys.stdout)
         >>> srf.print_prefix()
         <table class="irclog">
 
@@ -104,6 +110,8 @@ def set_up_sample():
               os.path.join(tmpdir, 'sample-2013-03-17.log.gz'))
     shutil.copy(os.path.join(here, 'sample.log'),
                 os.path.join(tmpdir, 'sample-2013-03-18.log'))
+    with open(os.path.join(tmpdir, "index.html"), "w") as f:
+        f.write("This is the index")
     return tmpdir
 
 
@@ -133,8 +141,6 @@ def doctest_print_search_form():
     """Test for print_search_form
 
         >>> print_search_form()
-        Content-Type: text/html; charset=UTF-8
-        <BLANKLINE>
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
                   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
         <html>
@@ -167,9 +173,7 @@ def doctest_print_search_results():
 
         >>> tmpdir = set_up_sample()
         >>> sys.stdout.buffer = BytesIOWrapper(sys.stdout)
-        >>> print_search_results('povbot', where=tmpdir)
-        Content-Type: text/html; charset=UTF-8
-        <BLANKLINE>
+        >>> fmt = print_search_results('povbot', where=tmpdir)
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
                   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
         <html>
@@ -215,6 +219,137 @@ def doctest_print_search_results():
 
         >>> clean_up_sample(tmpdir)
 
+    """
+
+
+def doctest_search_page():
+    """Test search_page
+    Let's mock the dependency functions:
+
+        >>> patcher = mock.patch.multiple("irclog2html.irclogsearch",
+        ...                               print_search_form=mock.DEFAULT,
+        ...                               print_search_results=mock.DEFAULT)
+
+        >>> values = patcher.start()
+        >>> values['print_search_results'].return_value = "Formatter"
+
+    When there is a 'q' param in the GET query, the logs are searched:
+
+        >>> form = cgi.FieldStorage(
+        ...     environ={'QUERY_STRING': 'q=123', 'HTTP_METHOD': 'GET'})
+        >>> search_page("The stream", form, "/logs", "#dev*.logs")
+        'Formatter'
+        >>> values['print_search_results'].assert_called_once_with(
+        ...     '123', logfile_pattern='#dev*.logs',
+        ...     stream='The stream', where='/logs')
+
+    When there is no query, the search form is displayed:
+
+        >>> form = cgi.FieldStorage(environ={
+        ...     'HTTP_METHOD': 'GET', 'QUERY_STRING': ''})
+        >>> search_page("The stream", form, "/logs", "#dev*.logs")
+        >>> values['print_search_form'].assert_called_once_with('The stream')
+
+    Clean up:
+
+        >>> patcher.stop()
+
+    """
+
+
+def doctest_get_path():
+    """Test for get_path.
+
+    This function decides whether to search or to display a file based
+    on URL path:
+
+        >>> get_path(dict(PATH_INFO='/search'))
+        'search'
+
+        >>> get_path(dict(PATH_INFO='/#channel-2015-05-05.log.html'))
+        '#channel-2015-05-05.log.html'
+
+    When there is no file name, we show the index:
+
+        >>> get_path(dict(PATH_INFO='/'))
+        'index.html'
+
+    Any slashes other than the leading one result in None:
+
+        >>> get_path(dict(PATH_INFO='/../../etc/passwd'))
+
+    """
+
+
+def doctest_wsgi():
+    """Test for the wsgi entry point
+
+        >>> tmpdir = set_up_sample()
+        >>> start_response = mock.MagicMock()
+
+        >>> environ = {
+        ...     'IRCLOG_LOCATION': tmpdir,
+        ...     'PATH_INFO': "/",
+        ...     'wsgi.input': None,
+        ... }
+
+    When accessing the root, we get the index:
+
+        >>> wsgi(environ, start_response)
+        [b'This is the index']
+        >>> start_response.assert_called_once_with(
+        ...     '200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
+
+    Accessing the search page:
+
+        >>> environ['PATH_INFO'] = '/search'
+        >>> start_response = mock.MagicMock()
+        >>> wsgi(environ, start_response)
+        [b'<!DOCTYPE html PUBLIC...<title>Search IRC logs</title>...
+        >>> start_response.assert_called_once_with(
+        ...    '200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
+
+    Searching the logs:
+
+        >>> environ['PATH_INFO'] = '/search'
+        >>> environ['QUERY_STRING'] = 'q=bot'
+        >>> start_response = mock.MagicMock()
+        >>> wsgi(environ, start_response)
+        [b'...<p>10 matches in 2 log files with 20 lines (... seconds).</p>...
+        >>> start_response.assert_called_once_with(
+        ...    '200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
+
+    Retrieving log files:
+
+        >>> environ['PATH_INFO'] = '/sample-2013-03-18.log'
+        >>> del environ['QUERY_STRING']
+        >>> start_response = mock.MagicMock()
+        >>> wsgi(environ, start_response)
+        [b'2005-01-08T23:33:54 *** povbot has joined #pov...
+        >>> start_response.assert_called_once_with(
+        ...    '200 Ok', [('Content-Type', 'text/plain')])
+
+    Accessing paths with slashes:
+
+        >>> environ['PATH_INFO'] = '/./index.html'
+        >>> start_response = mock.MagicMock()
+        >>> wsgi(environ, start_response)
+        [b'Not found']
+        >>> start_response.assert_called_once_with(
+        ...    '404 Not Found', [('Content-Type', 'text/html; charset=UTF-8')])
+
+    Accessing non-existing files:
+
+        >>> environ['PATH_INFO'] = '/nonexistent'
+        >>> start_response = mock.MagicMock()
+        >>> wsgi(environ, start_response)
+        [b'Not found']
+        >>> start_response.assert_called_once_with(
+        ...    '404 Not Found', [('Content-Type', 'text/html; charset=UTF-8')])
+
+    Clean up:
+
+        >>> clean_up_sample(tmpdir)
     """
 
 
@@ -311,11 +446,19 @@ def doctest_main_searches():
     """
 
 
+checker = None
+if sys.version_info[0] == 2:
+    checker = renormalizing.RENormalizing([
+        (re.compile(r"^\['"), r"[b'"),
+        (re.compile(r"u('.*?')"), r"\1"),
+    ])
+
+
 def test_suite():
     optionflags = (doctest.ELLIPSIS | doctest.REPORT_NDIFF |
                    doctest.NORMALIZE_WHITESPACE)
     return unittest.TestSuite([
-        doctest.DocTestSuite(optionflags=optionflags),
+        doctest.DocTestSuite(optionflags=optionflags, checker=checker),
     ])
 
 
