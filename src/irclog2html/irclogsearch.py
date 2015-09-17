@@ -25,14 +25,13 @@ Apache configuration example:
 from __future__ import print_function, unicode_literals
 
 import cgi
+import cgitb
 import io
 import os
 import re
 import sys
 import time
 from contextlib import closing
-
-import cgitb; cgitb.enable()
 
 try:
     from urllib import quote
@@ -329,6 +328,7 @@ def serve():
 
 def main():
     """CGI script"""
+    cgitb.enable()
     logfile_path = os.getenv('IRCLOG_LOCATION')
     logfile_pattern = os.getenv('IRCLOG_GLOB')
     form = cgi.FieldStorage()
