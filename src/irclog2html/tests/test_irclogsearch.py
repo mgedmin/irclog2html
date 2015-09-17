@@ -2,7 +2,6 @@ import cgi
 import datetime
 import doctest
 import gzip
-import io
 import os
 import re
 import shutil
@@ -259,7 +258,7 @@ def doctest_main_prints_form():
     """Test for main
 
         >>> os.environ.pop('QUERY_STRING', None)
-        >>> sys.stdout = io.TextIOWrapper(BytesIOWrapper(sys.stdout)) # it's gonna be rewrapped
+        >>> sys.stdout.buffer = BytesIOWrapper(sys.stdout)
         >>> main()
         Content-Type: text/html; charset=UTF-8
         <BLANKLINE>
@@ -294,7 +293,7 @@ def doctest_main_searches():
     """Test for main
 
         >>> tmpdir = set_up_sample()
-        >>> sys.stdout = io.TextIOWrapper(BytesIOWrapper(sys.stdout)) # it's gonna be rewrapped
+        >>> sys.stdout.buffer = BytesIOWrapper(sys.stdout)
         >>> os.environ['QUERY_STRING'] = 'q=povbot'
         >>> os.environ['IRCLOG_LOCATION'] = tmpdir
         >>> os.environ['IRCLOG_GLOB'] = '*.log'
