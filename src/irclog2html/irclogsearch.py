@@ -245,8 +245,8 @@ def print_search_results(query, where=None, logfile_pattern=None,
         print("  </li>", file=stream)
         print("</ul>", file=stream)
     total_time = time.time() - started
-    print("<p>%d matches in %d log files with %d lines (%.1f seconds).</p>" % (
-                stats.matches, stats.files, stats.lines, total_time),
+    print("<p>%d matches in %d log files with %d lines (%.1f seconds).</p>"
+          % (stats.matches, stats.files, stats.lines, total_time),
           file=stream)
     print(FOOTER, file=stream)
 
