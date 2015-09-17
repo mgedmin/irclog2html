@@ -113,17 +113,17 @@ class LogParser(object):
     OTHER = Enum('OTHER')
 
     TIME_REGEXP = re.compile(
-            r'^\[?(' # Optional [
-            r'(?:\d{4}-\d{2}-\d{2}T|\d{2}-\w{3}-\d{4} |\w{3} \d{2} |\d{2} \w{3} )?' # Optional date
-            r'\d\d:\d\d(:\d\d)?' # Mandatory HH:MM, optional :SS
-            r')\]? +') # Optional ], mandatory space
+        r'^\[?(' # Optional [
+        r'(?:\d{4}-\d{2}-\d{2}T|\d{2}-\w{3}-\d{4} |\w{3} \d{2} |\d{2} \w{3} )?' # Optional date
+        r'\d\d:\d\d(:\d\d)?' # Mandatory HH:MM, optional :SS
+        r')\]? +') # Optional ], mandatory space
     NICK_REGEXP = re.compile(r'^<(.*?)(!.*)?>\s')
     DIRCPROXY_NICK_REGEXP = re.compile(r'^<(.*?)(!.*)?>\s[\+-]?')
     JOIN_REGEXP = re.compile(r'^(?:\*\*\*|-->)\s.*joined')
     PART_REGEXP = re.compile(r'^(?:\*\*\*|<--)\s.*(quit|left)')
     SERVMSG_REGEXP = re.compile(r'^(?:\*\*\*|---)\s')
     NICK_CHANGE_REGEXP = re.compile(
-            r'^(?:\*\*\*|---)\s+(.*?) (?:are|is) now known as (.*)')
+        r'^(?:\*\*\*|---)\s+(.*?) (?:are|is) now known as (.*)')
 
     def __init__(self, infile, dircproxy=False):
         self.infile = infile
@@ -239,7 +239,14 @@ class ColourChooser:
         self.rgbmax = rgbmax
         assert 0 <= a <= 1.0
         assert 0 <= b <= 1.0
-        self.rgb = [(a,b,b), (b,a,b), (b,b,a), (a,a,b), (a,b,a), (b,a,a)]
+        self.rgb = [
+            (a, b, b),
+            (b, a, b),
+            (b, b, a),
+            (a, a, b),
+            (a, b, a),
+            (b, a, a),
+        ]
 
     def choose(self, i, n):
         """Choose a colour.
@@ -492,8 +499,7 @@ class TableStyle(SimpleTableStyle):
     def _nicktext(self, time, nick, text, htmlcolour):
         print('<tr><th bgcolor="%s"><font color="#ffffff">'
               '<tt>%s</tt></font></th>'
-              '<td width="100%%" bgcolor="#eeeeee"><tt><font'
-                 ' color="%s">%s</font></tt></td></tr>'
+              '<td width="100%%" bgcolor="#eeeeee"><tt><font color="%s">%s</font></tt></td></tr>'
               % (htmlcolour, nick, htmlcolour, text), file=self.outfile)
 
 
@@ -533,8 +539,7 @@ class XHTMLStyle(AbstractStyle):
   <meta name="version" content="%(VERSION)s - %(RELEASE)s" />
 </head>
 <body>""" % {'VERSION': VERSION, 'RELEASE': RELEASE,
-             'title': escape(title), 'charset': self.charset},
-              file=self.outfile)
+             'title': escape(title), 'charset': self.charset}, file=self.outfile)
         self.heading(title)
         if searchbox:
             self.searchbox()
@@ -563,6 +568,7 @@ class XHTMLStyle(AbstractStyle):
 </form>
 </div>
 """, file=self.outfile)
+
     def navbar(self, prev, index, next):
         prev_title, prev_url = prev
         index_title, index_url = index
@@ -869,7 +875,8 @@ def main(argv=sys.argv):
         if not options.output_file:
             outfilename = pick_output_filename(filename)
         elif os.path.isdir(options.output_file):
-            outfilename = os.path.join(options.output_file,
+            outfilename = os.path.join(
+                options.output_file,
                 os.path.basename(pick_output_filename(filename)))
         else:
             outfilename = options.output_file
