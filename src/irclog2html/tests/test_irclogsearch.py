@@ -329,9 +329,18 @@ def doctest_wsgi():
         >>> start_response.assert_called_once_with(
         ...    '200 Ok', [('Content-Type', 'text/plain')])
 
+    Accessing paths with slashes:
+
+        >>> environ['PATH_INFO'] = '/./index.html'
+        >>> start_response = mock.MagicMock()
+        >>> wsgi(environ, start_response)
+        [b'Not found']
+        >>> start_response.assert_called_once_with(
+        ...    '404 Not Found', [('Content-Type', 'text/html; charset=UTF-8')])
+
     Accessing non-existing files:
 
-        >>> environ['PATH_INFO'] = '/./sample-2013-03-18.log'
+        >>> environ['PATH_INFO'] = '/nonexistent'
         >>> start_response = mock.MagicMock()
         >>> wsgi(environ, start_response)
         [b'Not found']
