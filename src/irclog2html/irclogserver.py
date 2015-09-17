@@ -57,6 +57,7 @@ def application(environ, start_response):
     if path is None:
         status = "404 Not Found"
         result = [b"Not found"]
+        content_type = "text/plain"
     elif path == 'search':
         fmt = search_page(stream, form, logfile_path, logfile_pattern)
         result = [stream.buffer.getvalue()]
@@ -69,6 +70,7 @@ def application(environ, start_response):
         except IOError:  # pragma: nocover
             status = "404 Not Found"
             result = [b"Not found"]
+            content_type = "text/plain"
     else:
         if path.endswith('.css'):
             content_type = "text/css"
@@ -83,9 +85,11 @@ def application(environ, start_response):
                 status = "302 Found"
                 result = [b"Try /search"]
                 headers['Location'] = '/search'
+                content_type = "text/plain"
             else:
                 status = "404 Not Found"
                 result = [b"Not found"]
+                content_type = "text/plain"
 
     headers["Content-Type"] = content_type
     # We need str() for Python 2 because of unicode_literals

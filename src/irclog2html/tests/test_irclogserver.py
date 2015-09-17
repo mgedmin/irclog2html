@@ -1,14 +1,11 @@
-import doctest
 import gzip
 import os
-import re
 import shutil
-import sys
 import tempfile
+import unittest
 from contextlib import closing
 
 import mock
-from zope.testing import renormalizing
 
 from irclog2html.irclogserver import get_path, application
 
@@ -63,116 +60,102 @@ def doctest_get_path():
     """
 
 
-def doctest_application():
-    r"""Test for the WSGI entry point
-
-        >>> tmpdir = set_up_sample()
-        >>> start_response = mock.MagicMock()
-
-        >>> environ = {
-        ...     'IRCLOG_LOCATION': tmpdir,
-        ...     'PATH_INFO': "/",
-        ...     'wsgi.input': None,
-        ... }
-
-    When accessing the root, we get the index:
-
-        >>> application(environ, start_response)
-        [b'This is the index']
-        >>> start_response.assert_called_once_with(
-        ...     '200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
-
-    We can load the stylesheet too, even if it's not copied to the log
-    directory:
-
-        >>> environ['PATH_INFO'] = '/irclog.css'
-        >>> start_response = mock.MagicMock()
-        >>> application(environ, start_response)
-        [b'...div.searchbox {...']
-        >>> start_response.assert_called_once_with(
-        ...     '200 Ok', [('Content-Type', 'text/css')])
-
-    We can load other CSS files, if needed
-
-        >>> environ['PATH_INFO'] = '/font.css'
-        >>> start_response = mock.MagicMock()
-        >>> application(environ, start_response)
-        [b'* { font: comic sans; }']
-        >>> start_response.assert_called_once_with(
-        ...     '200 Ok', [('Content-Type', 'text/css')])
-
-    Accessing the search page:
-
-        >>> environ['PATH_INFO'] = '/search'
-        >>> start_response = mock.MagicMock()
-        >>> application(environ, start_response)
-        [b'<!DOCTYPE html PUBLIC...<title>Search IRC logs</title>...
-        >>> start_response.assert_called_once_with(
-        ...    '200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
-
-    Searching the logs:
-
-        >>> environ['PATH_INFO'] = '/search'
-        >>> environ['QUERY_STRING'] = 'q=bot'
-        >>> start_response = mock.MagicMock()
-        >>> application(environ, start_response)
-        [b'...<p>10 matches in 2 log files with 20 lines (... seconds).</p>...
-        >>> start_response.assert_called_once_with(
-        ...    '200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
-
-    Retrieving log files:
-
-        >>> environ['PATH_INFO'] = '/sample-2013-03-18.log'
-        >>> del environ['QUERY_STRING']
-        >>> start_response = mock.MagicMock()
-        >>> application(environ, start_response)
-        [b'2005-01-08T23:33:54 *** povbot has joined #pov...
-        >>> start_response.assert_called_once_with(
-        ...    '200 Ok', [('Content-Type', 'text/plain')])
-
-    Accessing paths with slashes:
-
-        >>> environ['PATH_INFO'] = '/./index.html'
-        >>> start_response = mock.MagicMock()
-        >>> application(environ, start_response)
-        [b'Not found']
-        >>> start_response.assert_called_once_with(
-        ...    '404 Not Found', [('Content-Type', 'text/html; charset=UTF-8')])
-
-    What if some poor soul runs Windows?
-
-        >>> environ['PATH_INFO'] = '/.\\index.html'
-        >>> start_response = mock.MagicMock()
-        >>> application(environ, start_response)
-        [b'Not found']
-        >>> start_response.assert_called_once_with(
-        ...    '404 Not Found', [('Content-Type', 'text/html; charset=UTF-8')])
-
-    Accessing non-existing files:
-
-        >>> environ['PATH_INFO'] = '/nonexistent'
-        >>> start_response = mock.MagicMock()
-        >>> application(environ, start_response)
-        [b'Not found']
-        >>> start_response.assert_called_once_with(
-        ...    '404 Not Found', [('Content-Type', 'text/html; charset=UTF-8')])
-
-    Clean up:
-
-        >>> clean_up_sample(tmpdir)
-
-    """
+class Response(object):
+    pass
 
 
-checker = None
-if sys.version_info[0] == 2:
-    checker = renormalizing.RENormalizing([
-        (re.compile(r"^\['"), r"[b'"),
-        (re.compile(r"u('.*?')"), r"\1"),
-    ])
+class TestApplication(unittest.TestCase):
+
+    def setUp(self):
+        self.tmpdir = set_up_sample()
+
+    def tearDown(self):
+        clean_up_sample(self.tmpdir)
+
+    if not hasattr(unittest.TestCase, 'assertIn'):
+        def assertIn(self, needle, haystack):
+            self.assertTrue(needle in haystack, haystack)
+
+    def request(self, path='/', expect=200):
+        environ = {
+            'IRCLOG_LOCATION': self.tmpdir,
+            'PATH_INFO': path.partition('?')[0],
+            'QUERY_STRING': path.partition('?')[-1],
+            'wsgi.input': None,
+        }
+        start_response = mock.Mock()
+        response = Response()
+        response.body = b''.join(application(environ, start_response))
+        self.assertEqual(start_response.call_count, 1)
+        status, headers = start_response.call_args[0]
+        response.status_string = status
+        response.status = int(status.split()[0])
+        response.header_list = headers
+        response.headers = dict(headers)
+        response.content_type = response.headers['Content-Type']
+        response.location = response.headers.get('Location')
+        self.assertEqual(response.status, expect)
+        return response
+
+    def test_root(self):
+        response = self.request('/')
+        self.assertEqual(response.body, b'This is the index')
+        self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
+
+    def test_root_without_index_html(self):
+        os.unlink(os.path.join(self.tmpdir, 'index.html'))
+        response = self.request('/', expect=302)
+        self.assertEqual(response.body, b'Try /search')
+        self.assertEqual(response.content_type, 'text/plain')
+        self.assertEqual(response.location, '/search')
+
+    def test_search_page(self):
+        response = self.request('/search')
+        self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
+        self.assertIn(b'<title>Search IRC logs</title>', response.body)
+
+    def test_search(self):
+        response = self.request('/search?q=bot')
+        self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
+        self.assertIn(b'<title>Search IRC logs</title>', response.body)
+        self.assertIn(b'<p>10 matches in 2 log files with 20 lines', response.body)
+
+    def test_log_file(self):
+        response = self.request('/sample-2013-03-18.log')
+        self.assertEqual(response.content_type, 'text/plain')
+        self.assertIn(b'2005-01-08T23:33:54  *** povbot has joined #pov', response.body)
+
+    def test_builtin_css(self):
+        response = self.request('/irclog.css')
+        self.assertEqual(response.content_type, 'text/css')
+        self.assertIn(b'div.searchbox {', response.body)
+
+    @mock.patch('irclog2html.irclogserver.CSS_FILE', '/nosuchfile')
+    def test_builtin_css_missing(self):
+        response = self.request('/irclog.css', expect=404)
+        self.assertEqual(response.content_type, 'text/plain')
+        self.assertIn(b'Not found', response.body)
+
+    def test_other_css(self):
+        response = self.request('/font.css')
+        self.assertEqual(response.content_type, 'text/css')
+        self.assertIn(b'{ font: comic sans; }', response.body)
+
+    def test_not_found(self):
+        response = self.request('/nosuchfile', expect=404)
+        self.assertEqual(response.content_type, 'text/plain')
+        self.assertIn(b'Not found', response.body)
+
+    def test_path_with_slashes(self):
+        response = self.request('/./index.html', expect=404)
+        self.assertEqual(response.content_type, 'text/plain')
+        self.assertIn(b'Not found', response.body)
+
+    def test_path_with_backslashes(self):
+        response = self.request('/.\\index.html', expect=404)
+        self.assertEqual(response.content_type, 'text/plain')
+        self.assertIn(b'Not found', response.body)
 
 
 def test_suite():
-    optionflags = (doctest.ELLIPSIS | doctest.REPORT_NDIFF |
-                   doctest.NORMALIZE_WHITESPACE)
-    return doctest.DocTestSuite(optionflags=optionflags, checker=checker)
+    return unittest.defaultTestLoader.loadTestsFromName(__name__)
