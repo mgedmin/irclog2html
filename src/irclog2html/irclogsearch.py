@@ -278,7 +278,7 @@ def search_page(stream, form, where, logfile_pattern):
 def get_path(environ):
     path = environ.get('PATH_INFO', '/')
     path = path[1:]  # Remove the leading slash
-    if '/' in path:
+    if '/' in path or '\\' in path:
         return None
     return path if path != '' else 'index.html'
 

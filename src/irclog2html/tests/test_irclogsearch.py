@@ -282,7 +282,7 @@ def doctest_get_path():
 
 
 def doctest_wsgi():
-    """Test for the wsgi entry point
+    r"""Test for the wsgi entry point
 
         >>> tmpdir = set_up_sample()
         >>> start_response = mock.MagicMock()
@@ -332,6 +332,15 @@ def doctest_wsgi():
     Accessing paths with slashes:
 
         >>> environ['PATH_INFO'] = '/./index.html'
+        >>> start_response = mock.MagicMock()
+        >>> wsgi(environ, start_response)
+        [b'Not found']
+        >>> start_response.assert_called_once_with(
+        ...    '404 Not Found', [('Content-Type', 'text/html; charset=UTF-8')])
+
+    What if some poor soul runs Windows?
+
+        >>> environ['PATH_INFO'] = '/.\\index.html'
         >>> start_response = mock.MagicMock()
         >>> wsgi(environ, start_response)
         [b'Not found']
