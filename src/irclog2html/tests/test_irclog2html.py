@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from __future__ import print_function
 
 import doctest
@@ -865,7 +863,3 @@ def test_suite():
         doctest.DocTestSuite('irclog2html.irclog2html'),
         doctest.DocTestSuite(optionflags=optionflags),
     ])
-
-
-if __name__ == '__main__':
-    unittest.main(defaultTest='test_suite')

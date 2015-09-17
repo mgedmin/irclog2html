@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import datetime
 import doctest
 import os
@@ -312,7 +310,3 @@ def test_suite():
         doctest.DocTestSuite(optionflags=doctest.ELLIPSIS | doctest.REPORT_NDIFF),
         unittest.makeSuite(TestLogFile),
     ])
-
-
-if __name__ == '__main__':
-    unittest.main(defaultTest='test_suite')
