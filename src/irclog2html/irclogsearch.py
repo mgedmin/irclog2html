@@ -173,7 +173,7 @@ def search_irc_logs(query, stats=None, where=None, logfile_pattern=None):
         date = f.date
         link = f.link
         stats.files += 1
-        for time, event, info in parse_log_file(f.filename):
+        for timestamp, event, info in parse_log_file(f.filename):
             if event == LogParser.COMMENT:
                 nick, text = info
                 text = nick + ' ' + text
@@ -184,7 +184,7 @@ def search_irc_logs(query, stats=None, where=None, logfile_pattern=None):
             stats.lines += 1
             if query in text.lower():
                 stats.matches += 1
-                yield SearchResult(f.filename, link, date, time, event, info)
+                yield SearchResult(f.filename, link, date, timestamp, event, info)
 
 
 def print_cgi_headers(stream):
