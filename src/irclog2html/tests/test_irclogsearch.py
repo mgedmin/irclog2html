@@ -112,6 +112,8 @@ def set_up_sample():
                 os.path.join(tmpdir, 'sample-2013-03-18.log'))
     with open(os.path.join(tmpdir, "index.html"), "w") as f:
         f.write("This is the index")
+    with open(os.path.join(tmpdir, "irclog.css"), "w") as f:
+        f.write("* { font: comic sans; }")
     return tmpdir
 
 
@@ -299,6 +301,16 @@ def doctest_wsgi():
         [b'This is the index']
         >>> start_response.assert_called_once_with(
         ...     '200 Ok', [('Content-Type', 'text/html; charset=UTF-8')])
+
+    We can load the stylesheet too
+
+        >>> environ['PATH_INFO'] = '/irclog.css'
+        >>> start_response = mock.MagicMock()
+        >>> wsgi(environ, start_response)
+        [b'* { font: comic sans; }']
+        >>> start_response.assert_called_once_with(
+        ...     '200 Ok', [('Content-Type', 'text/css')])
+
 
     Accessing the search page:
 
