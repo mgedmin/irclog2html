@@ -319,7 +319,8 @@ def wsgi(environ, start_response):
     return result
 
 
-def serve():
+def serve():  # pragma: nocover
+    """Simple web server for manual testing"""
     from wsgiref.simple_server import make_server
     srv = make_server('localhost', 8080, wsgi)
     print("Started at http://localhost:8080/")
