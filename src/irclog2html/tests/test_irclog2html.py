@@ -617,7 +617,7 @@ def doctest_MediaWikiStyle():
         |- id="t02:24:17"
         ! style="background-color: #77ff77" | mgedmin
         | style="color: #77ff77" | Hello, world!
-        || [[#t02:24:17|02:24]] 
+        || [[#t02:24:17|02:24]]
 
     Note that we don't need special markup for hyperlinks
 
@@ -625,7 +625,7 @@ def doctest_MediaWikiStyle():
         |- id="t02:24"
         ! style="background-color: #77ff77" | mgedmin
         | style="color: #77ff77" | http://google.com/ has a new favicon
-        || [[#t02:24|02:24]] 
+        || [[#t02:24|02:24]]
 
     But we ought to escape MediaWiki markup (XXX this is not currently done,
     would someone familiar with the markup please fix the code)
@@ -634,14 +634,14 @@ def doctest_MediaWikiStyle():
         |- id="t02:24"
         ! style="background-color: #77ff77" | [|mg|]
         | style="color: #77ff77" | [!@#$%^&amp;*()_+{};:,./&lt;&gt;?]
-        || [[#t02:24|02:24]] 
+        || [[#t02:24|02:24]]
 
     The time is optional (some IRC logs don't have it)
 
         >>> style.nicktext(None, 'mgedmin', 'what time is it?', '#77ff77')
         |-
         | style="background-color: #77ff77" | mgedmin
-        | style="color: #77ff77" colspan="2" | what time is it? 
+        | style="color: #77ff77" colspan="2" | what time is it?
 
     There are other kinds of things that happen in IRC channels
 
@@ -862,8 +862,9 @@ def doctest_main_output_directory():
 def test_suite():
     optionflags = doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS | doctest.REPORT_NDIFF
     return unittest.TestSuite([
-                doctest.DocTestSuite('irclog2html.irclog2html'),
-                doctest.DocTestSuite(optionflags=optionflags)])
+        doctest.DocTestSuite('irclog2html.irclog2html'),
+        doctest.DocTestSuite(optionflags=optionflags),
+    ])
 
 
 if __name__ == '__main__':
