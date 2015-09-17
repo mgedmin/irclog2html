@@ -50,6 +50,9 @@ except NameError:
     unicode = str
 
 
+DEFAULT_LOGFILE_PATH = os.path.dirname(__file__)
+DEFAULT_LOGFILE_PATTERN = "*.log"
+
 DATE_REGEXP = re.compile('^.*(\d\d\d\d)-(\d\d)-(\d\d)')
 
 
@@ -160,10 +163,10 @@ def parse_log_file(filename):
 
 
 def search_irc_logs(query, stats=None, where=None, logfile_pattern=None):
-    if where is None:
-        where = os.path.dirname(__file__)
-    if logfile_pattern is None:
-        logfile_pattern = "*.log"
+    if not where:
+        where = DEFAULT_LOGFILE_PATH
+    if not logfile_pattern:
+        logfile_pattern = DEFAULT_LOGFILE_PATTERN
     if not stats:
         stats = SearchStats() # will be discarded, but, oh, well
     query = query.lower()
@@ -284,8 +287,8 @@ def get_path(environ):
 
 def wsgi(environ, start_response):
     """WSGI application"""
-    logfile_path = environ.get('IRCLOG_LOCATION')
-    logfile_pattern = environ.get('IRCLOG_GLOB')
+    logfile_path = environ.get('IRCLOG_LOCATION') or DEFAULT_LOGFILE_PATH
+    logfile_pattern = environ.get('IRCLOG_GLOB') or DEFAULT_LOGFILE_PATTERN
     form = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ)
     stream = io.TextIOWrapper(io.BytesIO(), 'ascii',
                               errors='xmlcharrefreplace',
@@ -330,8 +333,8 @@ def serve():  # pragma: nocover
 def main():
     """CGI script"""
     cgitb.enable()
-    logfile_path = os.getenv('IRCLOG_LOCATION')
-    logfile_pattern = os.getenv('IRCLOG_GLOB')
+    logfile_path = os.getenv('IRCLOG_LOCATION') or DEFAULT_LOGFILE_PATH
+    logfile_pattern = os.getenv('IRCLOG_GLOB') or DEFAULT_LOGFILE_PATTERN
     form = cgi.FieldStorage()
     stream = rewrap_stdout()
     print_cgi_headers(stream)
