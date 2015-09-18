@@ -90,6 +90,7 @@ a:active, a:hover {
 }
 
 a.time, a.time:visited {
+    white-space: nowrap;
     text-decoration: none;
     color: #8888cc;
 }
