@@ -254,7 +254,7 @@ def print_search_results(query, where=DEFAULT_LOGFILE_PATH,
     return formatter # destroying it closes the stream, breaking the result
 
 
-def rewrap_stdout():
+def unicode_stdout():
     if hasattr(sys.stdout, 'buffer'):
         stream = sys.stdout.buffer # Python 3
     else:
@@ -281,7 +281,7 @@ def main():
     logfile_path = os.getenv('IRCLOG_LOCATION') or DEFAULT_LOGFILE_PATH
     logfile_pattern = os.getenv('IRCLOG_GLOB') or DEFAULT_LOGFILE_PATTERN
     form = cgi.FieldStorage()
-    stream = rewrap_stdout()
+    stream = unicode_stdout()
     print_cgi_headers(stream)
     search_page(stream, form, logfile_path, logfile_pattern)
 
