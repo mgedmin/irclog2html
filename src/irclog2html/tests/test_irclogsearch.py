@@ -52,6 +52,14 @@ class BytesIOWrapper(object):
         self.stream.flush()
 
 
+def prepare_stdout():
+    if sys.version_info[0] >= 3:
+        # Make the StringIO used by doctest act like the real sys.stdout, which
+        # has an underlying bytes-only output stream.  This is needed because
+        # we're going to print bytes in this CGI script.
+        sys.stdout.buffer = BytesIOWrapper(sys.stdout)
+
+
 def myrepr(o):
     """Repr that drops u prefixes on unicode strings."""
     if isinstance(o, tuple):
@@ -258,7 +266,7 @@ def doctest_main_prints_form():
     """Test for main
 
         >>> os.environ.pop('QUERY_STRING', None)
-        >>> sys.stdout.buffer = BytesIOWrapper(sys.stdout)
+        >>> prepare_stdout()
         >>> main()
         Content-Type: text/html; charset=UTF-8
         <BLANKLINE>
@@ -293,7 +301,7 @@ def doctest_main_searches():
     """Test for main
 
         >>> tmpdir = set_up_sample()
-        >>> sys.stdout.buffer = BytesIOWrapper(sys.stdout)
+        >>> prepare_stdout()
         >>> os.environ['QUERY_STRING'] = 'q=povbot'
         >>> os.environ['IRCLOG_LOCATION'] = tmpdir
         >>> os.environ['IRCLOG_GLOB'] = '*.log'
