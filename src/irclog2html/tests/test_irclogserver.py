@@ -3,6 +3,7 @@ import gzip
 import os
 import shutil
 import tempfile
+import doctest
 import unittest
 from contextlib import closing
 
@@ -161,4 +162,7 @@ class TestApplication(unittest.TestCase):
 
 
 def test_suite():
-    return unittest.defaultTestLoader.loadTestsFromName(__name__)
+    return unittest.TestSuite([
+        unittest.defaultTestLoader.loadTestsFromName(__name__),
+        doctest.DocTestSuite()
+    ])
