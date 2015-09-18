@@ -35,13 +35,20 @@ from .irclogsearch import (
 def get_path(environ):
     path = environ.get('PATH_INFO', '/')
     path = path[1:]  # Remove the leading slash
+    channel = None
+    if environ.get('IRCLOG_CHAN_DIR'):
+        if '/' in path:
+            channel, path = path.split('/', 1)
+            if channel == '..':
+                return None, None
     if '/' in path or '\\' in path:
-        return None
-    return path if path != '' else 'index.html'
+        return channel, None
+    return channel, path if path != '' else 'index.html'
 
 
 def application(environ, start_response):
     """WSGI application"""
+    chan_path = environ.get('IRCLOG_CHAN_DIR')
     logfile_path = environ.get('IRCLOG_LOCATION') or DEFAULT_LOGFILE_PATH
     logfile_pattern = environ.get('IRCLOG_GLOB') or DEFAULT_LOGFILE_PATTERN
     form = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ)
@@ -53,7 +60,9 @@ def application(environ, start_response):
     content_type = "text/html; charset=UTF-8"
     headers = {}
 
-    path = get_path(environ)
+    channel, path = get_path(environ)
+    if channel:
+        logfile_path = os.path.join(chan_path, channel)
     if path is None:
         status = "404 Not Found"
         result = [b"Not found"]

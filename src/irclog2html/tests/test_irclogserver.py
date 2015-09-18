@@ -31,6 +31,9 @@ def set_up_sample():
         f.write("This is the index")
     with open(os.path.join(tmpdir, "font.css"), "w") as f:
         f.write("* { font: comic sans; }")
+    os.mkdir(os.path.join(tmpdir, "#chan"))
+    with open(os.path.join(tmpdir, "#chan", "index.html"), "w") as f:
+        f.write("#chan index")
     return tmpdir
 
 
@@ -45,19 +48,49 @@ def doctest_get_path():
     on URL path:
 
         >>> get_path(dict(PATH_INFO='/search'))
-        'search'
+        (None, 'search')
 
         >>> get_path(dict(PATH_INFO='/#channel-2015-05-05.log.html'))
-        '#channel-2015-05-05.log.html'
+        (None, '#channel-2015-05-05.log.html')
 
     When there is no file name, we show the index:
 
         >>> get_path(dict(PATH_INFO='/'))
-        'index.html'
+        (None, 'index.html')
 
     Any slashes other than the leading one result in None:
 
         >>> get_path(dict(PATH_INFO='/../../etc/passwd'))
+        (None, None)
+
+    But there is an option to serve a directory with subdir for each
+    channel.  If IRCLOG_CHAN_DIR is defined, the first traversal step
+    is the first element of the returned tuple:
+
+        >>> get_path(dict(PATH_INFO='/#random/search',
+        ...          IRCLOG_CHAN_DIR='/opt/irclog'))
+        ('#random', 'search')
+
+
+        >>> get_path(dict(PATH_INFO='/#random/',
+        ...          IRCLOG_CHAN_DIR='/opt/irclog'))
+        ('#random', 'index.html')
+
+    If the path does not contain the channel name, tough cookies:
+
+        >>> get_path(dict(PATH_INFO='/index.html',
+        ...          IRCLOG_CHAN_DIR='/opt/irclog'))
+        (None, 'index.html')
+
+    Hacking verboten:
+
+        >>> get_path(dict(PATH_INFO='/../index.html',
+        ...          IRCLOG_CHAN_DIR='/opt/irclog'))
+        (None, None)
+
+        >>> get_path(dict(PATH_INFO='/#random/../index.html',
+        ...          IRCLOG_CHAN_DIR='/opt/irclog'))
+        ('#random', None)
 
     """
 
@@ -78,13 +111,15 @@ class TestApplication(unittest.TestCase):
         def assertIn(self, needle, haystack):
             self.assertTrue(needle in haystack, haystack)
 
-    def request(self, path='/', expect=200):
+    def request(self, path='/', expect=200, extra_env=None):
         environ = {
             'IRCLOG_LOCATION': self.tmpdir,
             'PATH_INFO': path.partition('?')[0],
             'QUERY_STRING': path.partition('?')[-1],
             'wsgi.input': None,
         }
+        if extra_env:
+            environ.update(extra_env)
         start_response = mock.Mock()
         response = Response()
         response.body = b''.join(application(environ, start_response))
@@ -159,6 +194,39 @@ class TestApplication(unittest.TestCase):
         response = self.request('/.\\index.html', expect=404)
         self.assertEqual(response.content_type, 'text/plain')
         self.assertIn(b'Not found', response.body)
+
+    def test_chan_index(self):
+        response = self.request(
+            '/#chan/',
+            extra_env={"IRCLOG_CHAN_DIR": self.tmpdir})
+        self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
+        self.assertEqual(b'#chan index', response.body)
+
+    def test_chan_search_page(self):
+        response = self.request(
+            '/#chan/search',
+            extra_env={"IRCLOG_CHAN_DIR": self.tmpdir})
+        self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
+        self.assertIn(b'<title>Search IRC logs</title>', response.body)
+
+    def test_chan_no_chan(self):
+        response = self.request(
+            '/',
+            extra_env={"IRCLOG_CHAN_DIR": self.tmpdir})
+        # when the channel is not provided in the URL path, revert to
+        # IRCLOG_LOCATION
+        self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
+        self.assertEqual(response.body, b'This is the index')
+
+    def test_chan_index(self):
+        response = self.request(
+            '/../index.html',
+            extra_env={"IRCLOG_CHAN_DIR": self.tmpdir},
+            expect=404)
+        self.assertEqual(response.content_type, 'text/plain')
+        self.assertIn(b'Not found', response.body)
+
+
 
 
 def test_suite():
