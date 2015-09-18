@@ -26,7 +26,7 @@ import cgi
 import io
 import os
 
-from .irclog2html import CSS_FILE
+from .irclog2html import CSS_FILE, LogParser
 from .irclogsearch import (
     DEFAULT_LOGFILE_PATH, DEFAULT_LOGFILE_PATTERN, search_page,
 )
@@ -72,10 +72,6 @@ def application(environ, start_response):
             result = [b"Not found"]
             content_type = "text/plain"
     else:
-        if path.endswith('.css'):
-            content_type = "text/css"
-        if path.endswith('.log') or path.endswith('.txt'):
-            content_type = "text/plain"
         try:
             with open(os.path.join(logfile_path, path), "rb") as f:
                 result = [f.read()]
@@ -90,6 +86,13 @@ def application(environ, start_response):
                 status = "404 Not Found"
                 result = [b"Not found"]
                 content_type = "text/plain"
+        else:
+            if path.endswith('.css'):
+                content_type = "text/css"
+            elif path.endswith('.log') or path.endswith('.txt'):
+                content_type = "text/plain; charset=UTF-8"
+                result = [LogParser.decode(line).encode('UTF-8')
+                          for line in b''.join(result).splitlines(True)]
 
     headers["Content-Type"] = content_type
     # We need str() for Python 2 because of unicode_literals

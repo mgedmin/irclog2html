@@ -130,7 +130,8 @@ class LogParser(object):
         if dircproxy:
             self.NICK_REGEXP = self.DIRCPROXY_NICK_REGEXP
 
-    def decode(self, s):
+    @staticmethod
+    def decode(s):
         """Convert 8-bit string to Unicode.
 
         Supports xchat's hybrid Latin/Unicode encoding, as documented here:

@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 import gzip
 import os
 import shutil
@@ -122,8 +123,10 @@ class TestApplication(unittest.TestCase):
 
     def test_log_file(self):
         response = self.request('/sample-2013-03-18.log')
-        self.assertEqual(response.content_type, 'text/plain')
+        self.assertEqual(response.content_type, 'text/plain; charset=UTF-8')
         self.assertIn(b'2005-01-08T23:33:54  *** povbot has joined #pov', response.body)
+        self.assertIn(u'ąčę'.encode('UTF-8'), response.body)
+        self.assertIn(u'<mgedmin> š'.encode('UTF-8'), response.body)
 
     def test_builtin_css(self):
         response = self.request('/irclog.css')
