@@ -22,6 +22,8 @@ Apache configuration example:
 # Released under the terms of the GNU GPL
 # http://www.gnu.org/copyleft/gpl.html
 
+from __future__ import print_function
+
 import cgi
 import io
 import os
@@ -29,10 +31,28 @@ import os
 from .irclog2html import CSS_FILE, LogParser
 from .irclogsearch import (
     DEFAULT_LOGFILE_PATH, DEFAULT_LOGFILE_PATTERN, search_page,
+    HEADER, FOOTER
 )
 
 
+def dir_listing(stream, path):
+    """Primitive listing of  subdirectories"""
+    print(HEADER, file=stream)
+    print("<h1>IRC logs</h1>", file=stream)
+    print("<ul>", file=stream)
+    for name in os.listdir(path):
+        if os.path.isdir(os.path.join(path, name)):
+            print('<li><a href="{0}/">{0}</a></li>'.format(name),
+                  file=stream)
+    print("</ul>", file=stream)
+    print(FOOTER, file=stream)
+
+
 def get_path(environ):
+    """Return tuples (channel, filename).
+
+    The channel of None means default, the filename of None means 404.
+    """
     path = environ.get('PATH_INFO', '/')
     path = path[1:]  # Remove the leading slash
     channel = None
@@ -67,6 +87,9 @@ def application(environ, start_response):
         status = "404 Not Found"
         result = [b"Not found"]
         content_type = "text/plain"
+    elif path == "index.html" and chan_path and channel is None:
+        dir_listing(stream, chan_path)
+        result = [stream.buffer.getvalue()]
     elif path == 'search':
         fmt = search_page(stream, form, logfile_path, logfile_pattern)
         result = [stream.buffer.getvalue()]

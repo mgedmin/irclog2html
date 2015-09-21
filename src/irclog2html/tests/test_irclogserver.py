@@ -211,14 +211,13 @@ class TestApplication(unittest.TestCase):
         self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
         self.assertIn(b'<title>Search IRC logs</title>', response.body)
 
-    def test_chan_no_chan(self):
+    def test_chan_listing(self):
         response = self.request(
             '/',
             extra_env={"IRCLOG_CHAN_DIR": self.tmpdir})
-        # when the channel is not provided in the URL path, revert to
-        # IRCLOG_LOCATION
         self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
-        self.assertEqual(response.body, b'This is the index')
+        self.assertIn(b'IRC logs', response.body)
+        self.assertIn(b'<a href="#chan/">#chan</a>', response.body)
 
     def test_chan_error(self):
         response = self.request(
@@ -227,8 +226,6 @@ class TestApplication(unittest.TestCase):
             expect=404)
         self.assertEqual(response.content_type, 'text/plain')
         self.assertIn(b'Not found', response.body)
-
-
 
 
 def test_suite():
