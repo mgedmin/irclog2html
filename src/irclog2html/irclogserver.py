@@ -38,13 +38,13 @@ from .irclogsearch import (
 def dir_listing(stream, path):
     """Primitive listing of  subdirectories"""
     print(HEADER, file=stream)
-    print("<h1>IRC logs</h1>", file=stream)
-    print("<ul>", file=stream)
+    print(u"<h1>IRC logs</h1>", file=stream)
+    print(u"<ul>", file=stream)
     for name in os.listdir(path):
         if os.path.isdir(os.path.join(path, name)):
-            print('<li><a href="{0}/">{0}</a></li>'.format(name),
+            print(u'<li><a href="{0}/">{0}</a></li>'.format(name),
                   file=stream)
-    print("</ul>", file=stream)
+    print(u"</ul>", file=stream)
     print(FOOTER, file=stream)
 
 
