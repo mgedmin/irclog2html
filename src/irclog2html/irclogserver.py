@@ -22,28 +22,64 @@ Apache configuration example:
 # Released under the terms of the GNU GPL
 # http://www.gnu.org/copyleft/gpl.html
 
+from __future__ import print_function
+
 import cgi
 import io
 import os
 
+try:
+    from urllib import quote_plus # Py2
+except ImportError:
+    from urllib.parse import quote_plus # Py3
+
 from .irclog2html import CSS_FILE, LogParser
 from .irclogsearch import (
     DEFAULT_LOGFILE_PATH, DEFAULT_LOGFILE_PATTERN, search_page,
+    HEADER, FOOTER
 )
 
 
-def get_path(environ):
+def dir_listing(stream, path):
+    """Primitive listing of subdirectories"""
+    print(HEADER, file=stream)
+    print(u"<h1>IRC logs</h1>", file=stream)
+    print(u"<ul>", file=stream)
+    for name in sorted(os.listdir(path)):
+        if os.path.isdir(os.path.join(path, name)):
+            print(u'<li><a href="%s/">%s</a></li>'
+                  % (quote_plus(name), cgi.escape(name)),
+                  file=stream)
+    print(u"</ul>", file=stream)
+    print(FOOTER, file=stream)
+
+
+def parse_path(environ):
+    """Return tuples (channel, filename).
+
+    The channel of None means default, the filename of None means 404.
+    """
     path = environ.get('PATH_INFO', '/')
     path = path[1:]  # Remove the leading slash
+    channel = None
+    if environ.get('IRCLOG_CHAN_DIR'):
+        if '/' in path:
+            channel, path = path.split('/', 1)
+            if channel == '..':
+                return None, None
     if '/' in path or '\\' in path:
-        return None
-    return path if path != '' else 'index.html'
+        return channel, None
+    return channel, path if path != '' else 'index.html'
 
 
 def application(environ, start_response):
     """WSGI application"""
-    logfile_path = environ.get('IRCLOG_LOCATION') or DEFAULT_LOGFILE_PATH
-    logfile_pattern = environ.get('IRCLOG_GLOB') or DEFAULT_LOGFILE_PATTERN
+    def getenv(name, default=None):
+        return environ.get(name, os.environ.get(name, default))
+
+    chan_path = getenv('IRCLOG_CHAN_DIR')
+    logfile_path = getenv('IRCLOG_LOCATION') or DEFAULT_LOGFILE_PATH
+    logfile_pattern = getenv('IRCLOG_GLOB') or DEFAULT_LOGFILE_PATTERN
     form = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ)
     stream = io.TextIOWrapper(io.BytesIO(), 'ascii',
                               errors='xmlcharrefreplace',
@@ -53,11 +89,16 @@ def application(environ, start_response):
     content_type = "text/html; charset=UTF-8"
     headers = {}
 
-    path = get_path(environ)
+    channel, path = parse_path(environ)
+    if channel:
+        logfile_path = os.path.join(chan_path, channel)
     if path is None:
         status = "404 Not Found"
         result = [b"Not found"]
         content_type = "text/plain"
+    elif path == "index.html" and chan_path and channel is None:
+        dir_listing(stream, chan_path)
+        result = [stream.buffer.getvalue()]
     elif path == 'search':
         fmt = search_page(stream, form, logfile_path, logfile_pattern)
         result = [stream.buffer.getvalue()]

@@ -1,14 +1,15 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 import gzip
 import os
 import shutil
 import tempfile
+import doctest
 import unittest
 from contextlib import closing
 
 import mock
 
-from irclog2html.irclogserver import get_path, application
+from irclog2html.irclogserver import parse_path, application
 
 
 here = os.path.dirname(__file__)
@@ -30,6 +31,9 @@ def set_up_sample():
         f.write("This is the index")
     with open(os.path.join(tmpdir, "font.css"), "w") as f:
         f.write("* { font: comic sans; }")
+    os.mkdir(os.path.join(tmpdir, "#chan"))
+    with open(os.path.join(tmpdir, "#chan", "index.html"), "w") as f:
+        f.write("#chan index")
     return tmpdir
 
 
@@ -37,26 +41,56 @@ def clean_up_sample(tmpdir):
     shutil.rmtree(tmpdir)
 
 
-def doctest_get_path():
-    """Test for get_path.
+def doctest_parse_path():
+    """Test for parse_path.
 
     This function decides whether to search or to display a file based
     on URL path:
 
-        >>> get_path(dict(PATH_INFO='/search'))
-        'search'
+        >>> parse_path(dict(PATH_INFO='/search'))
+        (None, 'search')
 
-        >>> get_path(dict(PATH_INFO='/#channel-2015-05-05.log.html'))
-        '#channel-2015-05-05.log.html'
+        >>> parse_path(dict(PATH_INFO='/#channel-2015-05-05.log.html'))
+        (None, '#channel-2015-05-05.log.html')
 
     When there is no file name, we show the index:
 
-        >>> get_path(dict(PATH_INFO='/'))
-        'index.html'
+        >>> parse_path(dict(PATH_INFO='/'))
+        (None, 'index.html')
 
     Any slashes other than the leading one result in None:
 
-        >>> get_path(dict(PATH_INFO='/../../etc/passwd'))
+        >>> parse_path(dict(PATH_INFO='/../../etc/passwd'))
+        (None, None)
+
+    But there is an option to serve a directory with subdir for each
+    channel.  If IRCLOG_CHAN_DIR is defined, the first traversal step
+    is the first element of the returned tuple:
+
+        >>> parse_path(dict(PATH_INFO='/#random/search',
+        ...            IRCLOG_CHAN_DIR='/opt/irclog'))
+        ('#random', 'search')
+
+
+        >>> parse_path(dict(PATH_INFO='/#random/',
+        ...            IRCLOG_CHAN_DIR='/opt/irclog'))
+        ('#random', 'index.html')
+
+    If the path does not contain the channel name, tough cookies:
+
+        >>> parse_path(dict(PATH_INFO='/index.html',
+        ...            IRCLOG_CHAN_DIR='/opt/irclog'))
+        (None, 'index.html')
+
+    Hacking verboten:
+
+        >>> parse_path(dict(PATH_INFO='/../index.html',
+        ...            IRCLOG_CHAN_DIR='/opt/irclog'))
+        (None, None)
+
+        >>> parse_path(dict(PATH_INFO='/#random/../index.html',
+        ...            IRCLOG_CHAN_DIR='/opt/irclog'))
+        ('#random', None)
 
     """
 
@@ -77,13 +111,15 @@ class TestApplication(unittest.TestCase):
         def assertIn(self, needle, haystack):
             self.assertTrue(needle in haystack, haystack)
 
-    def request(self, path='/', expect=200):
+    def request(self, path='/', expect=200, extra_env=None):
         environ = {
             'IRCLOG_LOCATION': self.tmpdir,
             'PATH_INFO': path.partition('?')[0],
             'QUERY_STRING': path.partition('?')[-1],
             'wsgi.input': None,
         }
+        if extra_env:
+            environ.update(extra_env)
         start_response = mock.Mock()
         response = Response()
         response.body = b''.join(application(environ, start_response))
@@ -119,12 +155,14 @@ class TestApplication(unittest.TestCase):
         response = self.request('/search?q=bot')
         self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
         self.assertIn(b'<title>Search IRC logs</title>', response.body)
-        self.assertIn(b'<p>10 matches in 2 log files with 20 lines', response.body)
+        self.assertIn(b'<p>10 matches in 2 log files with 20 lines',
+                      response.body)
 
     def test_log_file(self):
         response = self.request('/sample-2013-03-18.log')
         self.assertEqual(response.content_type, 'text/plain; charset=UTF-8')
-        self.assertIn(b'2005-01-08T23:33:54  *** povbot has joined #pov', response.body)
+        self.assertIn(b'2005-01-08T23:33:54  *** povbot has joined #pov',
+                      response.body)
         self.assertIn(u'ąčę'.encode('UTF-8'), response.body)
         self.assertIn(u'<mgedmin> š'.encode('UTF-8'), response.body)
 
@@ -159,6 +197,47 @@ class TestApplication(unittest.TestCase):
         self.assertEqual(response.content_type, 'text/plain')
         self.assertIn(b'Not found', response.body)
 
+    def test_chan_index(self):
+        response = self.request(
+            '/#chan/',
+            extra_env={"IRCLOG_CHAN_DIR": self.tmpdir})
+        self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
+        self.assertEqual(b'#chan index', response.body)
+
+    def test_chan_search_page(self):
+        response = self.request(
+            '/#chan/search',
+            extra_env={"IRCLOG_CHAN_DIR": self.tmpdir})
+        self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
+        self.assertIn(b'<title>Search IRC logs</title>', response.body)
+
+    def test_chan_listing(self):
+        response = self.request(
+            '/',
+            extra_env={"IRCLOG_CHAN_DIR": self.tmpdir})
+        self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
+        self.assertIn(b'IRC logs', response.body)
+        self.assertIn(b'<a href="%23chan/">#chan</a>', response.body)
+
+    def test_chan_error(self):
+        response = self.request(
+            '/../index.html',
+            extra_env={"IRCLOG_CHAN_DIR": self.tmpdir},
+            expect=404)
+        self.assertEqual(response.content_type, 'text/plain')
+        self.assertIn(b'Not found', response.body)
+
+    @mock.patch("os.environ")
+    def test_chan_os_environ(self, environ):
+        os.environ.get = {"IRCLOG_CHAN_DIR": self.tmpdir}.get
+        response = self.request('/')
+        self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
+        self.assertIn(b'IRC logs', response.body)
+        self.assertIn(b'<a href="%23chan/">#chan</a>', response.body)
+
 
 def test_suite():
-    return unittest.defaultTestLoader.loadTestsFromName(__name__)
+    return unittest.TestSuite([
+        unittest.defaultTestLoader.loadTestsFromName(__name__),
+        doctest.DocTestSuite()
+    ])
