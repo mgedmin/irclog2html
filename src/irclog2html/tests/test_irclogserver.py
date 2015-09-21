@@ -220,7 +220,7 @@ class TestApplication(unittest.TestCase):
         self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
         self.assertEqual(response.body, b'This is the index')
 
-    def test_chan_index(self):
+    def test_chan_error(self):
         response = self.request(
             '/../index.html',
             extra_env={"IRCLOG_CHAN_DIR": self.tmpdir},
