@@ -32,7 +32,7 @@ test-all-pythons: bin/tox
 
 .PHONY: coverage
 coverage: bin/tox
-	bin/detox -e coverage,coverage3 -- -p
+	bin/tox -e coverage,coverage3 -- -p
 	bin/coverage combine
 	bin/coverage report
 
