@@ -41,14 +41,14 @@ from .irclogsearch import (
 
 
 def dir_listing(stream, path):
-    """Primitive listing of  subdirectories"""
+    """Primitive listing of subdirectories"""
     print(HEADER, file=stream)
     print(u"<h1>IRC logs</h1>", file=stream)
     print(u"<ul>", file=stream)
-    for name in os.listdir(path):
+    for name in sorted(os.listdir(path)):
         if os.path.isdir(os.path.join(path, name)):
             print(u'<li><a href="%s/">%s</a></li>'
-                  % (quote_plus(name), name),
+                  % (quote_plus(name), cgi.escape(name)),
                   file=stream)
     print(u"</ul>", file=stream)
     print(FOOTER, file=stream)
