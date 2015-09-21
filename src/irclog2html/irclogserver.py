@@ -48,7 +48,7 @@ def dir_listing(stream, path):
     print(FOOTER, file=stream)
 
 
-def get_path(environ):
+def parse_path(environ):
     """Return tuples (channel, filename).
 
     The channel of None means default, the filename of None means 404.
@@ -80,7 +80,7 @@ def application(environ, start_response):
     content_type = "text/html; charset=UTF-8"
     headers = {}
 
-    channel, path = get_path(environ)
+    channel, path = parse_path(environ)
     if channel:
         logfile_path = os.path.join(chan_path, channel)
     if path is None:

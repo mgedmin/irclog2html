@@ -9,7 +9,7 @@ from contextlib import closing
 
 import mock
 
-from irclog2html.irclogserver import get_path, application
+from irclog2html.irclogserver import parse_path, application
 
 
 here = os.path.dirname(__file__)
@@ -41,55 +41,55 @@ def clean_up_sample(tmpdir):
     shutil.rmtree(tmpdir)
 
 
-def doctest_get_path():
-    """Test for get_path.
+def doctest_parse_path():
+    """Test for parse_path.
 
     This function decides whether to search or to display a file based
     on URL path:
 
-        >>> get_path(dict(PATH_INFO='/search'))
+        >>> parse_path(dict(PATH_INFO='/search'))
         (None, 'search')
 
-        >>> get_path(dict(PATH_INFO='/#channel-2015-05-05.log.html'))
+        >>> parse_path(dict(PATH_INFO='/#channel-2015-05-05.log.html'))
         (None, '#channel-2015-05-05.log.html')
 
     When there is no file name, we show the index:
 
-        >>> get_path(dict(PATH_INFO='/'))
+        >>> parse_path(dict(PATH_INFO='/'))
         (None, 'index.html')
 
     Any slashes other than the leading one result in None:
 
-        >>> get_path(dict(PATH_INFO='/../../etc/passwd'))
+        >>> parse_path(dict(PATH_INFO='/../../etc/passwd'))
         (None, None)
 
     But there is an option to serve a directory with subdir for each
     channel.  If IRCLOG_CHAN_DIR is defined, the first traversal step
     is the first element of the returned tuple:
 
-        >>> get_path(dict(PATH_INFO='/#random/search',
-        ...          IRCLOG_CHAN_DIR='/opt/irclog'))
+        >>> parse_path(dict(PATH_INFO='/#random/search',
+        ...            IRCLOG_CHAN_DIR='/opt/irclog'))
         ('#random', 'search')
 
 
-        >>> get_path(dict(PATH_INFO='/#random/',
-        ...          IRCLOG_CHAN_DIR='/opt/irclog'))
+        >>> parse_path(dict(PATH_INFO='/#random/',
+        ...            IRCLOG_CHAN_DIR='/opt/irclog'))
         ('#random', 'index.html')
 
     If the path does not contain the channel name, tough cookies:
 
-        >>> get_path(dict(PATH_INFO='/index.html',
-        ...          IRCLOG_CHAN_DIR='/opt/irclog'))
+        >>> parse_path(dict(PATH_INFO='/index.html',
+        ...            IRCLOG_CHAN_DIR='/opt/irclog'))
         (None, 'index.html')
 
     Hacking verboten:
 
-        >>> get_path(dict(PATH_INFO='/../index.html',
-        ...          IRCLOG_CHAN_DIR='/opt/irclog'))
+        >>> parse_path(dict(PATH_INFO='/../index.html',
+        ...            IRCLOG_CHAN_DIR='/opt/irclog'))
         (None, None)
 
-        >>> get_path(dict(PATH_INFO='/#random/../index.html',
-        ...          IRCLOG_CHAN_DIR='/opt/irclog'))
+        >>> parse_path(dict(PATH_INFO='/#random/../index.html',
+        ...            IRCLOG_CHAN_DIR='/opt/irclog'))
         ('#random', None)
 
     """
