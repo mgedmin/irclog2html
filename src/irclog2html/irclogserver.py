@@ -74,9 +74,12 @@ def parse_path(environ):
 
 def application(environ, start_response):
     """WSGI application"""
-    chan_path = environ.get('IRCLOG_CHAN_DIR')
-    logfile_path = environ.get('IRCLOG_LOCATION') or DEFAULT_LOGFILE_PATH
-    logfile_pattern = environ.get('IRCLOG_GLOB') or DEFAULT_LOGFILE_PATTERN
+    def getenv(name, default=None):
+        return environ.get(name, os.environ.get(name, default))
+
+    chan_path = getenv('IRCLOG_CHAN_DIR')
+    logfile_path = getenv('IRCLOG_LOCATION') or DEFAULT_LOGFILE_PATH
+    logfile_pattern = getenv('IRCLOG_GLOB') or DEFAULT_LOGFILE_PATTERN
     form = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ)
     stream = io.TextIOWrapper(io.BytesIO(), 'ascii',
                               errors='xmlcharrefreplace',

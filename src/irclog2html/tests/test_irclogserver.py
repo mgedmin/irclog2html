@@ -227,6 +227,14 @@ class TestApplication(unittest.TestCase):
         self.assertEqual(response.content_type, 'text/plain')
         self.assertIn(b'Not found', response.body)
 
+    @mock.patch("os.environ")
+    def test_chan_os_environ(self, environ):
+        os.environ.get = {"IRCLOG_CHAN_DIR": self.tmpdir}.get
+        response = self.request('/')
+        self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
+        self.assertIn(b'IRC logs', response.body)
+        self.assertIn(b'<a href="%23chan/">#chan</a>', response.body)
+
 
 def test_suite():
     return unittest.TestSuite([
