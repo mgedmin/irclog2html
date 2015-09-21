@@ -217,7 +217,7 @@ class TestApplication(unittest.TestCase):
             extra_env={"IRCLOG_CHAN_DIR": self.tmpdir})
         self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
         self.assertIn(b'IRC logs', response.body)
-        self.assertIn(b'<a href="#chan/">#chan</a>', response.body)
+        self.assertIn(b'<a href="%23chan/">#chan</a>', response.body)
 
     def test_chan_error(self):
         response = self.request(

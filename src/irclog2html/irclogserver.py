@@ -28,6 +28,11 @@ import cgi
 import io
 import os
 
+try:
+    from urllib import quote_plus # Py2
+except ImportError:
+    from urllib.parse import quote_plus # Py3
+
 from .irclog2html import CSS_FILE, LogParser
 from .irclogsearch import (
     DEFAULT_LOGFILE_PATH, DEFAULT_LOGFILE_PATTERN, search_page,
@@ -42,7 +47,8 @@ def dir_listing(stream, path):
     print(u"<ul>", file=stream)
     for name in os.listdir(path):
         if os.path.isdir(os.path.join(path, name)):
-            print(u'<li><a href="{0}/">{0}</a></li>'.format(name),
+            print(u'<li><a href="%s/">%s</a></li>'
+                  % (quote_plus(name), name),
                   file=stream)
     print(u"</ul>", file=stream)
     print(FOOTER, file=stream)
