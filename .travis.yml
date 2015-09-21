@@ -12,7 +12,7 @@ install:
     - pip install zope.testrunner coverage coveralls zope.testing mock
     - pip install -e .
 script:
-    - coverage run --source=irclog2html -m zope.testrunner.__init__ --test-path=src
+    - coverage run --source=irclog2html -m zope.testrunner --test-path=src
 after_script:
     - coveralls
 notifications:
