@@ -235,6 +235,14 @@ class TestApplication(unittest.TestCase):
         self.assertIn(b'IRC logs', response.body)
         self.assertIn(b'<a href="%23chan/">#chan</a>', response.body)
 
+    @mock.patch("os.environ")
+    def test_chan_search_page(self, environ):
+        os.environ.get = {"IRCLOG_CHAN_DIR": self.tmpdir}.get
+        response = self.request(
+            '/#chan/search')
+        self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
+        self.assertIn(b'<title>Search IRC logs</title>', response.body)
+
 
 def test_suite():
     return unittest.TestSuite([

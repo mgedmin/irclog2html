@@ -62,7 +62,7 @@ def parse_path(environ):
     path = environ.get('PATH_INFO', '/')
     path = path[1:]  # Remove the leading slash
     channel = None
-    if environ.get('IRCLOG_CHAN_DIR'):
+    if environ.get('IRCLOG_CHAN_DIR', os.environ.get('IRCLOG_CHAN_DIR')):
         if '/' in path:
             channel, path = path.split('/', 1)
             if channel == '..':
