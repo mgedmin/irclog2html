@@ -14,5 +14,6 @@ include porting/testcases/*.log
 include testcases/*.log
 include .gitignore
 include .travis.yml
+include appveyor.yml
 include .coveragerc
 include COPYING

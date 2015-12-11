@@ -1,9 +1,0 @@
-[report]
-omit =
-    src/irclog2html/xchatlogsplit.py
-    src/irclog2html/tests/*
-exclude_lines =
-    pragma: nocover
-    except ImportError:
-    except NameError:
-    if __name__ == '__main__':

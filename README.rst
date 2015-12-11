@@ -86,10 +86,13 @@ https://bugs.launchpad.net/irclog2html
 
 Licence: GPL v2 or later (http://www.gnu.org/copyleft/gpl.html)
 
-|buildstatus|_ |coverage|_
+|buildstatus|_ |appveyor|_ |coverage|_
 
 .. |buildstatus| image:: https://api.travis-ci.org/mgedmin/irclog2html.svg?branch=master
 .. _buildstatus: https://travis-ci.org/mgedmin/irclog2html
+
+.. |appveyor| image:: https://ci.appveyor.com/api/projects/status/github/mgedmin/irclog2html?branch=master&svg=true
+.. _appveyor: https://ci.appveyor.com/project/mgedmin/irclog2html
 
 .. |coverage| image:: https://coveralls.io/repos/mgedmin/irclog2html/badge.svg?branch=master
 .. _coverage: https://coveralls.io/r/mgedmin/irclog2html
