@@ -1,0 +1,9 @@
+[run]
+source = irclog2html
+omit = */tests/*
+
+[report]
+exclude_lines =
+    pragma: nocover
+    except ImportError:
+    except NameError:
