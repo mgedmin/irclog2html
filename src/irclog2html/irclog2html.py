@@ -386,7 +386,7 @@ class AbstractStyle(object):
     def foot(self):
         """Generate the footer."""
 
-    def servermsg(self, time, what, line):
+    def servermsg(self, time, time_counter, what, line):
         """Output a generic server message.
 
         `time` is a string.
@@ -394,7 +394,7 @@ class AbstractStyle(object):
         `what` is one of LogParser event constants (e.g. LogParser.JOIN).
         """
 
-    def nicktext(self, time, nick, text, htmlcolour):
+    def nicktext(self, time, time_counter, nick, text, htmlcolour):
         """Output a comment uttered by someone.
 
         `time` is a string.
@@ -433,7 +433,7 @@ class SimpleTextStyle(AbstractStyle):
  - find it at <a href="http://mg.pov.lt/irclog2html/">mg.pov.lt</a>!
 </tt></body></html>""" % {'VERSION': VERSION, 'RELEASE': RELEASE}, end=' ', file=self.outfile)
 
-    def servermsg(self, time, what, text):
+    def servermsg(self, time, time_counter, what, text):
         text = escape(text)
         text = createlinks(text)
         colour = self.colours.get(what)
@@ -444,12 +444,12 @@ class SimpleTextStyle(AbstractStyle):
     def _servermsg(self, line):
         print('%s<br>' % line, file=self.outfile)
 
-    def nicktext(self, time, nick, text, htmlcolour):
+    def nicktext(self, time, time_counter, nick, text, htmlcolour):
         nick = escape(nick)
         text = escape(text)
         text = createlinks(text)
         text = text.replace('  ', '&nbsp;&nbsp;')
-        self._nicktext(time, nick, text, htmlcolour)
+        self._nicktext(time, time_counter, nick, text, htmlcolour)
 
     def _nicktext(self, time, nick, text, htmlcolour):
         print('&lt;%s&gt; %s<br>' % (nick, text), file=self.outfile)
@@ -594,7 +594,7 @@ class XHTMLStyle(AbstractStyle):
 </body>
 </html>""" % {'VERSION': VERSION, 'RELEASE': RELEASE}, file=self.outfile)
 
-    def servermsg(self, time, what, text):
+    def servermsg(self, time, time_counter, what, text):
         """Output a generic server message.
 
         `time` is a string.
@@ -605,16 +605,16 @@ class XHTMLStyle(AbstractStyle):
         text = createlinks(text)
         if time:
             displaytime = shorttime(time)
-            print('<p id="t%s" class="%s">'
-                  '<a href="#t%s" class="time">%s</a> '
+            print('<p id="t%s-%s" class="%s">'
+                  '<a href="#t%s-%s" class="time">%s</a> '
                   '%s</p>'
-                  % (time, self.CLASSMAP[what], time, displaytime, text),
+                  % (time, time_counter, self.CLASSMAP[what], time, time_counter, displaytime, text),
                   file=self.outfile)
         else:
             print('<p class="%s">%s</p>' % (self.CLASSMAP[what], text),
                   file=self.outfile)
 
-    def nicktext(self, time, nick, text, htmlcolour):
+    def nicktext(self, time, time_counter, nick, text, htmlcolour):
         """Output a comment uttered by someone.
 
         `time` is a string.
@@ -627,12 +627,12 @@ class XHTMLStyle(AbstractStyle):
         text = text.replace('  ', '&nbsp;&nbsp;')
         if time:
             displaytime = shorttime(time)
-            print('<p id="t%s" class="comment">'
-                  '<a href="#t%s" class="time">%s</a> '
+            print('<p id="t%s-%s" class="comment">'
+                  '<a href="#t%s-%s" class="time">%s</a> '
                   '<span class="nick" style="color: %s">'
                   '&lt;%s&gt;</span>'
                   ' <span class="text">%s</span></p>'
-                  % (time, time, displaytime, htmlcolour, nick, text),
+                  % (time, time_counter, time, time_counter, displaytime, htmlcolour, nick, text),
                   file=self.outfile)
         else:
             print('<p class="comment">'
@@ -651,16 +651,16 @@ class XHTMLTableStyle(XHTMLStyle):
     prefix = '<table class="irclog">'
     suffix = '</table>'
 
-    def servermsg(self, time, what, text, link=''):
+    def servermsg(self, time, time_counter, what, text, link=''):
         text = escape(text)
         text = createlinks(text)
         if time:
             displaytime = shorttime(time)
-            print('<tr id="t%s">'
+            print('<tr id="t%s-%s">'
                   '<td class="%s" colspan="2">%s</td>'
-                  '<td><a href="%s#t%s" class="time">%s</a></td>'
+                  '<td><a href="%s#t%s-%s" class="time">%s</a></td>'
                   '</tr>'
-                  % (time, self.CLASSMAP[what], text, link, time, displaytime),
+                  % (time, time_counter, self.CLASSMAP[what], text, link, time, time_counter, displaytime),
                   file=self.outfile)
         else:
             print('<tr>'
@@ -668,21 +668,21 @@ class XHTMLTableStyle(XHTMLStyle):
                   '</tr>'
                   % (self.CLASSMAP[what], text), file=self.outfile)
 
-    def nicktext(self, time, nick, text, htmlcolour, link=''):
+    def nicktext(self, time, time_counter, nick, text, htmlcolour, link=''):
         nick = escape(nick)
         text = escape(text)
         text = createlinks(text)
         text = text.replace('  ', '&nbsp;&nbsp;')
         if time:
             displaytime = shorttime(time)
-            print('<tr id="t%s">'
+            print('<tr id="t%s-%s">'
                   '<th class="nick" style="background: %s">%s</th>'
                   '<td class="text" style="color: %s">%s</td>'
                   '<td class="time">'
-                  '<a href="%s#t%s" class="time">%s</a></td>'
+                  '<a href="%s#t%s-%s" class="time">%s</a></td>'
                   '</tr>'
-                  % (time, htmlcolour, nick, htmlcolour, text,
-                     link, time, displaytime), file=self.outfile)
+                  % (time, time_counter, htmlcolour, nick, htmlcolour, text,
+                     link, time, time_counter, displaytime), file=self.outfile)
         else:
             print('<tr>'
                   '<th class="nick" style="background: %s">%s</th>'
@@ -701,31 +701,31 @@ class MediaWikiStyle(AbstractStyle):
              searchbox=False):
         print('{|', file=self.outfile)
 
-    def servermsg(self, time, what, text, link=''):
+    def servermsg(self, time, time_counter, what, text, link=''):
         text = escape(text)
         # no need to call createlinks, MediaWiki parses links automatically
         if time:
             displaytime = shorttime(time)
-            print('|- id="t%s"\n'
+            print('|- id="t%s-%s"\n'
                   '| colspan="2" | %s\n'
-                  '|| [[#t%s|%s]]'
-                  % (time, text, time, displaytime), file=self.outfile)
+                  '|| [[#t%s-%s|%s]]'
+                  % (time, time_counter, text, time, time_counter, displaytime), file=self.outfile)
         else:
             print('|-\n'
                   '| colspan="3" | %s' % text, file=self.outfile)
 
-    def nicktext(self, time, nick, text, htmlcolour, link=''):
+    def nicktext(self, time, time_counter, nick, text, htmlcolour, link=''):
         nick = escape(nick)
         text = escape(text)
         # no need to call createlinks, MediaWiki parses links automatically
         if time:
             displaytime = shorttime(time)
-            print('|- id="t%s"\n'
+            print('|- id="t%s-%s"\n'
                   '! style="background-color: %s" | %s\n'
                   '| style="color: %s" | %s\n'
-                  '|| [[#t%s|%s]] '
-                  % (time, htmlcolour, nick, htmlcolour, text,
-                     time, displaytime), file=self.outfile)
+                  '|| [[#t%s-%s|%s]] '
+                  % (time, time_counter, htmlcolour, nick, htmlcolour, text,
+                     time, time_counter, displaytime), file=self.outfile)
         else:
             print('|-\n'
                   '| style="background-color: %s" | %s\n'
@@ -905,18 +905,21 @@ def convert_irc_log(parser, formatter, title, prev, index, next,
     """Convert IRC log to HTML or some other format."""
     nick_colour = NickColourizer()
     formatter.head(title, prev, index, next, searchbox=searchbox)
+    time_counter = 0
     for time, what, info in parser:
         if what == LogParser.COMMENT:
             nick, text = info
             htmlcolour = nick_colour[nick]
-            formatter.nicktext(time, nick, text, htmlcolour)
+            formatter.nicktext(time, time_counter, nick, text, htmlcolour)
         else:
             if what == LogParser.NICKCHANGE:
                 text, oldnick, newnick = info
                 nick_colour.change(oldnick, newnick)
             else:
                 text = info
-            formatter.servermsg(time, what, text)
+            formatter.servermsg(time, time_counter, what, text)
+
+        time_counter += 1
     formatter.foot()
 
 
