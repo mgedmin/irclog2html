@@ -250,7 +250,7 @@ class TestApplication(unittest.TestCase):
         self.assertIn(b'<a href="%23chan/">#chan</a>', response.body)
 
     @mock.patch("os.environ")
-    def test_chan_search_page(self, environ):
+    def test_chan_search_page_os_environ(self, environ):
         os.environ.get = {"IRCLOG_CHAN_DIR": self.tmpdir}.get
         response = self.request(
             '/#chan/search')
