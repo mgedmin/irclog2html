@@ -206,6 +206,11 @@ class TestApplication(unittest.TestCase):
         self.assertEqual(response.content_type, 'text/plain')
         self.assertIn(b'Not found', response.body)
 
+    def test_html_not_found_stupid_corner_case(self):
+        response = self.request('/2016-09-25.html', expect=404)
+        self.assertEqual(response.content_type, 'text/plain')
+        self.assertIn(b'Not found', response.body)
+
     def test_path_with_slashes(self):
         response = self.request('/./index.html', expect=404)
         self.assertEqual(response.content_type, 'text/plain')

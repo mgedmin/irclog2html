@@ -99,10 +99,11 @@ Currently it has certain downsides:
 
 - configuration is very limited, e.g you cannot specify titles or styles
   or enable dircproxy mode
-- navigation links (next/previous/index) are missing
 - HTML files in the irc log directory will take precedence over
   dynamically-generated logs even if they're older than the corresponding
-  log file
+  log file (but on the plus side you can use that to have dynamic search
+  via WSGI, but keep statically-generated HTML files with your own config
+  tweaks)
 
 
 WSGI script for multi-channel log serving

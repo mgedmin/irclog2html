@@ -71,9 +71,16 @@ def log_listing(stream, path, pattern, channel=None):
     write_index(stream, title, logfiles, searchbox=True)
 
 
-def dynamic_log(stream, path, channel=None):
+def dynamic_log(stream, path, pattern, channel=None):
     """Render HTML dynamically"""
     lf = LogFile(path)
+    logfiles = find_log_files(os.path.dirname(path), pattern)
+    try:
+        idx = logfiles.index(lf)
+        lf.prev = logfiles[idx - 1] if idx > 0 else None
+        lf.next = logfiles[idx + 1] if idx + 1 < len(logfiles) else None
+    except ValueError:
+        pass
     with open(path, 'rb') as f:
         parser = LogParser(f)
         formatter = XHTMLTableStyle(stream.buffer)
@@ -82,7 +89,10 @@ def dynamic_log(stream, path, channel=None):
         else:
             title = u"IRC log"
         title += u" for {date:%A, %Y-%m-%d}".format(date=lf.date)
-        prev = next = ('', '')
+        prev = ('&#171; {date:%A, %Y-%m-%d}'.format(date=lf.prev.date),
+                lf.prev.link) if lf.prev else ('', '')
+        next = ('{date:%A, %Y-%m-%d} &#187;'.format(date=lf.next.date),
+                lf.next.link) if lf.next else ('', '')
         index = ('Index', 'index.html')
         convert_irc_log(parser, formatter, title, prev, index, next,
                         searchbox=True)
@@ -156,7 +166,7 @@ def application(environ, start_response):
             elif path.endswith('.html'):
                 try:
                     dynamic_log(stream, os.path.join(logfile_path, path[:-5]),
-                                channel=channel)
+                                logfile_pattern, channel=channel)
                     result = [stream.buffer.getvalue()]
                 except (Error, IOError):
                     # Error will be raised if the filename has no ISO-8601 date
