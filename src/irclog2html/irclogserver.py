@@ -10,7 +10,10 @@ Apache configuration example:
 
   WSGIScriptAlias /irclogs /path/to/irclogserver.py
   <Location /irclogs>
+    # If you're serving the logs for one channel, specify this:
     SetEnv IRCLOG_LOCATION /path/to/irclog/files/
+    # If you're serving the logs for many channels, specify this:
+    SetEnv IRCLOG_CHAN_DIR /path/to/irclog/channels/
     # Uncomment the following if your log files use a different format
     #SetEnv IRCLOG_GLOB "*.log.????-??-??"
   </Location>
@@ -33,9 +36,8 @@ try:
 except ImportError:
     from urllib.parse import quote_plus # Py3
 
-from .irclog2html import (
-    CSS_FILE, LogParser, XHTMLTableStyle, convert_irc_log,
-)
+from .irclog2html import CSS_FILE, LogParser, XHTMLTableStyle, convert_irc_log
+from .logs2html import find_log_files, write_index
 from .irclogsearch import (
     DEFAULT_LOGFILE_PATH, DEFAULT_LOGFILE_PATTERN, search_page,
     HEADER, FOOTER
@@ -43,7 +45,7 @@ from .irclogsearch import (
 
 
 def dir_listing(stream, path):
-    """Primitive listing of subdirectories"""
+    """Primitive listing of subdirectories."""
     print(HEADER, file=stream)
     print(u"<h1>IRC logs</h1>", file=stream)
     print(u"<ul>", file=stream)
@@ -54,6 +56,13 @@ def dir_listing(stream, path):
                   file=stream)
     print(u"</ul>", file=stream)
     print(FOOTER, file=stream)
+
+
+def log_listing(stream, path, pattern):
+    """Primitive listing of log files."""
+    logfiles = find_log_files(path, pattern)
+    logfiles.reverse()
+    write_index(stream, u"IRC logs", logfiles, searchbox=True)
 
 
 def parse_path(environ):
@@ -119,11 +128,8 @@ def application(environ, start_response):
                 result = [f.read()]
         except IOError:
             if path == 'index.html':
-                # no index? redirect to search page
-                status = "302 Found"
-                result = [b"Try /search"]
-                headers['Location'] = '/search'
-                content_type = "text/plain"
+                log_listing(stream, logfile_path, logfile_pattern)
+                result = [stream.buffer.getvalue()]
             elif path.endswith('.html'):
                 buf = io.BytesIO()
                 try:

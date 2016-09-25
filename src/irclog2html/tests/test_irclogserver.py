@@ -141,10 +141,9 @@ class TestApplication(unittest.TestCase):
 
     def test_root_without_index_html(self):
         os.unlink(os.path.join(self.tmpdir, 'index.html'))
-        response = self.request('/', expect=302)
-        self.assertEqual(response.body, b'Try /search')
-        self.assertEqual(response.content_type, 'text/plain')
-        self.assertEqual(response.location, '/search')
+        response = self.request('/')
+        self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
+        self.assertIn(b'<a href="sample-2013-03-18.log.html">', response.body)
 
     def test_search_page(self):
         response = self.request('/search')

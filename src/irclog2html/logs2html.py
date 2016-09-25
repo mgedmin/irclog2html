@@ -11,7 +11,7 @@ Looks for *.log in a given directory.  Needs an ISO 8601 date (YYYY-MM-DD or
 YYYYMMDD) in the filename.
 """
 
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 from operator import attrgetter
 
