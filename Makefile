@@ -109,7 +109,7 @@ bin/buildout: python bootstrap.py
 	touch -c $@
 
 
-scripts = bin/test bin/irclog2html bin/logs2html bin/irclogsearch bin/tox
+scripts = bin/test bin/irclog2html bin/logs2html bin/irclogsearch bin/irclogserver bin/tox
 $(scripts): bin/buildout buildout.cfg setup.py python/bin/virtualenv
 	bin/buildout
 	touch -c $(scripts)
