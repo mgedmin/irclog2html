@@ -184,22 +184,20 @@ def main():  # pragma: nocover
         help='serve logs for multiple channels in subdirectories'
              ' (default: when $IRCLOG_CHAN_DIR points to a path)')
     parser.add_argument(
-        'path', nargs='?',
-        help='where to find IRC logs (default: $IRCLOG_LOCATION,'
-             ' falling back to %s)' % DEFAULT_LOGFILE_PATH)
+        'path',
+        help='where to find IRC logs (default: $IRCLOG_LOCATION'
+             ' or $IRCLOG_CHAN_DIR, falling back to %s)'
+             % DEFAULT_LOGFILE_PATH)
     args = parser.parse_args()
     srv = make_server('localhost', args.port, application)
     print("Started at http://localhost:{port}/".format(port=args.port))
-    if args.path:
-        if args.multi:
-            os.environ['IRCLOG_CHAN_DIR'] = args.path
-            print("Serving IRC logs for multiple channels from {path}".format(
-                path=args.path))
-        else:
-            os.environ['IRCLOG_LOCATION'] = args.path
-            print("Serving IRC logs from {path}".format(path=args.path))
-    elif args.multi:
-        parser.error('--multi requires a path')
+    if args.multi:
+        os.environ['IRCLOG_CHAN_DIR'] = args.path
+        print("Serving IRC logs for multiple channels from {path}".format(
+            path=args.path))
+    else:
+        os.environ['IRCLOG_LOCATION'] = args.path
+        print("Serving IRC logs from {path}".format(path=args.path))
     if args.pattern:
         os.environ['IRCLOG_GLOB'] = args.pattern
         print("Looking for files matching {pattern}".format(
