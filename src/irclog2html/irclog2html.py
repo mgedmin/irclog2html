@@ -363,12 +363,14 @@ class AbstractStyle(object):
     def __init__(self, outfile, colours=None):
         """Create a text formatter for writing to outfile.
 
-        `colours` may have the following attributes:
-           part
-           join
-           server
-           nickchange
-           action
+        The ``colours`` dictionary may have the following items:
+
+        - part
+        - join
+        - server
+        - nickchange
+        - action
+
         """
         self.outfile = io.TextIOWrapper(outfile, encoding=self.charset,
                                         errors='xmlcharrefreplace',
