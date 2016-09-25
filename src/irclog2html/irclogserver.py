@@ -126,13 +126,18 @@ def application(environ, start_response):
                 content_type = "text/plain"
             elif path.endswith('.html'):
                 buf = io.BytesIO()
-                with open(os.path.join(logfile_path, path[:-5]), 'rb') as f:
-                    parser = LogParser(f)
-                    formatter = XHTMLTableStyle(buf)
-                    convert_irc_log(parser, formatter, path[:-5],
-                                    ('', ''), ('', ''), ('', ''),
-                                    searchbox=True)
-                    result = [buf.getvalue()]
+                try:
+                    with open(os.path.join(logfile_path, path[:-5]), 'rb') as f:
+                        parser = LogParser(f)
+                        formatter = XHTMLTableStyle(buf)
+                        convert_irc_log(parser, formatter, path[:-5],
+                                        ('', ''), ('', ''), ('', ''),
+                                        searchbox=True)
+                        result = [buf.getvalue()]
+                except IOError:
+                    status = "404 Not Found"
+                    result = [b"Not found"]
+                    content_type = "text/plain"
             else:
                 status = "404 Not Found"
                 result = [b"Not found"]
