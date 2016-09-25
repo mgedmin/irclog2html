@@ -9,13 +9,15 @@ VCS_EXPORT = git archive --format=tar --prefix=tmp/tree/ HEAD | tar -xf -
 VCS_TAG = git tag
 VCS_COMMIT_AND_PUSH = git commit -a -m "Post-release version bump" && git push && git push --tags
 
+scripts = bin/test bin/irclog2html bin/logs2html bin/irclogsearch bin/irclogserver bin/tox
+
 
 .PHONY: default
 default: all
 
 
 .PHONY: all
-all: bin/buildout bin/test
+all: $(scripts)
 
 
 .PHONY: check test
@@ -109,7 +111,6 @@ bin/buildout: python bootstrap.py
 	touch -c $@
 
 
-scripts = bin/test bin/irclog2html bin/logs2html bin/irclogsearch bin/tox
 $(scripts): bin/buildout buildout.cfg setup.py python/bin/virtualenv
 	bin/buildout
 	touch -c $(scripts)

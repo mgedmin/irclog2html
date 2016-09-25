@@ -34,6 +34,8 @@ def set_up_sample():
     os.mkdir(os.path.join(tmpdir, "#chan"))
     with open(os.path.join(tmpdir, "#chan", "index.html"), "w") as f:
         f.write("#chan index")
+    shutil.copy(os.path.join(here, 'sample.log'),
+                os.path.join(tmpdir, '#chan', 'sample-2013-03-18.log'))
     return tmpdir
 
 
@@ -141,10 +143,10 @@ class TestApplication(unittest.TestCase):
 
     def test_root_without_index_html(self):
         os.unlink(os.path.join(self.tmpdir, 'index.html'))
-        response = self.request('/', expect=302)
-        self.assertEqual(response.body, b'Try /search')
-        self.assertEqual(response.content_type, 'text/plain')
-        self.assertEqual(response.location, '/search')
+        response = self.request('/')
+        self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
+        self.assertIn(b'<title>IRC logs</title>', response.body)
+        self.assertIn(b'<a href="sample-2013-03-18.log.html">', response.body)
 
     def test_search_page(self):
         response = self.request('/search')
@@ -165,6 +167,18 @@ class TestApplication(unittest.TestCase):
                       response.body)
         self.assertIn(u'ąčę'.encode('UTF-8'), response.body)
         self.assertIn(u'<mgedmin> š'.encode('UTF-8'), response.body)
+
+    def test_dynamic_log_file_html(self):
+        response = self.request('/sample-2013-03-18.log.html')
+        self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
+        self.assertIn(
+            b'<title>IRC log for Monday, 2013-03-18</title>',
+            response.body)
+        self.assertIn(
+            b'<td class="join" colspan="2">*** povbot has joined #pov</td>',
+            response.body)
+        self.assertIn(u'ąčę'.encode('UTF-8'), response.body)
+        self.assertIn(u'š'.encode('UTF-8'), response.body)
 
     def test_builtin_css(self):
         response = self.request('/irclog.css')
@@ -187,6 +201,16 @@ class TestApplication(unittest.TestCase):
         self.assertEqual(response.content_type, 'text/plain')
         self.assertIn(b'Not found', response.body)
 
+    def test_html_not_found(self):
+        response = self.request('/nosuchfile.html', expect=404)
+        self.assertEqual(response.content_type, 'text/plain')
+        self.assertIn(b'Not found', response.body)
+
+    def test_html_not_found_stupid_corner_case(self):
+        response = self.request('/2016-09-25.html', expect=404)
+        self.assertEqual(response.content_type, 'text/plain')
+        self.assertIn(b'Not found', response.body)
+
     def test_path_with_slashes(self):
         response = self.request('/./index.html', expect=404)
         self.assertEqual(response.content_type, 'text/plain')
@@ -203,6 +227,14 @@ class TestApplication(unittest.TestCase):
             extra_env={"IRCLOG_CHAN_DIR": self.tmpdir})
         self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
         self.assertEqual(b'#chan index', response.body)
+
+    def test_chan_index_without_index_html(self):
+        os.unlink(os.path.join(self.tmpdir, '#chan', 'index.html'))
+        response = self.request(
+            '/#chan/',
+            extra_env={"IRCLOG_CHAN_DIR": self.tmpdir})
+        self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
+        self.assertIn(b'<title>IRC logs of #chan</title>', response.body)
 
     def test_chan_search_page(self):
         response = self.request(
@@ -227,6 +259,17 @@ class TestApplication(unittest.TestCase):
         self.assertEqual(response.content_type, 'text/plain')
         self.assertIn(b'Not found', response.body)
 
+    def test_chan_dynamic_log_file_html(self):
+        response = self.request('/#chan/sample-2013-03-18.log.html',
+                                extra_env={"IRCLOG_CHAN_DIR": self.tmpdir})
+        self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
+        self.assertIn(
+            b'<title>IRC log of #chan for Monday, 2013-03-18</title>',
+            response.body)
+        self.assertIn(
+            b'<td class="join" colspan="2">*** povbot has joined #pov</td>',
+            response.body)
+
     @mock.patch("os.environ")
     def test_chan_os_environ(self, environ):
         os.environ.get = {"IRCLOG_CHAN_DIR": self.tmpdir}.get
@@ -236,7 +279,7 @@ class TestApplication(unittest.TestCase):
         self.assertIn(b'<a href="%23chan/">#chan</a>', response.body)
 
     @mock.patch("os.environ")
-    def test_chan_search_page(self, environ):
+    def test_chan_search_page_os_environ(self, environ):
         os.environ.get = {"IRCLOG_CHAN_DIR": self.tmpdir}.get
         response = self.request(
             '/#chan/search')

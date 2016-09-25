@@ -163,7 +163,7 @@ def parse_log_file(filename):
 
 
 def search_irc_logs(query, stats=None, where=DEFAULT_LOGFILE_PATH,
-                    logfile_pattern=DEFAULT_LOGFILE_PATTERN):
+                    logfile_pattern=DEFAULT_LOGFILE_PATTERN, limit=None):
     if not stats:
         stats = SearchStats() # will be discarded, but, oh, well
     query = query.lower()
@@ -185,6 +185,8 @@ def search_irc_logs(query, stats=None, where=DEFAULT_LOGFILE_PATH,
             if query in text.lower():
                 stats.matches += 1
                 yield SearchResult(f.filename, link, date, timestamp, event, info)
+                if stats.matches == limit:
+                    return
 
 
 def print_cgi_headers(stream):
@@ -206,6 +208,7 @@ def print_search_form(stream=None):
 
 def print_search_results(query, where=DEFAULT_LOGFILE_PATH,
                          logfile_pattern=DEFAULT_LOGFILE_PATTERN,
+                         limit=100,
                          stream=None):
     if stream is None:
         stream = sys.stdout
@@ -222,7 +225,8 @@ def print_search_results(query, where=DEFAULT_LOGFILE_PATH,
     formatter = SearchResultFormatter(stream)
     stats = SearchStats()
     for result in search_irc_logs(query, stats=stats, where=where,
-                                  logfile_pattern=logfile_pattern):
+                                  logfile_pattern=logfile_pattern,
+                                  limit=limit):
         if date != result.date:
             if prev_result:
                 formatter.print_suffix()
@@ -251,8 +255,6 @@ def print_search_results(query, where=DEFAULT_LOGFILE_PATH,
           file=stream)
     print(FOOTER, file=stream)
 
-    return formatter # destroying it closes the stream, breaking the result
-
 
 def unicode_stdout():
     if hasattr(sys.stdout, 'buffer'):
@@ -271,8 +273,8 @@ def search_page(stream, form, where, logfile_pattern):
         search_text = form["q"].value
         if isinstance(search_text, bytes):
             search_text = search_text.decode('UTF-8')
-        return print_search_results(search_text, stream=stream, where=where,
-                                    logfile_pattern=logfile_pattern)
+        print_search_results(search_text, stream=stream, where=where,
+                             logfile_pattern=logfile_pattern)
 
 
 def main():

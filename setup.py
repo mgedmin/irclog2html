@@ -54,6 +54,7 @@ setup(
         irclog2html = irclog2html.irclog2html:main
         logs2html = irclog2html.logs2html:main
         irclogsearch = irclog2html.irclogsearch:main
+        irclogserver = irclog2html.irclogserver:main
     """,
     zip_safe=False,
 )

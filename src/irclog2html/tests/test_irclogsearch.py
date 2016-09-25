@@ -142,6 +142,20 @@ def doctest_search_irc_logs():
     """
 
 
+def doctest_search_irc_logs_limit():
+    """Test for search_irc_logs
+
+        >>> tmpdir = set_up_sample()
+        >>> for r in search_irc_logs('seen', where=tmpdir, limit=2):
+        ...     print('%s %s %s %s %s' % (r.link, r.date, r.time, r.event, myrepr(r.info)))
+        sample-2013-03-18.log.html 2013-03-18 2005-01-08T23:47:17 COMMENT ('mgedmin', 'seen mgedmin')
+        sample-2013-03-18.log.html 2013-03-18 2005-01-08T23:47:19 COMMENT ('mgedmin', '!seen mgedmin')
+
+        >>> clean_up_sample(tmpdir)
+
+    """
+
+
 def doctest_print_search_form():
     """Test for print_search_form
 
@@ -236,14 +250,12 @@ def doctest_search_page():
         ...                               print_search_results=mock.DEFAULT)
 
         >>> values = patcher.start()
-        >>> values['print_search_results'].return_value = "Formatter"
 
     When there is a 'q' param in the GET query, the logs are searched:
 
         >>> form = cgi.FieldStorage(
         ...     environ={'QUERY_STRING': 'q=123', 'HTTP_METHOD': 'GET'})
         >>> search_page("The stream", form, "/logs", "#dev*.logs")
-        'Formatter'
         >>> values['print_search_results'].assert_called_once_with(
         ...     '123', logfile_pattern='#dev*.logs',
         ...     stream='The stream', where='/logs')

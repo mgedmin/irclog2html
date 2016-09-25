@@ -10,7 +10,10 @@ Apache configuration example:
 
   WSGIScriptAlias /irclogs /path/to/irclogserver.py
   <Location /irclogs>
+    # If you're serving the logs for one channel, specify this:
     SetEnv IRCLOG_LOCATION /path/to/irclog/files/
+    # If you're serving the logs for many channels, specify this:
+    SetEnv IRCLOG_CHAN_DIR /path/to/irclog/channels/
     # Uncomment the following if your log files use a different format
     #SetEnv IRCLOG_GLOB "*.log.????-??-??"
   </Location>
@@ -24,16 +27,19 @@ Apache configuration example:
 
 from __future__ import print_function
 
+import argparse
 import cgi
 import io
 import os
+from wsgiref.simple_server import make_server
 
 try:
     from urllib import quote_plus # Py2
 except ImportError:
     from urllib.parse import quote_plus # Py3
 
-from .irclog2html import CSS_FILE, LogParser
+from .irclog2html import CSS_FILE, LogParser, XHTMLTableStyle, convert_irc_log
+from .logs2html import LogFile, Error, find_log_files, write_index
 from .irclogsearch import (
     DEFAULT_LOGFILE_PATH, DEFAULT_LOGFILE_PATTERN, search_page,
     HEADER, FOOTER
@@ -41,7 +47,7 @@ from .irclogsearch import (
 
 
 def dir_listing(stream, path):
-    """Primitive listing of subdirectories"""
+    """Primitive listing of subdirectories."""
     print(HEADER, file=stream)
     print(u"<h1>IRC logs</h1>", file=stream)
     print(u"<ul>", file=stream)
@@ -52,6 +58,44 @@ def dir_listing(stream, path):
                   file=stream)
     print(u"</ul>", file=stream)
     print(FOOTER, file=stream)
+
+
+def log_listing(stream, path, pattern, channel=None):
+    """Primitive listing of log files."""
+    logfiles = find_log_files(path, pattern)
+    logfiles.reverse()
+    if channel:
+        title = u"IRC logs of {channel}".format(channel=channel)
+    else:
+        title = u"IRC logs"
+    write_index(stream, title, logfiles, searchbox=True)
+
+
+def dynamic_log(stream, path, pattern, channel=None):
+    """Render HTML dynamically"""
+    lf = LogFile(path)
+    logfiles = find_log_files(os.path.dirname(path), pattern)
+    try:
+        idx = logfiles.index(lf)
+        lf.prev = logfiles[idx - 1] if idx > 0 else None
+        lf.next = logfiles[idx + 1] if idx + 1 < len(logfiles) else None
+    except ValueError:
+        pass
+    with open(path, 'rb') as f:
+        parser = LogParser(f)
+        formatter = XHTMLTableStyle(stream.buffer)
+        if channel:
+            title = u"IRC log of {channel}".format(channel=channel)
+        else:
+            title = u"IRC log"
+        title += u" for {date:%A, %Y-%m-%d}".format(date=lf.date)
+        prev = ('&#171; {date:%A, %Y-%m-%d}'.format(date=lf.prev.date),
+                lf.prev.link) if lf.prev else ('', '')
+        next = ('{date:%A, %Y-%m-%d} &#187;'.format(date=lf.next.date),
+                lf.next.link) if lf.next else ('', '')
+        index = ('Index', 'index.html')
+        convert_irc_log(parser, formatter, title, prev, index, next,
+                        searchbox=True)
 
 
 def parse_path(environ):
@@ -100,9 +144,8 @@ def application(environ, start_response):
         dir_listing(stream, chan_path)
         result = [stream.buffer.getvalue()]
     elif path == 'search':
-        fmt = search_page(stream, form, logfile_path, logfile_pattern)
+        search_page(stream, form, logfile_path, logfile_pattern)
         result = [stream.buffer.getvalue()]
-        del fmt
     elif path == 'irclog.css':
         content_type = "text/css"
         try:
@@ -118,11 +161,18 @@ def application(environ, start_response):
                 result = [f.read()]
         except IOError:
             if path == 'index.html':
-                # no index? redirect to search page
-                status = "302 Found"
-                result = [b"Try /search"]
-                headers['Location'] = '/search'
-                content_type = "text/plain"
+                log_listing(stream, logfile_path, logfile_pattern, channel)
+                result = [stream.buffer.getvalue()]
+            elif path.endswith('.html'):
+                try:
+                    dynamic_log(stream, os.path.join(logfile_path, path[:-5]),
+                                logfile_pattern, channel=channel)
+                    result = [stream.buffer.getvalue()]
+                except (Error, IOError):
+                    # Error will be raised if the filename has no ISO-8601 date
+                    status = "404 Not Found"
+                    result = [b"Not found"]
+                    content_type = "text/plain"
             else:
                 status = "404 Not Found"
                 result = [b"Not found"]
@@ -144,10 +194,41 @@ def application(environ, start_response):
 
 def main():  # pragma: nocover
     """Simple web server for manual testing"""
-    from wsgiref.simple_server import make_server
-    srv = make_server('localhost', 8080, application)
-    print("Started at http://localhost:8080/")
-    srv.serve_forever()
+    parser = argparse.ArgumentParser(description="Serve IRC logs")
+    parser.add_argument(
+        '-p', '--port', type=int, default=8080,
+        help='listen on the specified port (default: 8080)')
+    parser.add_argument(
+        '-P', '--pattern',
+        help='IRC log file pattern (default: $IRCLOG_GLOB,'
+             ' falling back to %s)' % DEFAULT_LOGFILE_PATTERN)
+    parser.add_argument(
+        '-m', '--multi', action='store_true',
+        help='serve logs for multiple channels in subdirectories'
+             ' (default: when $IRCLOG_CHAN_DIR points to a path)')
+    parser.add_argument(
+        'path',
+        help='where to find IRC logs (default: $IRCLOG_LOCATION'
+             ' or $IRCLOG_CHAN_DIR, falling back to %s)'
+             % DEFAULT_LOGFILE_PATH)
+    args = parser.parse_args()
+    srv = make_server('localhost', args.port, application)
+    print("Started at http://localhost:{port}/".format(port=args.port))
+    if args.multi:
+        os.environ['IRCLOG_CHAN_DIR'] = args.path
+        print("Serving IRC logs for multiple channels from {path}".format(
+            path=args.path))
+    else:
+        os.environ['IRCLOG_LOCATION'] = args.path
+        print("Serving IRC logs from {path}".format(path=args.path))
+    if args.pattern:
+        os.environ['IRCLOG_GLOB'] = args.pattern
+        print("Looking for files matching {pattern}".format(
+            pattern=args.pattern))
+    try:
+        srv.serve_forever()
+    except KeyboardInterrupt:
+        pass
 
 
 if __name__ == '__main__':
