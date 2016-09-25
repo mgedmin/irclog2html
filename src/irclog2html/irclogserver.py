@@ -102,9 +102,8 @@ def application(environ, start_response):
         dir_listing(stream, chan_path)
         result = [stream.buffer.getvalue()]
     elif path == 'search':
-        fmt = search_page(stream, form, logfile_path, logfile_pattern)
+        search_page(stream, form, logfile_path, logfile_pattern)
         result = [stream.buffer.getvalue()]
-        del fmt
     elif path == 'irclog.css':
         content_type = "text/css"
         try:

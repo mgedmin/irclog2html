@@ -377,6 +377,12 @@ class AbstractStyle(object):
                                         line_buffering=True)
         self.colours = colours or {}
 
+    def __del__(self):
+        """Destructor to make sure we don't close outfile prematurely."""
+        if not self.outfile.closed:
+            self.outfile.flush()
+            self.outfile.detach()  # don't let TextIOWrapper.__del__ close it!
+
     def head(self, title, prev=('', ''), index=('', ''), next=('', ''),
              searchbox=False):
         """Generate the header.

@@ -236,14 +236,12 @@ def doctest_search_page():
         ...                               print_search_results=mock.DEFAULT)
 
         >>> values = patcher.start()
-        >>> values['print_search_results'].return_value = "Formatter"
 
     When there is a 'q' param in the GET query, the logs are searched:
 
         >>> form = cgi.FieldStorage(
         ...     environ={'QUERY_STRING': 'q=123', 'HTTP_METHOD': 'GET'})
         >>> search_page("The stream", form, "/logs", "#dev*.logs")
-        'Formatter'
         >>> values['print_search_results'].assert_called_once_with(
         ...     '123', logfile_pattern='#dev*.logs',
         ...     stream='The stream', where='/logs')
