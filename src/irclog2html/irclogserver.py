@@ -215,7 +215,10 @@ def main():  # pragma: nocover
         os.environ['IRCLOG_GLOB'] = args.pattern
         print("Looking for files matching {pattern}".format(
             pattern=args.pattern))
-    srv.serve_forever()
+    try:
+        srv.serve_forever()
+    except KeyboardInterrupt:
+        pass
 
 
 if __name__ == '__main__':
