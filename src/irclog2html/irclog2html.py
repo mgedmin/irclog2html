@@ -410,6 +410,10 @@ class AbstractStyle(object):
         `htmlcolour` is a string ('#rrggbb').
         """
 
+    def timestamp_anchor(self, time):
+        anchor = 't%s' % time
+        return anchor
+
 
 class SimpleTextStyle(AbstractStyle):
     """Text style with little use of colour"""
@@ -612,15 +616,20 @@ class XHTMLStyle(AbstractStyle):
         text = escape(text)
         text = createlinks(text)
         if time:
-            displaytime = shorttime(time)
-            print('<p id="t%s" class="%s">'
-                  '<a href="#t%s" class="time">%s</a> '
-                  '%s</p>'
-                  % (time, self.CLASSMAP[what], time, displaytime, text),
-                  file=self.outfile)
+            print(
+                '<p id="{anchor}" class="{css_class}">'
+                '<a href="#{anchor}" class="time">{time}</a>'
+                ' {text}</p>'.format(
+                    anchor=self.timestamp_anchor(time),
+                    css_class=self.CLASSMAP[what],
+                    time=shorttime(time),
+                    text=text),
+                file=self.outfile)
         else:
-            print('<p class="%s">%s</p>' % (self.CLASSMAP[what], text),
-                  file=self.outfile)
+            print(
+                '<p class="{css_class}">{text}</p>'.format(
+                    css_class=self.CLASSMAP[what], text=text),
+                file=self.outfile)
 
     def nicktext(self, time, nick, text, htmlcolour):
         """Output a comment uttered by someone.
@@ -634,20 +643,28 @@ class XHTMLStyle(AbstractStyle):
         text = createlinks(text)
         text = text.replace('  ', '&nbsp;&nbsp;')
         if time:
-            displaytime = shorttime(time)
-            print('<p id="t%s" class="comment">'
-                  '<a href="#t%s" class="time">%s</a> '
-                  '<span class="nick" style="color: %s">'
-                  '&lt;%s&gt;</span>'
-                  ' <span class="text">%s</span></p>'
-                  % (time, time, displaytime, htmlcolour, nick, text),
-                  file=self.outfile)
+            print(
+                '<p id="{anchor}" class="comment">'
+                '<a href="#{anchor}" class="time">{time}</a> '
+                '<span class="nick" style="color: {color}">'
+                '&lt;{nick}&gt;</span>'
+                ' <span class="text">{text}</span></p>'.format(
+                    anchor=self.timestamp_anchor(time),
+                    time=shorttime(time),
+                    color=htmlcolour,
+                    nick=nick,
+                    text=text),
+                file=self.outfile)
         else:
-            print('<p class="comment">'
-                  '<span class="nick" style="color: %s">'
-                  '&lt;%s&gt;</span>'
-                  ' <span class="text">%s</span></p>'
-                  % (htmlcolour, nick, text), file=self.outfile)
+            print(
+                '<p class="comment">'
+                '<span class="nick" style="color: {color}">'
+                '&lt;{nick}&gt;</span>'
+                ' <span class="text">{text}</span></p>'.format(
+                    color=htmlcolour,
+                    nick=nick,
+                    text=text),
+                file=self.outfile)
 
 
 class XHTMLTableStyle(XHTMLStyle):
@@ -663,18 +680,25 @@ class XHTMLTableStyle(XHTMLStyle):
         text = escape(text)
         text = createlinks(text)
         if time:
-            displaytime = shorttime(time)
-            print('<tr id="t%s">'
-                  '<td class="%s" colspan="2">%s</td>'
-                  '<td><a href="%s#t%s" class="time">%s</a></td>'
-                  '</tr>'
-                  % (time, self.CLASSMAP[what], text, link, time, displaytime),
-                  file=self.outfile)
+            print(
+                '<tr id="{anchor}">'
+                '<td class="{css_class}" colspan="2">{text}</td>'
+                '<td><a href="{link}#{anchor}" class="time">{time}</a></td>'
+                '</tr>'.format(
+                    anchor=self.timestamp_anchor(time),
+                    css_class=self.CLASSMAP[what],
+                    text=text,
+                    link=link,
+                    time=shorttime(time)),
+                file=self.outfile)
         else:
-            print('<tr>'
-                  '<td class="%s" colspan="3">%s</td>'
-                  '</tr>'
-                  % (self.CLASSMAP[what], text), file=self.outfile)
+            print(
+                '<tr>'
+                '<td class="{css_class}" colspan="3">{text}</td>'
+                '</tr>'.format(
+                    css_class=self.CLASSMAP[what],
+                    text=text),
+                file=self.outfile)
 
     def nicktext(self, time, nick, text, htmlcolour, link=''):
         nick = escape(nick)
@@ -682,21 +706,30 @@ class XHTMLTableStyle(XHTMLStyle):
         text = createlinks(text)
         text = text.replace('  ', '&nbsp;&nbsp;')
         if time:
-            displaytime = shorttime(time)
-            print('<tr id="t%s">'
-                  '<th class="nick" style="background: %s">%s</th>'
-                  '<td class="text" style="color: %s">%s</td>'
-                  '<td class="time">'
-                  '<a href="%s#t%s" class="time">%s</a></td>'
-                  '</tr>'
-                  % (time, htmlcolour, nick, htmlcolour, text,
-                     link, time, displaytime), file=self.outfile)
+            print(
+                '<tr id="{anchor}">'
+                '<th class="nick" style="background: {color}">{nick}</th>'
+                '<td class="text" style="color: {color}">{text}</td>'
+                '<td class="time">'
+                '<a href="{link}#{anchor}" class="time">{time}</a></td>'
+                '</tr>'.format(
+                    anchor=self.timestamp_anchor(time),
+                    color=htmlcolour,
+                    nick=nick,
+                    text=text,
+                    link=link,
+                    time=shorttime(time)),
+                file=self.outfile)
         else:
-            print('<tr>'
-                  '<th class="nick" style="background: %s">%s</th>'
-                  '<td class="text" colspan="2" style="color: %s">%s</td>'
-                  '</tr>'
-                  % (htmlcolour, nick, htmlcolour, text), file=self.outfile)
+            print(
+                '<tr>'
+                '<th class="nick" style="background: {color}">{nick}</th>'
+                '<td class="text" colspan="2" style="color: {color}">{text}</td>'
+                '</tr>'.format(
+                    color=htmlcolour,
+                    nick=nick,
+                    text=text),
+                file=self.outfile)
 
 
 class MediaWikiStyle(AbstractStyle):
