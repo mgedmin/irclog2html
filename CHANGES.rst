@@ -4,7 +4,9 @@ Changelog
 2.15.1 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Lines with the same timestamp now get different HTML anchors
+  (https://github.com/mgedmin/irclog2html/issues/17).  Thanks
+  to Bryan Bishop for the original pull request.
 
 
 2.15.0 (2016-09-25)
