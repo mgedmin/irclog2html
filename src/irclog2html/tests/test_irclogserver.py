@@ -166,6 +166,15 @@ class TestApplication(unittest.TestCase):
         self.assertIn(u'ąčę'.encode('UTF-8'), response.body)
         self.assertIn(u'<mgedmin> š'.encode('UTF-8'), response.body)
 
+    def test_dynamic_log_file_html(self):
+        response = self.request('/sample-2013-03-18.log.html')
+        self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
+        self.assertIn(
+            b'<td class="join" colspan="2">*** povbot has joined #pov</td>',
+            response.body)
+        self.assertIn(u'ąčę'.encode('UTF-8'), response.body)
+        self.assertIn(u'š'.encode('UTF-8'), response.body)
+
     def test_builtin_css(self):
         response = self.request('/irclog.css')
         self.assertEqual(response.content_type, 'text/css')
