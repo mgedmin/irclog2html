@@ -492,6 +492,9 @@ def doctest_XHTMLStyle():
         >>> style.servermsg('02:25', LogParser.ACTION, '* mgedmin hacks <&>')
         <p id="t02:25" class="action"><a href="#t02:25" class="time">02:25</a> * mgedmin hacks &lt;&amp;&gt;</p>
 
+        >>> style.servermsg('02:25', LogParser.ACTION, '* mgedmin is very fast')
+        <p id="t02:25-2" class="action"><a href="#t02:25-2" class="time">02:25</a> * mgedmin is very fast</p>
+
         >>> style.servermsg('02:26:01', LogParser.PART, '* mgedmin leaves')
         <p id="t02:26:01" class="part"><a href="#t02:26:01" class="time">02:26</a> * mgedmin leaves</p>
 

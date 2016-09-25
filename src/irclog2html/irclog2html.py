@@ -49,6 +49,7 @@ from __future__ import print_function, unicode_literals
 
 import gzip
 import io
+import itertools
 import optparse
 import os
 import re
@@ -376,6 +377,7 @@ class AbstractStyle(object):
                                         errors='xmlcharrefreplace',
                                         line_buffering=True)
         self.colours = colours or {}
+        self._anchors = set()
 
     def __del__(self):
         """Destructor to make sure we don't close outfile prematurely."""
@@ -412,6 +414,12 @@ class AbstractStyle(object):
 
     def timestamp_anchor(self, time):
         anchor = 't%s' % time
+        if anchor in self._anchors:
+            for n in itertools.count(2):
+                anchor = '%s-%d' % (anchor, n)
+                if anchor not in self._anchors:
+                    break
+        self._anchors.add(anchor)
         return anchor
 
 

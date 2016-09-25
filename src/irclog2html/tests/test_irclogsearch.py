@@ -89,15 +89,15 @@ def doctest_SearchResultFormatter():
 
         >>> srf.print_html(SearchResult(
         ...     filename='/path/to/log', link='log.html',
-        ...     date=datetime.date(2013, 3, 17), time='12:34',
+        ...     date=datetime.date(2013, 3, 17), time='12:35',
         ...     event=LogParser.NICKCHANGE, info=('mgedmin is now known as mg_away', 'mgedmin', 'mg_away')))
-        <tr id="t12:34"><td class="nickchange" colspan="2">mgedmin is now known as mg_away</td><td><a href="log.html#t12:34" class="time">12:34</a></td></tr>
+        <tr id="t12:35"><td class="nickchange" colspan="2">mgedmin is now known as mg_away</td><td><a href="log.html#t12:35" class="time">12:35</a></td></tr>
 
         >>> srf.print_html(SearchResult(
         ...     filename='/path/to/log', link='log.html',
-        ...     date=datetime.date(2013, 3, 17), time='12:34',
+        ...     date=datetime.date(2013, 3, 17), time='12:36',
         ...     event=LogParser.ACTION, info='* mgedmin jumps up and down'))
-        <tr id="t12:34"><td class="action" colspan="2">* mgedmin jumps up and down</td><td><a href="log.html#t12:34" class="time">12:34</a></td></tr>
+        <tr id="t12:36"><td class="action" colspan="2">* mgedmin jumps up and down</td><td><a href="log.html#t12:36" class="time">12:36</a></td></tr>
 
         >>> srf.print_suffix()
         </table>
@@ -220,10 +220,10 @@ def doctest_print_search_results():
           </li>
           <li><a href="sample-2013-03-17.log.html">2013-03-17 (Sunday)</a>:
         <table class="irclog">
-        <tr id="t2005-01-08T23:33:54"><td class="join" colspan="2">*** povbot has joined #pov</td><td><a href="sample-2013-03-17.log.html#t2005-01-08T23:33:54" class="time">23:33</a></td></tr>
-        <tr id="t2005-01-08T23:46:35"><td class="join" colspan="2">*** povbot has joined #pov</td><td><a href="sample-2013-03-17.log.html#t2005-01-08T23:46:35" class="time">23:46</a></td></tr>
-        <tr id="t2005-01-08T23:47:19"><th class="nick" style="background: #407a40">povbot</th><td class="text" style="color: #407a40">mgedmin: mgedmin was last seen in #pov 2 seconds ago saying: &lt;mgedmin&gt; seen mgedmin</td><td class="time"><a href="sample-2013-03-17.log.html#t2005-01-08T23:47:19" class="time">23:47</a></td></tr>
-        <tr id="t2005-01-08T23:47:54"><th class="nick" style="background: #407a40">povbot</th><td class="text" style="color: #407a40">mgedmin: web1913, jargon, foldoc, vera, and wn responded: vera: BOT Beginning Of Tape; vera: BOT Broadcast Online TV; web1913: Bot \Bot\, n. (Zo[&quot;o]l.) See {Bots}; vera: BOT Build, Operate and Transfer (networke); vera: BOT Back On Topic (telecommunication-slang, Usenet, IRC); wn: bot n : botfly larva; typically develops inside the body of a horse or sheep or human; foldoc: bot &lt;networking, chat, (6 more messages)</td><td class="time"><a href="sample-2013-03-17.log.html#t2005-01-08T23:47:54" class="time">23:47</a></td></tr>
+        <tr id="t2005-01-08T23:33:54-2"><td class="join" colspan="2">*** povbot has joined #pov</td><td><a href="sample-2013-03-17.log.html#t2005-01-08T23:33:54-2" class="time">23:33</a></td></tr>
+        <tr id="t2005-01-08T23:46:35-2"><td class="join" colspan="2">*** povbot has joined #pov</td><td><a href="sample-2013-03-17.log.html#t2005-01-08T23:46:35-2" class="time">23:46</a></td></tr>
+        <tr id="t2005-01-08T23:47:19-2"><th class="nick" style="background: #407a40">povbot</th><td class="text" style="color: #407a40">mgedmin: mgedmin was last seen in #pov 2 seconds ago saying: &lt;mgedmin&gt; seen mgedmin</td><td class="time"><a href="sample-2013-03-17.log.html#t2005-01-08T23:47:19-2" class="time">23:47</a></td></tr>
+        <tr id="t2005-01-08T23:47:54-2"><th class="nick" style="background: #407a40">povbot</th><td class="text" style="color: #407a40">mgedmin: web1913, jargon, foldoc, vera, and wn responded: vera: BOT Beginning Of Tape; vera: BOT Broadcast Online TV; web1913: Bot \Bot\, n. (Zo[&quot;o]l.) See {Bots}; vera: BOT Build, Operate and Transfer (networke); vera: BOT Back On Topic (telecommunication-slang, Usenet, IRC); wn: bot n : botfly larva; typically develops inside the body of a horse or sheep or human; foldoc: bot &lt;networking, chat, (6 more messages)</td><td class="time"><a href="sample-2013-03-17.log.html#t2005-01-08T23:47:54-2" class="time">23:47</a></td></tr>
         </table>
           </li>
         </ul>
@@ -347,10 +347,10 @@ def doctest_main_searches():
           </li>
           <li><a href="sample-2013-03-17.log.html">2013-03-17 (Sunday)</a>:
         <table class="irclog">
-        <tr id="t2005-01-08T23:33:54"><td class="join" colspan="2">*** povbot has joined #pov</td><td><a href="sample-2013-03-17.log.html#t2005-01-08T23:33:54" class="time">23:33</a></td></tr>
-        <tr id="t2005-01-08T23:46:35"><td class="join" colspan="2">*** povbot has joined #pov</td><td><a href="sample-2013-03-17.log.html#t2005-01-08T23:46:35" class="time">23:46</a></td></tr>
-        <tr id="t2005-01-08T23:47:19"><th class="nick" style="background: #407a40">povbot</th><td class="text" style="color: #407a40">mgedmin: mgedmin was last seen in #pov 2 seconds ago saying: &lt;mgedmin&gt; seen mgedmin</td><td class="time"><a href="sample-2013-03-17.log.html#t2005-01-08T23:47:19" class="time">23:47</a></td></tr>
-        <tr id="t2005-01-08T23:47:54"><th class="nick" style="background: #407a40">povbot</th><td class="text" style="color: #407a40">mgedmin: web1913, jargon, foldoc, vera, and wn responded: vera: BOT Beginning Of Tape; vera: BOT Broadcast Online TV; web1913: Bot \Bot\, n. (Zo[&quot;o]l.) See {Bots}; vera: BOT Build, Operate and Transfer (networke); vera: BOT Back On Topic (telecommunication-slang, Usenet, IRC); wn: bot n : botfly larva; typically develops inside the body of a horse or sheep or human; foldoc: bot &lt;networking, chat, (6 more messages)</td><td class="time"><a href="sample-2013-03-17.log.html#t2005-01-08T23:47:54" class="time">23:47</a></td></tr>
+        <tr id="t2005-01-08T23:33:54-2"><td class="join" colspan="2">*** povbot has joined #pov</td><td><a href="sample-2013-03-17.log.html#t2005-01-08T23:33:54-2" class="time">23:33</a></td></tr>
+        <tr id="t2005-01-08T23:46:35-2"><td class="join" colspan="2">*** povbot has joined #pov</td><td><a href="sample-2013-03-17.log.html#t2005-01-08T23:46:35-2" class="time">23:46</a></td></tr>
+        <tr id="t2005-01-08T23:47:19-2"><th class="nick" style="background: #407a40">povbot</th><td class="text" style="color: #407a40">mgedmin: mgedmin was last seen in #pov 2 seconds ago saying: &lt;mgedmin&gt; seen mgedmin</td><td class="time"><a href="sample-2013-03-17.log.html#t2005-01-08T23:47:19-2" class="time">23:47</a></td></tr>
+        <tr id="t2005-01-08T23:47:54-2"><th class="nick" style="background: #407a40">povbot</th><td class="text" style="color: #407a40">mgedmin: web1913, jargon, foldoc, vera, and wn responded: vera: BOT Beginning Of Tape; vera: BOT Broadcast Online TV; web1913: Bot \Bot\, n. (Zo[&quot;o]l.) See {Bots}; vera: BOT Build, Operate and Transfer (networke); vera: BOT Back On Topic (telecommunication-slang, Usenet, IRC); wn: bot n : botfly larva; typically develops inside the body of a horse or sheep or human; foldoc: bot &lt;networking, chat, (6 more messages)</td><td class="time"><a href="sample-2013-03-17.log.html#t2005-01-08T23:47:54-2" class="time">23:47</a></td></tr>
         </table>
           </li>
         </ul>
