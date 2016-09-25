@@ -34,6 +34,8 @@ def set_up_sample():
     os.mkdir(os.path.join(tmpdir, "#chan"))
     with open(os.path.join(tmpdir, "#chan", "index.html"), "w") as f:
         f.write("#chan index")
+    shutil.copy(os.path.join(here, 'sample.log'),
+                os.path.join(tmpdir, '#chan', 'sample-2013-03-18.log'))
     return tmpdir
 
 
@@ -170,6 +172,9 @@ class TestApplication(unittest.TestCase):
         response = self.request('/sample-2013-03-18.log.html')
         self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
         self.assertIn(
+            b'<title>IRC log for Monday, 2013-03-18</title>',
+            response.body)
+        self.assertIn(
             b'<td class="join" colspan="2">*** povbot has joined #pov</td>',
             response.body)
         self.assertIn(u'ąčę'.encode('UTF-8'), response.body)
@@ -248,6 +253,17 @@ class TestApplication(unittest.TestCase):
             expect=404)
         self.assertEqual(response.content_type, 'text/plain')
         self.assertIn(b'Not found', response.body)
+
+    def test_chan_dynamic_log_file_html(self):
+        response = self.request('/#chan/sample-2013-03-18.log.html',
+                                extra_env={"IRCLOG_CHAN_DIR": self.tmpdir})
+        self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
+        self.assertIn(
+            b'<title>IRC log of #chan for Monday, 2013-03-18</title>',
+            response.body)
+        self.assertIn(
+            b'<td class="join" colspan="2">*** povbot has joined #pov</td>',
+            response.body)
 
     @mock.patch("os.environ")
     def test_chan_os_environ(self, environ):

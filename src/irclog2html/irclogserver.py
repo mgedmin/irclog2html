@@ -39,7 +39,7 @@ except ImportError:
     from urllib.parse import quote_plus # Py3
 
 from .irclog2html import CSS_FILE, LogParser, XHTMLTableStyle, convert_irc_log
-from .logs2html import find_log_files, write_index
+from .logs2html import LogFile, Error, find_log_files, write_index
 from .irclogsearch import (
     DEFAULT_LOGFILE_PATH, DEFAULT_LOGFILE_PATTERN, search_page,
     HEADER, FOOTER
@@ -69,6 +69,23 @@ def log_listing(stream, path, pattern, channel=None):
     else:
         title = u"IRC logs"
     write_index(stream, title, logfiles, searchbox=True)
+
+
+def dynamic_log(stream, path, channel=None):
+    """Render HTML dynamically"""
+    lf = LogFile(path)
+    with open(path, 'rb') as f:
+        parser = LogParser(f)
+        formatter = XHTMLTableStyle(stream.buffer)
+        if channel:
+            title = u"IRC log of {channel}".format(channel=channel)
+        else:
+            title = u"IRC log"
+        title += u" for {date:%A, %Y-%m-%d}".format(date=lf.date)
+        prev = next = ('', '')
+        index = ('Index', 'index.html')
+        convert_irc_log(parser, formatter, title, prev, index, next,
+                        searchbox=True)
 
 
 def parse_path(environ):
@@ -137,16 +154,12 @@ def application(environ, start_response):
                 log_listing(stream, logfile_path, logfile_pattern, channel)
                 result = [stream.buffer.getvalue()]
             elif path.endswith('.html'):
-                buf = io.BytesIO()
                 try:
-                    with open(os.path.join(logfile_path, path[:-5]), 'rb') as f:
-                        parser = LogParser(f)
-                        formatter = XHTMLTableStyle(buf)
-                        convert_irc_log(parser, formatter, path[:-5],
-                                        ('', ''), ('', ''), ('', ''),
-                                        searchbox=True)
-                        result = [buf.getvalue()]
-                except IOError:
+                    dynamic_log(stream, os.path.join(logfile_path, path[:-5]),
+                                channel=channel)
+                    result = [stream.buffer.getvalue()]
+                except (Error, IOError):
+                    # Error will be raised if the filename has no ISO-8601 date
                     status = "404 Not Found"
                     result = [b"Not found"]
                     content_type = "text/plain"
