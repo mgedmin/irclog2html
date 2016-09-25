@@ -162,9 +162,14 @@ def write_index(outfile, title, logfiles, searchbox=False, latest_log_link=None)
                            link), file=outfile)
         print('</ul>', file=outfile)
     print('<ul>', file=outfile)
+    current_month = None
     for logfile in logfiles:
-        # TODO: split by year/month.  Perhaps split off old logs into separate
-        # pages
+        month = logfile.date.strftime('%Y-%m')
+        if month != current_month:
+            current_month = month
+            print('</ul>', file=outfile)
+            print('<h2>%s</h2>' % month, file=outfile)
+            print('<ul>', file=outfile)
         link = escape(quote(logfile.link))
         title = escape(logfile.title)
         print('<li><a href="%s">%s</a></li>' % (link, title), file=outfile)

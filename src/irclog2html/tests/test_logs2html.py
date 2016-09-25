@@ -238,6 +238,9 @@ def doctest_write_index():
         <li><a href="latest.html">Latest (bookmarkable)</a></li>
         </ul>
         <ul>
+        </ul>
+        <h2>2013-03</h2>
+        <ul>
         <li><a href="somechannel-20130316.log.html">2013-03-16 (Saturday)</a></li>
         <li><a href="somechannel-20130317.log.html">2013-03-17 (Sunday)</a></li>
         <li><a href="somechannel-20130318.log.html">2013-03-18 (Monday)</a></li>

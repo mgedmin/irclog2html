@@ -9,6 +9,9 @@ Changelog
   deployed via WSGI.  Portions contributed by Albertas Agejevas
   (https://github.com/mgedmin/irclog2html/pull/9).
 
+- Index pages group the logs by month
+  (https://github.com/mgedmin/irclog2html/issues/12).
+
 - Drop support for Python 2.6.
 
 
