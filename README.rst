@@ -134,8 +134,7 @@ Misc
 Website: http://mg.pov.lt/irclog2html/
 
 Bug tracker:
-https://github.com/mgedmin/irclog2html/issues or
-https://bugs.launchpad.net/irclog2html
+https://github.com/mgedmin/irclog2html/issues
 
 Licence: GPL v2 or later (http://www.gnu.org/copyleft/gpl.html)
 
