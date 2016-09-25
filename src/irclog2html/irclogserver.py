@@ -27,9 +27,11 @@ Apache configuration example:
 
 from __future__ import print_function
 
+import argparse
 import cgi
 import io
 import os
+from wsgiref.simple_server import make_server
 
 try:
     from urllib import quote_plus # Py2
@@ -169,9 +171,39 @@ def application(environ, start_response):
 
 def main():  # pragma: nocover
     """Simple web server for manual testing"""
-    from wsgiref.simple_server import make_server
-    srv = make_server('localhost', 8080, application)
-    print("Started at http://localhost:8080/")
+    parser = argparse.ArgumentParser(description="Serve IRC logs")
+    parser.add_argument(
+        '-p', '--port', type=int, default=8080,
+        help='listen on the specified port (default: 8080)')
+    parser.add_argument(
+        '-P', '--pattern',
+        help='IRC log file pattern (default: $IRCLOG_GLOB,'
+             ' falling back to %s)' % DEFAULT_LOGFILE_PATTERN)
+    parser.add_argument(
+        '-m', '--multi', action='store_true',
+        help='serve logs for multiple channels in subdirectories'
+             ' (default: when $IRCLOG_CHAN_DIR points to a path)')
+    parser.add_argument(
+        'path', nargs='?',
+        help='where to find IRC logs (default: $IRCLOG_LOCATION,'
+             ' falling back to %s)' % DEFAULT_LOGFILE_PATH)
+    args = parser.parse_args()
+    srv = make_server('localhost', args.port, application)
+    print("Started at http://localhost:{port}/".format(port=args.port))
+    if args.path:
+        if args.multi:
+            os.environ['IRCLOG_CHAN_DIR'] = args.path
+            print("Serving IRC logs for multiple channels from {path}".format(
+                path=args.path))
+        else:
+            os.environ['IRCLOG_LOCATION'] = args.path
+            print("Serving IRC logs from {path}".format(path=args.path))
+    elif args.multi:
+        parser.error('--multi requires a path')
+    if args.pattern:
+        os.environ['IRCLOG_GLOB'] = args.pattern
+        print("Looking for files matching {pattern}".format(
+            pattern=args.pattern))
     srv.serve_forever()
 
 
