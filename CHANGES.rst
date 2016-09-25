@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.15.0 (unreleased)
+2.15.0 (2016-09-25)
 -------------------
 
 - There's a new ``irclogserver`` script that can be used to serve
