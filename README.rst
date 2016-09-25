@@ -32,7 +32,7 @@ For example::
 
   -t 'IRC logs for #mychannel'
   -p 'IRC logs for #mychannel for '
-  # the following needs some extra Apache setup to enable the CGI script
+  # the following needs some extra Apache setup to enable the CGI/WSGI script
   --searchbox
   # where we keep the logs
   /full/path/to/directory/
@@ -73,6 +73,58 @@ it work::
     #SetEnv IRCLOG_GLOB "*.log.????-??-??"
     # (this will also automatically handle *.log.????-??-??.gz)
   </Location>
+
+
+WSGI script for log serving
+===========================
+
+.. warning::
+   The script can be easily abused to cause a denial of service attack; it
+   parses *all* log files every time you perform a search.
+
+There's now an experimental WSGI script that can generate HTML for the
+logs on the fly.  You can use it if you don't like cron scripts and CGI.
+
+Here's an example Apache config snippet::
+
+  WSGIScriptAlias /irclogs /usr/local/bin/irclogserver
+  <Location /irclogs>
+    SetEnv IRCLOG_LOCATION "/var/www/my-irclog/"
+    # Uncomment the following if your log files use a different format
+    #SetEnv IRCLOG_GLOB "*.log.????-??-??"
+    # (this will also automatically handle *.log.????-??-??.gz)
+  </Location>
+
+Currently it has certain downsides:
+
+- configuration is very limited, e.g you cannot specify titles or styles
+  or enable dircproxy mode
+- navigation links (next/previous/index) are missing
+- HTML files in the irc log directory will take precedence over
+  dynamically-generated logs even if they're older than the corresponding
+  log file
+
+
+WSGI script for multi-channel log serving
+=========================================
+
+.. warning::
+   The script can be easily abused to cause a denial of service attack; it
+   parses *all* log files every time you perform a search.
+
+The experimental WSGI script can serve logs for multiple channels::
+
+  WSGIScriptAlias /irclogs /usr/local/bin/irclogserver
+  <Location /irclogs>
+    SetEnv IRCLOG_CHAN_DIR "/var/www/my-irclog/"
+    # Uncomment the following if your log files use a different format
+    #SetEnv IRCLOG_GLOB "*.log.????-??-??"
+    # (this will also automatically handle *.log.????-??-??.gz)
+  </Location>
+
+Now ``/irclogs`` will show a list of channels (subdirectories under
+``/var/www/my-irclog/``), and ``/irclogs/channel/`` will show the
+date index for that channel.
 
 
 Misc

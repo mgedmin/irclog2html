@@ -4,11 +4,10 @@ Changelog
 2.15.0 (unreleased)
 -------------------
 
-- irclogsearch can now be deployed via WSGI.  Contributed by Albertas Agejevas
-  (https://github.com/mgedmin/irclog2html/pull/9).
-
 - There's a new ``irclogserver`` script that can be used to serve
-  dynamically-generated IRC logs.  It can also be deployed via WSGI.
+  dynamically-generated IRC logs and perform search.  It can also be
+  deployed via WSGI.  Portions contributed by Albertas Agejevas
+  (https://github.com/mgedmin/irclog2html/pull/9).
 
 - Drop support for Python 2.6.
 
