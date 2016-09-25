@@ -7,6 +7,8 @@ Changelog
 - irclogsearch can now be deployed via WSGI.  Contributed by Albertas Agejevas
   (https://github.com/mgedmin/irclog2html/pull/9).
 
+- Drop support for Python 2.6.
+
 
 2.14.0 (2014-12-12)
 -------------------
