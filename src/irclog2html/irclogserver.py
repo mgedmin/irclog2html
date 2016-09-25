@@ -58,11 +58,15 @@ def dir_listing(stream, path):
     print(FOOTER, file=stream)
 
 
-def log_listing(stream, path, pattern):
+def log_listing(stream, path, pattern, channel=None):
     """Primitive listing of log files."""
     logfiles = find_log_files(path, pattern)
     logfiles.reverse()
-    write_index(stream, u"IRC logs", logfiles, searchbox=True)
+    if channel:
+        title = u"IRC logs of {channel}".format(channel=channel)
+    else:
+        title = u"IRC logs"
+    write_index(stream, title, logfiles, searchbox=True)
 
 
 def parse_path(environ):
@@ -128,7 +132,7 @@ def application(environ, start_response):
                 result = [f.read()]
         except IOError:
             if path == 'index.html':
-                log_listing(stream, logfile_path, logfile_pattern)
+                log_listing(stream, logfile_path, logfile_pattern, channel)
                 result = [stream.buffer.getvalue()]
             elif path.endswith('.html'):
                 buf = io.BytesIO()

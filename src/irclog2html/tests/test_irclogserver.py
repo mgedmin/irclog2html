@@ -143,6 +143,7 @@ class TestApplication(unittest.TestCase):
         os.unlink(os.path.join(self.tmpdir, 'index.html'))
         response = self.request('/')
         self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
+        self.assertIn(b'<title>IRC logs</title>', response.body)
         self.assertIn(b'<a href="sample-2013-03-18.log.html">', response.body)
 
     def test_search_page(self):
@@ -216,6 +217,14 @@ class TestApplication(unittest.TestCase):
             extra_env={"IRCLOG_CHAN_DIR": self.tmpdir})
         self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
         self.assertEqual(b'#chan index', response.body)
+
+    def test_chan_index_without_index_html(self):
+        os.unlink(os.path.join(self.tmpdir, '#chan', 'index.html'))
+        response = self.request(
+            '/#chan/',
+            extra_env={"IRCLOG_CHAN_DIR": self.tmpdir})
+        self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
+        self.assertIn(b'<title>IRC logs of #chan</title>', response.body)
 
     def test_chan_search_page(self):
         response = self.request(
