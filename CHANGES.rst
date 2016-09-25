@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.15.1 (unreleased)
+2.15.1 (2016-09-25)
 -------------------
 
 - Lines with the same timestamp now get different HTML anchors
