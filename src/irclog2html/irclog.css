@@ -67,8 +67,11 @@ body {
     background: white;
 }
 
-h1 {
+h1, h2, h3 {
     color: #134d73;
+}
+
+h1 {
     margin: 0.5em 8em 0.5em 0;
 }
 

@@ -29,8 +29,11 @@ from __future__ import print_function
 
 import argparse
 import cgi
+import datetime
 import io
 import os
+import time
+from operator import attrgetter
 from wsgiref.simple_server import make_server
 
 try:
@@ -46,22 +49,56 @@ from .irclogsearch import (
 )
 
 
+class Channel(object):
+    """IRC channel."""
+
+    def __init__(self, name, path):
+        self.name = name
+        self.mtime = os.stat(os.path.join(path, name)).st_mtime
+
+    @property
+    def age(self):
+        return datetime.timedelta(seconds=time.time() - self.mtime)
+
+
 def find_channels(path):
-    return sorted(d for d in os.listdir(path)
-                  if os.path.isdir(os.path.join(path, d)))
+    return sorted([Channel(name, path) for name in os.listdir(path)
+                   if os.path.isdir(os.path.join(path, name))],
+                  key=attrgetter('name'))
 
 
 def dir_listing(stream, path):
     """Primitive listing of subdirectories."""
     print(HEADER, file=stream)
     print(u"<h1>IRC logs</h1>", file=stream)
-    print(u"<ul>", file=stream)
     channels = find_channels(path)
-    for name in channels:
-        print(u'<li><a href="%s/">%s</a></li>'
-              % (quote_plus(name), cgi.escape(name)),
-              file=stream)
-    print(u"</ul>", file=stream)
+    old, new = [], []
+    for channel in channels:
+        if channel.age > datetime.timedelta(days=7):
+            old.append(channel)
+        else:
+            new.append(channel)
+
+    if new:
+        if old:
+            print(u'<h2>Active channels</h2>', file=stream)
+        print(u"<ul>", file=stream)
+        for channel in new:
+            print(u'<li><a href="%s/">%s</a></li>'
+                  % (quote_plus(channel.name), cgi.escape(channel.name)),
+                  file=stream)
+        print(u"</ul>", file=stream)
+
+    if old:
+        if new:
+            print(u'<h2>Old channels</h2>', file=stream)
+        print(u"<ul>", file=stream)
+        for channel in old:
+            print(u'<li><a href="%s/">%s</a></li>'
+                  % (quote_plus(channel.name), cgi.escape(channel.name)),
+                  file=stream)
+        print(u"</ul>", file=stream)
+
     print(FOOTER, file=stream)
 
 

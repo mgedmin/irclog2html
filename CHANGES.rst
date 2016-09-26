@@ -1,10 +1,14 @@
 Changelog
 =========
 
-2.15.2 (unreleased)
+2.16.0 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- ``irclogserver`` channel list is now split into old channels and active
+  channels, detected by checking whether the directory modification date
+  is newer or older than 7 days.
+
+- 2nd-level headings now have the same color as 1st-level headings.
 
 
 2.15.1 (2016-09-25)
