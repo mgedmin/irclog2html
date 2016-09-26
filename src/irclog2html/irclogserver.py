@@ -79,6 +79,9 @@ def dir_listing(stream, path):
         else:
             new.append(channel)
 
+    if not channels:
+        print(u"<p>No channels found.</p>", file=stream)
+
     if new:
         if old:
             print(u'<h2>Active channels</h2>', file=stream)

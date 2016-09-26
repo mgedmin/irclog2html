@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+import datetime
 import gzip
+import io
 import os
 import shutil
 import tempfile
@@ -9,7 +11,7 @@ from contextlib import closing
 
 import mock
 
-from irclog2html.irclogserver import parse_path, application
+from irclog2html.irclogserver import dir_listing, parse_path, application
 
 
 here = os.path.dirname(__file__)
@@ -95,6 +97,73 @@ def doctest_parse_path():
         ('#random', None)
 
     """
+
+
+class TestDirListing(unittest.TestCase):
+
+    def make_channel(self, name, age):
+        m = mock.Mock(age=age)  # can't pass name here :(
+        m.name = name
+        return m
+
+    @mock.patch('irclog2html.irclogserver.find_channels')
+    def test_dir_listing_old_an_new(self, mock_find_channels):
+        mock_find_channels.return_value = [
+            self.make_channel(name='#cobwebs', age=datetime.timedelta(days=7.5)),
+            self.make_channel(name='#rainbows', age=datetime.timedelta(minutes=5)),
+            self.make_channel(name='#puppies', age=datetime.timedelta(days=6.5)),
+        ]
+        stream = io.StringIO()
+        dir_listing(stream, '/all/my/logs')
+        response = stream.getvalue()
+        self.assertIn('<h2>Active channels</h2>', response)
+        self.assertIn('#rainbows', response)
+        self.assertIn('#puppies', response)
+        self.assertIn('<h2>Old channels</h2>', response)
+        self.assertIn('#cobwebs', response)
+        self.assertTrue(
+            response.index('Active channels') <
+            response.index('#rainbows') <
+            response.index('#puppies') <
+            response.index('Old channels') <
+            response.index('#cobwebs')
+        )
+
+    @mock.patch('irclog2html.irclogserver.find_channels')
+    def test_dir_listing_old(self, mock_find_channels):
+        mock_find_channels.return_value = [
+            self.make_channel(name='#cobwebs', age=datetime.timedelta(days=7.5)),
+        ]
+        stream = io.StringIO()
+        dir_listing(stream, '/all/my/logs')
+        response = stream.getvalue()
+        self.assertNotIn('<h2>Active channels</h2>', response)
+        self.assertNotIn('<h2>Old channels</h2>', response)
+        self.assertIn('#cobwebs', response)
+
+    @mock.patch('irclog2html.irclogserver.find_channels')
+    def test_dir_listing_new(self, mock_find_channels):
+        mock_find_channels.return_value = [
+            self.make_channel(name='#rainbows', age=datetime.timedelta(minutes=5)),
+            self.make_channel(name='#puppies', age=datetime.timedelta(days=6.5)),
+        ]
+        stream = io.StringIO()
+        dir_listing(stream, '/all/my/logs')
+        response = stream.getvalue()
+        self.assertNotIn('<h2>Active channels</h2>', response)
+        self.assertNotIn('<h2>Old channels</h2>', response)
+        self.assertIn('#rainbows', response)
+        self.assertIn('#puppies', response)
+
+    @mock.patch('irclog2html.irclogserver.find_channels')
+    def test_dir_listing_empty(self, mock_find_channels):
+        mock_find_channels.return_value = []
+        stream = io.StringIO()
+        dir_listing(stream, '/all/my/logs')
+        response = stream.getvalue()
+        self.assertNotIn('<h2>Active channels</h2>', response)
+        self.assertNotIn('<h2>Old channels</h2>', response)
+        self.assertIn('<p>No channels found.</p>', response)
 
 
 class Response(object):
