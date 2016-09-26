@@ -109,10 +109,6 @@ class TestApplication(unittest.TestCase):
     def tearDown(self):
         clean_up_sample(self.tmpdir)
 
-    if not hasattr(unittest.TestCase, 'assertIn'):
-        def assertIn(self, needle, haystack):
-            self.assertTrue(needle in haystack, haystack)
-
     def request(self, path='/', expect=200, extra_env=None):
         environ = {
             'IRCLOG_LOCATION': self.tmpdir,
