@@ -10,6 +10,9 @@ Changelog
 
 - 2nd-level headings now have the same color as 1st-level headings.
 
+- ``irclogserver`` no longer shows a 404 if you omit the trailing ``/``
+  after a channel name in the URL.
+
 
 2.15.1 (2016-09-25)
 -------------------

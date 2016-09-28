@@ -94,7 +94,7 @@ def doctest_parse_path():
 
         >>> parse_path(dict(PATH_INFO='/#random/../index.html',
         ...            IRCLOG_CHAN_DIR='/opt/irclog'))
-        ('#random', None)
+        (None, None)
 
     """
 
@@ -292,6 +292,13 @@ class TestApplication(unittest.TestCase):
             extra_env={"IRCLOG_CHAN_DIR": self.tmpdir})
         self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
         self.assertEqual(b'#chan index', response.body)
+
+    def test_chan_index_no_trailing_slash(self):
+        response = self.request(
+            '/#chan',
+            extra_env={"IRCLOG_CHAN_DIR": self.tmpdir},
+            expect=302)
+        self.assertEqual(response.location, '%23chan/')
 
     def test_chan_index_without_index_html(self):
         os.unlink(os.path.join(self.tmpdir, '#chan', 'index.html'))

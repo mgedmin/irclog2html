@@ -178,11 +178,9 @@ def parse_path(environ):
     if environ.get('IRCLOG_CHAN_DIR', os.environ.get('IRCLOG_CHAN_DIR')):
         if '/' in path:
             channel, path = path.split('/', 1)
-            if channel == '..':
-                return None, None
-    if '/' in path or '\\' in path:
-        return channel, None
-    return channel, path if path != '' else 'index.html'
+    if channel == '..' or path == '..' or '/' in path or '\\' in path:
+        return None, None
+    return channel, (path or 'index.html')
 
 
 def application(environ, start_response):
@@ -201,6 +199,7 @@ def application(environ, start_response):
     status = "200 Ok"
     content_type = "text/html; charset=UTF-8"
     headers = {}
+    result = []
 
     channel, path = parse_path(environ)
     if channel:
@@ -225,8 +224,9 @@ def application(environ, start_response):
             result = [b"Not found"]
             content_type = "text/plain"
     else:
+        full_path = os.path.join(logfile_path, path)
         try:
-            with open(os.path.join(logfile_path, path), "rb") as f:
+            with open(full_path, "rb") as f:
                 result = [f.read()]
         except IOError:
             if path == 'index.html':
@@ -234,7 +234,7 @@ def application(environ, start_response):
                 result = [stream.buffer.getvalue()]
             elif path.endswith('.html'):
                 try:
-                    dynamic_log(stream, os.path.join(logfile_path, path[:-5]),
+                    dynamic_log(stream, full_path[:-len('.html')],
                                 logfile_pattern, channel=channel)
                     result = [stream.buffer.getvalue()]
                 except (Error, IOError):
@@ -242,6 +242,11 @@ def application(environ, start_response):
                     status = "404 Not Found"
                     result = [b"Not found"]
                     content_type = "text/plain"
+            elif chan_path and not channel and os.path.isdir(os.path.join(chan_path, path)):
+                status = "302 Found"
+                headers["Location"] = quote_plus(path) + "/"
+                result = [b"Redirecting..."]
+                content_type = "text/plain"
             else:
                 status = "404 Not Found"
                 result = [b"Not found"]
