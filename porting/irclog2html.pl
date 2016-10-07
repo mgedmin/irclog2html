@@ -15,7 +15,7 @@
 #   Rick Welykochy <rick@praxis.com.au>
 #   Alexander Else <aelse@uu.net>
 
-# Released under the terms of the GNU GPL
+# Released under the terms of the GNU GPL v2 or later
 # http://www.gnu.org/copyleft/gpl.html
 
 # Usage: irclog2html filename

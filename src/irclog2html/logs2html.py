@@ -19,7 +19,7 @@ from operator import attrgetter
 # Copyright (c) 2005--2013  Marius Gedminas
 # latest.log.html symlink suggested by Chris Foster
 #
-# Released under the terms of the GNU GPL
+# Released under the terms of the GNU GPL v2 or later
 # http://www.gnu.org/copyleft/gpl.html
 
 import os

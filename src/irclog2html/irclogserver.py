@@ -20,9 +20,9 @@ Apache configuration example:
 
 """
 
-# Copyright (c) 2015, Marius Gedminas and contributors
+# Copyright (c) 2015-2016, Marius Gedminas and contributors
 #
-# Released under the terms of the GNU GPL
+# Released under the terms of the GNU GPL v2 or later
 # http://www.gnu.org/copyleft/gpl.html
 
 from __future__ import print_function
