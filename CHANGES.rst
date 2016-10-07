@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.16.0 (unreleased)
+2.15.2 (2016-10-07)
 -------------------
 
 - ``irclogserver`` channel list is now split into old channels and active
