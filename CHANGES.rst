@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.15.3 (unreleased)
+2.15.3 (2016-12-08)
 -------------------
 
 - In some circumstances parts of a message up to the last '>' could be lost
