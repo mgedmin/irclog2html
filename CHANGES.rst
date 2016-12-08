@@ -4,7 +4,8 @@ Changelog
 2.15.3 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- In some circumstances parts of a message up to the last '>' could be lost
+  (https://github.com/mgedmin/irclog2html/issues/19).
 
 
 2.15.2 (2016-10-07)

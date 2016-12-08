@@ -97,6 +97,14 @@ def doctest_LogParser():
         >>> test('[15 Jan 08:42] <jsmith!n=jsmith@10.20.30.40> Hello!')
         '15 Jan 08:42' COMMENT ('jsmith', 'Hello!')
 
+    Greater-than signs do not confuse the parser (any more)
+
+        >>> test('14:18 <mg> apples > oranges')
+        '14:18' COMMENT ('mg', 'apples > oranges')
+
+        >>> test('[15 Jan 08:42] <jsmith!n=jsmith@10.20.30.40> Hello > world!')
+        '15 Jan 08:42' COMMENT ('jsmith', 'Hello > world!')
+
     `what` can be COMMENT...
 
         >>> test('<nick> text')
