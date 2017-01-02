@@ -4,7 +4,7 @@ Changelog
 2.15.4 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Support Python 3.6.
 
 
 2.15.3 (2016-12-08)
