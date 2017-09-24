@@ -1,6 +1,6 @@
 [run]
 source = irclog2html
-omit = */tests/*
+omit = */tests/*,*/xchatlogsplit.py
 
 [report]
 exclude_lines =
