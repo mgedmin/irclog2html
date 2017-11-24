@@ -1,6 +1,6 @@
 PYTHON = python
 PAGER = less -RFX
-TESTFLAGS = -vc
+TESTFLAGS = -v
 
 FILE_WITH_VERSION = src/irclog2html/_version.py
 FILE_WITH_CHANGELOG = CHANGES.rst
@@ -10,6 +10,13 @@ VCS_TAG = git tag
 VCS_COMMIT_AND_PUSH = git commit -a -m "Post-release version bump" && git push && git push --tags
 
 scripts = bin/test bin/irclog2html bin/logs2html bin/irclogsearch bin/irclogserver bin/tox
+
+SHELL = /bin/bash -o pipefail
+
+
+ifneq "$(TERM)" "dumb"
+is_tty = $(shell test -t 2 && echo 1)
+endif
 
 
 .PHONY: default
@@ -22,8 +29,8 @@ all: $(scripts)
 
 .PHONY: check test
 check test: bin/test
-ifdef PAGER
-	bin/test $(TESTFLAGS) | $(PAGER)
+ifdef is_tty
+	bin/test $(TESTFLAGS) -c | $(PAGER)
 else
 	bin/test $(TESTFLAGS)
 endif
