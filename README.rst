@@ -131,12 +131,12 @@ date index for that channel.
 Misc
 ====
 
-Website: http://mg.pov.lt/irclog2html/
+Website: https://mg.pov.lt/irclog2html/
 
 Bug tracker:
 https://github.com/mgedmin/irclog2html/issues
 
-Licence: GPL v2 or later (http://www.gnu.org/copyleft/gpl.html)
+Licence: GPL v2 or later (https://www.gnu.org/copyleft/gpl.html)
 
 |buildstatus|_ |appveyor|_ |coverage|_
 

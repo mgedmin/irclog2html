@@ -70,7 +70,7 @@ def run_and_compare(inputfile, args=""):
                                 VERSION: 'VERSION',
                                 RELEASE: 'REVISION',
                                 'marius@pov.lt': 'EMAIL',
-                                'http://mg.pov.lt/irclog2html/': 'URL',
+                                'https://mg.pov.lt/irclog2html/': 'URL',
                                 'mg.pov.lt': 'WEBSITE'})
     output2 = run_in_tempdir(inputfile, './irclog2html.pl', args)
     output2 = replace(output2, {'irclog2html.pl': 'SCRIPT',

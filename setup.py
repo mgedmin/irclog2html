@@ -15,8 +15,9 @@ def read(filename):
 long_description = read('README.rst') + '\n\n' + read('CHANGES.rst')
 
 version_file = os.path.join(here, 'src/irclog2html/_version.py')
-d = dict(re.findall('''(__version__) *= *'([^']*)''', read(version_file)))
+d = dict(re.findall('''(__[a-z]+__) *= *'([^']*)''', read(version_file)))
 version = d['__version__']
+homepage = d['__homepage__']
 
 setup(
     name='irclog2html',
@@ -25,7 +26,7 @@ setup(
     author_email='marius@gedmin.as',
     license='GPL v2 or later',
     platforms=['any'],
-    url='http://mg.pov.lt/irclog2html/',
+    url=homepage,
     description='Convert IRC logs to HTML',
     long_description=long_description,
     classifiers=[
