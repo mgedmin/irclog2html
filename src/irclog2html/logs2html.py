@@ -211,7 +211,7 @@ def main(argv=sys.argv):
     parser.add_option('-g', '--glob-pattern', dest="pattern", default="*.log",
                       help="glob pattern that finds log files to be processed"
                       " (default: *.log)")
-    parser.add_option('-o', '--output-dir',
+    parser.add_option('-o', '--output-dir', dest="output_dir",
                       help="destination output directory"
                            " (default: current)")
     options, args = parser.parse_args(argv[1:])
