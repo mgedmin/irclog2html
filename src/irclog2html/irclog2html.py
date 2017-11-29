@@ -416,8 +416,9 @@ class AbstractStyle(object):
     def timestamp_anchor(self, time):
         anchor = 't%s' % time
         if anchor in self._anchors:
+            org_anchor = anchor
             for n in itertools.count(2):
-                anchor = '%s-%d' % (anchor, n)
+                anchor = '%s-%d' % (org_anchor, n)
                 if anchor not in self._anchors:
                     break
         self._anchors.add(anchor)
