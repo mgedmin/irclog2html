@@ -211,9 +211,9 @@ def main(argv=sys.argv):
     parser.add_option('-g', '--glob-pattern', dest="pattern", default="*.log",
                       help="glob pattern that finds log files to be processed"
                       " (default: *.log)")
-    parser.add_option('-o', '--output-dir', dest="output_dir",
+    parser.add_option('-o', '--output-dir', dest="output_dir", default=None,
                       help="destination output directory"
-                           " (default: current)")
+                           " (default: same as input directory)")
     options, args = parser.parse_args(argv[1:])
     if len(args) < 1:
         parser.error("missing directory name")
