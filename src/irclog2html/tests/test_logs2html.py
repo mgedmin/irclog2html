@@ -150,7 +150,7 @@ class TestLogFile(TestCase):
         self.create('somechannel-20130318.log')
         options = optparse.Values(dict(searchbox=True, dircproxy=True,
                                        pattern='*.log', force=False,
-                                       prefix='IRC logs for ',
+                                       prefix='IRC logs for ', output_dir=None,
                                        style='xhtmltable', title='IRC logs'))
         process(self.tmpdir, options)
         self.assertTrue(os.path.exists(self.filename('index.html')))
@@ -169,7 +169,7 @@ class TestLogFile(TestCase):
         self.create('somechannel-20130316.log.html')
         options = optparse.Values(dict(searchbox=True, dircproxy=True,
                                        pattern='*.log', force=False,
-                                       prefix='IRC logs for ',
+                                       prefix='IRC logs for ', output_dir=None,
                                        style='xhtmltable', title='IRC logs'))
         process(self.tmpdir, options)
         self.assertTrue(os.path.exists(self.filename('index.html')))
@@ -183,7 +183,7 @@ class TestLogFile(TestCase):
         self.create('index.html')
         options = optparse.Values(dict(searchbox=True, dircproxy=True,
                                        pattern='*.log', force=False,
-                                       prefix='IRC logs for ',
+                                       prefix='IRC logs for ', output_dir=None,
                                        style='xhtmltable', title='IRC logs'))
         os.chmod(self.filename('index.html'), 0o444)
         self.assertRaises(Error, process, self.tmpdir, options)
