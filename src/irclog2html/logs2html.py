@@ -239,7 +239,13 @@ def process(dir, options):
             extra_args += ['--output-file', options.output_dir]
             out_dir = options.output_dir
         else:
-            raise Error('Argument specified in --output-file is not a directory')
+            if os.path.isfile(options.output_dir):
+                raise Error("%s is a file" % options.output_dir)
+            else:
+                try:
+                    os.makedirs(options.output_dir)
+                except Error as e:
+                    sys.exit("Failed to recursively create directory %s: %s" % (options.output_dir, e))
     else:
         out_dir = dir
     logfiles = find_log_files(dir, options.pattern)
