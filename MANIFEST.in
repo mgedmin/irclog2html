@@ -17,3 +17,6 @@ include .travis.yml
 include appveyor.yml
 include .coveragerc
 include COPYING
+
+# added by check_manifest.py
+include *.mk
