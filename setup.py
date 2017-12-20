@@ -44,6 +44,7 @@ setup(
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
+    keywords='irc log colorizer html wsgi',
     extras_require=dict(test=[
         "mock",
         "zope.testing",

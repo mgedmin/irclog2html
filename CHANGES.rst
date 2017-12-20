@@ -1,12 +1,18 @@
 Changelog
 =========
 
-2.15.4 (unreleased)
+2.16.0 (2017-12-20)
 -------------------
 
 - Support Python 3.6.
-- Fix for duplicated lines with the same time where the resulting HTML ``id`` anchors would evolve into long form like "t22:24:49-2-3-4-5-6-7-8-9-10" instead of "t22:24:49-10" resulting in significant output file sizes grow in some cases
-- Add --output-dir (-o) parameter to logs2html allowing to place resulting files in a directory different from input catalogue
+
+- Fix for duplicated lines with the same time where the resulting HTML ``id``
+  anchors would evolve into long form like "t22:24:49-2-3-4-5-6-7-8-9-10"
+  instead of "t22:24:49-10" resulting in significant output file size growth
+  in some cases.
+
+- Add --output-dir (-o) parameter to logs2html so you can place the generated
+  HTML files in a directory different from the input directory.
 
 
 2.15.3 (2016-12-08)

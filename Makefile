@@ -46,7 +46,16 @@ clean:
 	rm -f testcases/*.html testcases/*.css
 
 
+.PHONY: releasechecklist
+releasechecklist: check-date  # also release.mk will add other checks
+
 include release.mk
+
+.PHONY: check-date
+check-date:
+	@date_line="__date__ = '`date +%Y-%m-%d`'" && \
+	    grep -q "^$$date_line$$" $(FILE_WITH_VERSION) || { \
+	        echo "$(FILE_WITH_VERSION) doesn't specify $$date_line"; exit 1; }
 
 
 python:
