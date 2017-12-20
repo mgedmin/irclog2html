@@ -191,6 +191,33 @@ class TestLogFile(TestCase):
         # Restore the permissions so that our tearDown() can succeed.
         os.chmod(self.filename('index.html'), 0o644)
 
+    def test_process_with_output_dir(self):
+        self.create('somechannel-20130316.log')
+        options = optparse.Values(dict(searchbox=True, dircproxy=True,
+                                       pattern='*.log', force=False,
+                                       prefix='IRC logs for ',
+                                       output_dir=self.filename('new/out/dir'),
+                                       style='xhtmltable', title='IRC logs'))
+        process(self.tmpdir, options)
+        self.assertTrue(os.path.exists(self.filename('new/out/dir/index.html')))
+        self.assertTrue(os.path.exists(self.filename('new/out/dir/irclog.css')))
+        self.assertTrue(os.path.exists(
+            self.filename('new/out/dir/somechannel-20130316.log.html')))
+        if hasattr(os, 'symlink'):
+            self.assertTrue(os.path.exists(
+                self.filename('new/out/dir/latest.log.html')))
+
+    def test_process_with_output_dir_failure_to_mkdir(self):
+        self.create('somechannel-20130316.log')
+        self.create('out')
+        options = optparse.Values(dict(searchbox=True, dircproxy=True,
+                                       pattern='*.log', force=False,
+                                       prefix='IRC logs for ',
+                                       output_dir=self.filename('out'),
+                                       style='xhtmltable', title='IRC logs'))
+        with self.assertRaises(Error):
+            process(self.tmpdir, options)
+
     def test_main(self):
         self.create('somechannel-20130316.log')
         self.create('somechannel-20130316.log.html')

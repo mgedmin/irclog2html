@@ -234,20 +234,15 @@ def process(dir, options):
         extra_args += ['-S']
     if options.dircproxy:
         extra_args += ['--dircproxy']
+    out_dir = dir
     if options.output_dir:
-        if os.path.isdir(options.output_dir):
-            extra_args += ['--output-file', options.output_dir]
-            out_dir = options.output_dir
-        else:
-            if os.path.isfile(options.output_dir):
-                raise Error("%s is a file" % options.output_dir)
-            else:
-                try:
-                    os.makedirs(options.output_dir)
-                except Error as e:
-                    sys.exit("Failed to recursively create directory %s: %s" % (options.output_dir, e))
-    else:
-        out_dir = dir
+        out_dir = options.output_dir
+        extra_args += ['--output-file', out_dir]
+        if not os.path.isdir(out_dir):
+            try:
+                os.makedirs(out_dir)
+            except OSError as e:
+                raise Error("Failed to create directory %s: %s" % (out_dir, e))
     logfiles = find_log_files(dir, options.pattern)
     logfiles.reverse() # newest first
     for n, logfile in enumerate(logfiles):
