@@ -9,7 +9,7 @@ import tempfile
 import unittest
 
 from irclog2html.irclog2html import (
-    LogParser, ColourChooser, NickColourizer,
+    LogParser, ColourChooser, NickColourizer, AbstractStyle,
     SimpleTextStyle, TextStyle, SimpleTableStyle, TableStyle,
     XHTMLStyle, XHTMLTableStyle, MediaWikiStyle,
     COLOURS, parse_args, main)
@@ -284,6 +284,22 @@ class BytesIOWrapper(object):
     def write(self, bytestr):
         self.stream.write(bytestr.decode(self.charset))
         self.stream.flush()
+
+
+def doctest_AbstractStyle_timestamp_anchor_duplicate_timestamps():
+    """Test for AbstractStyle.timestamp_anchor
+
+        >>> style = AbstractStyle(BytesIOWrapper(sys.stdout))
+        >>> print(style.timestamp_anchor('14:51:30'))
+        t14:51:30
+        >>> print(style.timestamp_anchor('14:51:31'))
+        t14:51:31
+        >>> print(style.timestamp_anchor('14:51:31'))
+        t14:51:31-2
+        >>> print(style.timestamp_anchor('14:51:31'))
+        t14:51:31-3
+
+    """
 
 
 def doctest_SimpleTextStyle():
