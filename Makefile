@@ -5,7 +5,7 @@ TESTFLAGS = -v
 FILE_WITH_VERSION = src/irclog2html/_version.py
 FILE_WITH_CHANGELOG = CHANGES.rst
 
-scripts = bin/test bin/irclog2html bin/logs2html bin/irclogsearch bin/irclogserver bin/tox
+scripts = bin/test bin/irclog2html bin/logs2html bin/irclogsearch bin/irclogserver
 
 SHELL = /bin/bash -o pipefail
 
@@ -32,14 +32,14 @@ else
 endif
 
 .PHONY: test-all-pythons
-test-all-pythons: bin/tox
-	bin/tox
+test-all-pythons:
+	tox
 
 .PHONY: coverage
-coverage: bin/tox
-	bin/tox -e coverage,coverage3 -- -p
-	bin/coverage combine
-	bin/coverage report
+coverage:
+	tox -e coverage,coverage3 -- -p
+	coverage combine
+	coverage report -m --fail-under=100
 
 .PHONY: clean
 clean:
