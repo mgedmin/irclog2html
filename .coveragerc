@@ -1,8 +1,8 @@
 [run]
 source = irclog2html
-omit = */tests/*,*/xchatlogsplit.py
 
 [report]
+omit = */tests/*,*/xchatlogsplit.py
 exclude_lines =
     pragma: nocover
     except ImportError:
