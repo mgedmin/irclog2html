@@ -91,6 +91,8 @@ def doctest_LogParser():
         '02-Feb-2004 14:18:55' COMMENT ('mg', 'Hello!')
         >>> test('[15 Jan 08:42] <mg> +++Hello+++')
         '15 Jan 08:42' COMMENT ('mg', '+++Hello+++')
+        >>> test('1075917300 <mg> Hello!')
+        '2004-02-04T17:55:00' COMMENT ('mg', 'Hello!')
 
     Excessive metainformation is stripped from nicknames
 

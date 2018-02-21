@@ -56,6 +56,7 @@ import re
 import shlex
 import shutil
 import sys
+import datetime
 
 try:
     from urllib import quote
@@ -119,6 +120,7 @@ class LogParser(object):
         r'(?:\d{4}-\d{2}-\d{2}T|\d{2}-\w{3}-\d{4} |\w{3} \d{2} |\d{2} \w{3} )?' # Optional date
         r'\d\d:\d\d(:\d\d)?' # Mandatory HH:MM, optional :SS
         r')\]? +') # Optional ], mandatory space
+    TIMESTAMP_REGEXP = re.compile(r'^(\d+) +')
     NICK_REGEXP = re.compile(r'^<(.*?)(!.*?)?>\s')
     DIRCPROXY_NICK_REGEXP = re.compile(r'^<(.*?)(!.*)?>\s[\+-]?')
     JOIN_REGEXP = re.compile(r'^(?:\*\*\*|-->)\s.*joined')
@@ -159,6 +161,13 @@ class LogParser(object):
                 line = line[len(m.group(0)):]
             else:
                 time = None
+
+            if time is None:
+                m = self.TIMESTAMP_REGEXP.match(line)
+                if m:
+                    time = datetime.datetime.utcfromtimestamp(
+                        int(m.group(1))).isoformat()
+                    line = line[len(m.group(0)):]
 
             m = self.NICK_REGEXP.match(line)
             if m:
