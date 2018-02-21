@@ -165,7 +165,7 @@ class LogParser(object):
             if time is None:
                 m = self.TIMESTAMP_REGEXP.match(line)
                 if m:
-                    time = datetime.datetime.fromtimestamp(
+                    time = datetime.datetime.utcfromtimestamp(
                         int(m.group(1))).isoformat()
                     line = line[len(m.group(0)):]
 
