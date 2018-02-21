@@ -1,10 +1,12 @@
 Changelog
 =========
 
-2.16.1 (unreleased)
+2.17.0 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Support `ii <https://tools.suckless.org/ii/>`_ logs which use Unix
+  timestamps (https://github.com/mgedmin/irclog2html/pull/21).
+  Pull request by Cédric Krier.
 
 
 2.16.0 (2017-12-20)
