@@ -15,5 +15,6 @@ script:
     - coverage run --source=irclog2html -m zope.testrunner --test-path=src
 after_script:
     - coveralls
+    - coverage report -m
 notifications:
     email: false
