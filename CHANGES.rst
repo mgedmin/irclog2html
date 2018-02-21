@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.17.0 (unreleased)
+2.17.0 (2018-02-21)
 -------------------
 
 - Support `ii <https://tools.suckless.org/ii/>`_ logs which use Unix
