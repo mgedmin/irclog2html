@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import re
+from io import open
 from setuptools import setup
 
 
@@ -8,7 +9,7 @@ here = os.path.dirname(__file__)
 
 
 def read(filename):
-    with open(os.path.join(here, filename)) as f:
+    with open(os.path.join(here, filename), encoding='utf-8') as f:
         return f.read()
 
 
