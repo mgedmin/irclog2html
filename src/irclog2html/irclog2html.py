@@ -185,7 +185,6 @@ class LogParser(object):
                 if m:
                     oldnick = m.group(1)
                     newnick = m.group(2)
-                    line = line
                     yield time, self.NICKCHANGE, (line, oldnick, newnick)
                 elif self.SERVMSG_REGEXP.match(line):
                     yield time, self.SERVER, line
