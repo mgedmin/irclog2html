@@ -4,7 +4,7 @@ Changelog
 2.17.1 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Drop support for Python 3.3.
 
 
 2.17.0 (2018-02-21)
