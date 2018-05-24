@@ -844,10 +844,9 @@ def do_config_file(option, opt_str, value, parser):
 
 
 def parse_args(argv=sys.argv):
-    progname = os.path.basename(argv[0])
     parser = optparse.OptionParser("usage: %prog [options] filename [...]",
-                                   prog=progname,
                                    version=VERSION,
+                                   prog='irclog2html',
                                    description="Colourises and converts IRC"
                                                " logs to HTML format for easy"
                                                " web reading.")

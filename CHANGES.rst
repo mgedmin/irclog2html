@@ -6,6 +6,9 @@ Changelog
 
 - Drop support for Python 3.3.
 
+- Support ``python -m irclog2html`` as shortcut for
+  ``python -m irclog2html.irclog2html``.
+
 
 2.17.0 (2018-02-21)
 -------------------

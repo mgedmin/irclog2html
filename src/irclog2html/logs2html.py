@@ -97,7 +97,7 @@ class LogFile:
                  extra_args=()):
         """Generate HTML for this log file."""
         self.newfile() # update newness flag and remember it
-        argv = ['irclog2html.py', '-s', style]
+        argv = ['irclog2html', '-s', style]
         argv.extend(extra_args)
         argv += ['-t', title_prefix + self.date.strftime('%A, %Y-%m-%d')]
         if prev:
@@ -181,7 +181,7 @@ def write_index(outfile, title, logfiles, searchbox=False, latest_log_link=None)
 
 
 def main(argv=sys.argv):
-    progname = os.path.basename(argv[0])
+    progname = 'logs2html'
     parser = optparse.OptionParser("usage: %prog [options] directory",
                                    version=VERSION,
                                    prog=progname,
