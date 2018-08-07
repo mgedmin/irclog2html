@@ -4,6 +4,8 @@ Changelog
 2.17.1 (unreleased)
 -------------------
 
+- Add support for Python 3.7.
+
 - Drop support for Python 3.3.
 
 - Support ``python -m irclog2html`` as shortcut for
