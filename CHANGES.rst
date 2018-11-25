@@ -11,6 +11,8 @@ Changelog
 - Support ``python -m irclog2html`` as shortcut for
   ``python -m irclog2html.irclog2html``.
 
+- Make irclogserver ignore hidden directories (such as .git).
+
 
 2.17.0 (2018-02-21)
 -------------------

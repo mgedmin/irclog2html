@@ -86,9 +86,10 @@ class Channel(object):
 
 
 def find_channels(path):
-    return sorted([Channel(name, path) for name in os.listdir(path)
-                   if os.path.isdir(os.path.join(path, name))],
-                  key=attrgetter('name'))
+    return sorted([
+        Channel(name, path) for name in os.listdir(path)
+        if not name.startswith('.') and os.path.isdir(os.path.join(path, name))
+    ], key=attrgetter('name'))
 
 
 def dir_listing(stream, path):

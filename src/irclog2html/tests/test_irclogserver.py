@@ -25,6 +25,7 @@ def gzip_copy(src, dst):
 
 def set_up_sample():
     tmpdir = tempfile.mkdtemp(prefix='irclog2html-test-')
+    os.mkdir(os.path.join(tmpdir, '.hidden'))
     gzip_copy(os.path.join(here, 'sample.log'),
               os.path.join(tmpdir, 'sample-2013-03-17.log.gz'))
     shutil.copy(os.path.join(here, 'sample.log'),
@@ -322,6 +323,7 @@ class TestApplication(unittest.TestCase):
         self.assertEqual(response.content_type, 'text/html; charset=UTF-8')
         self.assertIn(b'IRC logs', response.body)
         self.assertIn(b'<a href="%23chan/">#chan</a>', response.body)
+        self.assertNotIn(b'.hidden', response.body)
 
     def test_chan_error(self):
         response = self.request(
