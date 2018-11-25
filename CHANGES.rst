@@ -4,8 +4,7 @@ Changelog
 2.17.2 (unreleased)
 -------------------
 
-- Make irclogserver determine active channels from dates in log filenames
-  rather than directory mtimes.
+- Nothing changed yet.
 
 
 2.17.1 (2018-11-25)

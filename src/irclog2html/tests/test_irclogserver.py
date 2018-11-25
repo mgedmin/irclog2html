@@ -11,7 +11,6 @@ from contextlib import closing
 
 import mock
 
-from irclog2html.irclogsearch import DEFAULT_LOGFILE_PATTERN
 from irclog2html.irclogserver import dir_listing, parse_path, application
 
 
@@ -27,9 +26,6 @@ def gzip_copy(src, dst):
 def set_up_sample():
     tmpdir = tempfile.mkdtemp(prefix='irclog2html-test-')
     os.mkdir(os.path.join(tmpdir, '.hidden'))
-    os.mkdir(os.path.join(tmpdir, 'unrelated'))
-    with open(os.path.join(tmpdir, 'unrelated', 'nodate.txt'), 'w'):
-        pass
     gzip_copy(os.path.join(here, 'sample.log'),
               os.path.join(tmpdir, 'sample-2013-03-17.log.gz'))
     shutil.copy(os.path.join(here, 'sample.log'),
@@ -111,13 +107,6 @@ class TestDirListing(unittest.TestCase):
         m.name = name
         return m
 
-    def test_dir_listing_with_bad_glob(self):
-        self.tmpdir = set_up_sample()
-        self.addCleanup(clean_up_sample, self.tmpdir)
-        stream = io.StringIO()
-        dir_listing(stream, self.tmpdir, '*')
-        # basically we want there to be no exceptions
-
     @mock.patch('irclog2html.irclogserver.find_channels')
     def test_dir_listing_old_an_new(self, mock_find_channels):
         mock_find_channels.return_value = [
@@ -126,7 +115,7 @@ class TestDirListing(unittest.TestCase):
             self.make_channel(name='#puppies', age=datetime.timedelta(days=6.5)),
         ]
         stream = io.StringIO()
-        dir_listing(stream, '/all/my/logs', DEFAULT_LOGFILE_PATTERN)
+        dir_listing(stream, '/all/my/logs')
         response = stream.getvalue()
         self.assertIn('<h2>Active channels</h2>', response)
         self.assertIn('#rainbows', response)
@@ -147,7 +136,7 @@ class TestDirListing(unittest.TestCase):
             self.make_channel(name='#cobwebs', age=datetime.timedelta(days=7.5)),
         ]
         stream = io.StringIO()
-        dir_listing(stream, '/all/my/logs', DEFAULT_LOGFILE_PATTERN)
+        dir_listing(stream, '/all/my/logs')
         response = stream.getvalue()
         self.assertNotIn('<h2>Active channels</h2>', response)
         self.assertNotIn('<h2>Old channels</h2>', response)
@@ -160,7 +149,7 @@ class TestDirListing(unittest.TestCase):
             self.make_channel(name='#puppies', age=datetime.timedelta(days=6.5)),
         ]
         stream = io.StringIO()
-        dir_listing(stream, '/all/my/logs', DEFAULT_LOGFILE_PATTERN)
+        dir_listing(stream, '/all/my/logs')
         response = stream.getvalue()
         self.assertNotIn('<h2>Active channels</h2>', response)
         self.assertNotIn('<h2>Old channels</h2>', response)
@@ -171,7 +160,7 @@ class TestDirListing(unittest.TestCase):
     def test_dir_listing_empty(self, mock_find_channels):
         mock_find_channels.return_value = []
         stream = io.StringIO()
-        dir_listing(stream, '/all/my/logs', DEFAULT_LOGFILE_PATTERN)
+        dir_listing(stream, '/all/my/logs')
         response = stream.getvalue()
         self.assertNotIn('<h2>Active channels</h2>', response)
         self.assertNotIn('<h2>Old channels</h2>', response)

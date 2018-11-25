@@ -45,13 +45,6 @@ coverage:
 	coverage combine
 	coverage report -m --fail-under=100
 
-.PHONY: diff-cover
-diff-cover: coverage
-	tox -e coverage,coverage3 -- -p
-	coverage combine
-	coverage xml
-	diff-cover coverage.xml
-
 .PHONY: clean
 clean:
 	rm -f testcases/*.html testcases/*.css
