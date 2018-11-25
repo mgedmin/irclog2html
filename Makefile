@@ -24,12 +24,16 @@ all: $(scripts)
 
 
 .PHONY: check test
-check test: bin/test
+check test: bin/test flake8
 ifdef is_tty
 	bin/test $(TESTFLAGS) -c | $(PAGER)
 else
 	bin/test $(TESTFLAGS)
 endif
+
+.PHONY: flake8 lint
+flake8 lint:
+	flake8 src setup.py
 
 .PHONY: test-all-pythons
 test-all-pythons:

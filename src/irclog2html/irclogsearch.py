@@ -53,7 +53,7 @@ except NameError:
 DEFAULT_LOGFILE_PATH = os.path.dirname(__file__)
 DEFAULT_LOGFILE_PATTERN = "*.log"
 
-DATE_REGEXP = re.compile('^.*(\d\d\d\d)-(\d\d)-(\d\d)')
+DATE_REGEXP = re.compile(r'^.*(\d\d\d\d)-(\d\d)-(\d\d)')
 
 
 HEADER = """\

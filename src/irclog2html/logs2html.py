@@ -44,7 +44,7 @@ from .irclog2html import VERSION, RELEASE, HOMEPAGE, escape
 CSS_FILE = os.path.join(os.path.dirname(__file__), 'irclog.css')
 
 
-DATE_REGEXP = re.compile('^.*(\d\d\d\d)-?(\d\d)-?(\d\d)')
+DATE_REGEXP = re.compile(r'^.*(\d\d\d\d)-?(\d\d)-?(\d\d)')
 
 
 class Error(Exception):
@@ -120,10 +120,10 @@ def find_log_files(directory, pattern='*.log'):
     """
     pattern = os.path.join(directory, pattern)
     # ISO 8601 dates sort the way we need them
-    return sorted([LogFile(filename)
-                   for filename in glob.glob(pattern)
-                                   + glob.glob(pattern + '.gz')],
-                  key=attrgetter('filename'))
+    return sorted([
+        LogFile(filename)
+        for filename in glob.glob(pattern) + glob.glob(pattern + '.gz')
+    ], key=attrgetter('filename'))
 
 
 def write_index(outfile, title, logfiles, searchbox=False, latest_log_link=None):
@@ -255,7 +255,7 @@ def process(dir, options):
         else:
             prev = None
         if (options.force or not logfile.uptodate()
-            or prev and prev.newfile() or next and next.newfile()):
+                or prev and prev.newfile() or next and next.newfile()):
             logfile.generate(options.style, options.prefix, prev, next,
                              extra_args)
     latest_log_link = None

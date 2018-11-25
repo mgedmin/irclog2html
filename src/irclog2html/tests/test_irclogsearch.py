@@ -310,7 +310,7 @@ def doctest_main_prints_form():
 
 
 def doctest_main_searches():
-    """Test for main
+    r"""Test for main
 
         >>> tmpdir = set_up_sample()
         >>> prepare_stdout()

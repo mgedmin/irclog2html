@@ -20,7 +20,9 @@ import re
 import locale
 from warnings import warn
 
+
 STAMP_RX = re.compile(r'^[*][*][*][*] ((BEGIN|ENDING) LOGGING AT|(LOGINIMAS|ŽURNALAS) (PRADĖTAS|BAIGTAS)) ')
+
 
 def readxchatlogs(infile):
     date = None
@@ -46,7 +48,7 @@ def readxchatlogs(infile):
                 locale.setlocale(locale.LC_TIME, "")
                 try:
                     t = time.strptime(stamp, '%a %b %d %H:%M:%S %Y')
-                except:
+                except ValueError:
                     warn("Skipping %s" % line.strip())
                     locale.setlocale(locale.LC_TIME, "C")
                     continue
@@ -64,6 +66,7 @@ def readxchatlogs(infile):
         assert date
         yield date, line
 
+
 def main(argv=sys.argv):
     if len(argv) < 2:
         sys.exit(__doc__)
@@ -75,14 +78,17 @@ def main(argv=sys.argv):
     outfile = None
     for date, line in readxchatlogs(file(filename)):
         if curdate != date:
-            if outfile: outfile.close()
+            if outfile:
+                outfile.close()
             curdate = date
             outfilename = prefix + "." + date + ".log"
             if os.path.exists(outfilename):
                 sys.exit("refusing to overwrite %s" % outfilename)
             outfile = open(outfilename, "a")
         print(line, end=' ', file=outfile)
-    if outfile: outfile.close()
+    if outfile:
+        outfile.close()
+
 
 if __name__ == '__main__':
     main()
