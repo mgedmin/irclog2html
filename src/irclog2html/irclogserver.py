@@ -32,7 +32,6 @@ import cgi
 import datetime
 import io
 import os
-import time
 from operator import attrgetter
 from wsgiref.simple_server import make_server
 
@@ -76,27 +75,36 @@ FOOTER = u'''
 class Channel(object):
     """IRC channel."""
 
-    def __init__(self, name, path):
+    def __init__(self, name, path, logfile_pattern):
         self.name = name
         self.mtime = os.stat(os.path.join(path, name)).st_mtime
+        self.date = datetime.datetime.fromtimestamp(self.mtime)
+        try:
+            self.logfiles = find_log_files(path, logfile_pattern)
+        except Error:
+            # directory might contain files without a YYYY-MM-DD date
+            self.logfiles = []
+        if self.logfiles and self.logfiles[-1].date < self.date.date():
+            self.date = datetime.datetime.combine(
+                self.logfiles[-1].date, datetime.time())
 
     @property
     def age(self):
-        return datetime.timedelta(seconds=time.time() - self.mtime)
+        return datetime.datetime.now() - self.date
 
 
-def find_channels(path):
+def find_channels(path, logfile_pattern):
     return sorted([
-        Channel(name, path) for name in os.listdir(path)
+        Channel(name, path, logfile_pattern) for name in os.listdir(path)
         if not name.startswith('.') and os.path.isdir(os.path.join(path, name))
     ], key=attrgetter('name'))
 
 
-def dir_listing(stream, path):
+def dir_listing(stream, path, logfile_pattern):
     """Primitive listing of subdirectories."""
     print(HEADER, file=stream)
     print(u"<h1>IRC logs</h1>", file=stream)
-    channels = find_channels(path)
+    channels = find_channels(path, logfile_pattern=logfile_pattern)
     old, new = [], []
     for channel in channels:
         if channel.age > datetime.timedelta(days=7):
@@ -210,7 +218,7 @@ def application(environ, start_response):
         result = [b"Not found"]
         content_type = "text/plain"
     elif path == "index.html" and chan_path and channel is None:
-        dir_listing(stream, chan_path)
+        dir_listing(stream, chan_path, logfile_pattern)
         result = [stream.buffer.getvalue()]
     elif path == 'search':
         search_page(stream, form, logfile_path, logfile_pattern)
