@@ -43,7 +43,7 @@ except ImportError:
 
 from ._version import __version__, __date__
 from .irclog2html import (
-    CSS_FILE, LogParser, XHTMLTableStyle, convert_irc_log,
+    CSS_FILE, LogParser, XHTMLTableStyle, convert_irc_log, escape,
 )
 from .logs2html import LogFile, Error, find_log_files, write_index
 from .irclogsearch import (
@@ -113,7 +113,7 @@ def dir_listing(stream, path):
         print(u"<ul>", file=stream)
         for channel in new:
             print(u'<li><a href="%s/">%s</a></li>'
-                  % (quote_plus(channel.name), cgi.escape(channel.name)),
+                  % (quote_plus(channel.name), escape(channel.name)),
                   file=stream)
         print(u"</ul>", file=stream)
 
@@ -123,7 +123,7 @@ def dir_listing(stream, path):
         print(u"<ul>", file=stream)
         for channel in old:
             print(u'<li><a href="%s/">%s</a></li>'
-                  % (quote_plus(channel.name), cgi.escape(channel.name)),
+                  % (quote_plus(channel.name), escape(channel.name)),
                   file=stream)
         print(u"</ul>", file=stream)
 
