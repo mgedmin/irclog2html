@@ -76,16 +76,17 @@ def main(argv=sys.argv):
     prefix = os.path.join(dir, prefix)
     curdate = None
     outfile = None
-    for date, line in readxchatlogs(file(filename)):
-        if curdate != date:
-            if outfile:
-                outfile.close()
-            curdate = date
-            outfilename = prefix + "." + date + ".log"
-            if os.path.exists(outfilename):
-                sys.exit("refusing to overwrite %s" % outfilename)
-            outfile = open(outfilename, "a")
-        print(line, end=' ', file=outfile)
+    with open(filename) as fp:
+        for date, line in readxchatlogs(fp):
+            if curdate != date:
+                if outfile:
+                    outfile.close()
+                curdate = date
+                outfilename = prefix + "." + date + ".log"
+                if os.path.exists(outfilename):
+                    sys.exit("refusing to overwrite %s" % outfilename)
+                outfile = open(outfilename, "a")
+            print(line, end=' ', file=outfile)
     if outfile:
         outfile.close()
 
