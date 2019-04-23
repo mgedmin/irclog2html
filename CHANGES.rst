@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.17.2 (unreleased)
+2.17.2 (2019-04-23)
 -------------------
 
 - Drop support for Python 3.4.
