@@ -4,7 +4,7 @@ Changelog
 2.17.3 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Add support for Python 3.8.
 
 
 2.17.2 (2019-04-23)
