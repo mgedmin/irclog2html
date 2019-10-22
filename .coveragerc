@@ -1,5 +1,13 @@
 [run]
 source = irclog2html
+plugins =
+    coverage_python_version
+
+[paths]
+source =
+    src/
+    .tox/*/lib/python*/site-packages/
+    .tox/pypy*/site-packages/
 
 [report]
 omit = */tests/*,*/xchatlogsplit.py

@@ -41,14 +41,11 @@ test-all-pythons:
 
 .PHONY: coverage
 coverage:
-	tox -e coverage,coverage3 -- -p
-	coverage combine
-	coverage report -m --fail-under=100
+	tox -e coverage2,coverage3
 
 .PHONY: diff-cover
 diff-cover: coverage
-	tox -e coverage,coverage3 -- -p
-	coverage combine
+	tox -e coverage
 	coverage xml
 	diff-cover coverage.xml
 

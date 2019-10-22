@@ -104,7 +104,7 @@ class SearchResult(object):
         self.info = info
 
 
-class StdoutWrapper(object):
+class StdoutWrapper(object):  # pragma: PY2
     # Because I can't wrap sys.stdout with io.TextIOWrapper on Python 2
 
     def __init__(self, stream):
@@ -258,10 +258,10 @@ def print_search_results(query, where=DEFAULT_LOGFILE_PATH,
 
 
 def unicode_stdout():
-    if hasattr(sys.stdout, 'buffer'):
-        stream = sys.stdout.buffer # Python 3
-    else:
-        stream = StdoutWrapper(sys.stdout) # Python 2
+    if hasattr(sys.stdout, 'buffer'):  # pragma: PY3
+        stream = sys.stdout.buffer
+    else:  # pragma: PY2
+        stream = StdoutWrapper(sys.stdout)
     return io.TextIOWrapper(stream, 'ascii',
                             errors='xmlcharrefreplace',
                             line_buffering=True)
@@ -272,7 +272,7 @@ def search_page(stream, form, where, logfile_pattern):
         print_search_form(stream)
     else:
         search_text = form["q"].value
-        if isinstance(search_text, bytes):
+        if isinstance(search_text, bytes):  # pragma: PY2
             search_text = search_text.decode('UTF-8')
         print_search_results(search_text, stream=stream, where=where,
                              logfile_pattern=logfile_pattern)
