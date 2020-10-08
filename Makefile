@@ -10,11 +10,6 @@ scripts = bin/test bin/irclog2html bin/logs2html bin/irclogsearch bin/irclogserv
 SHELL = /bin/bash -o pipefail
 
 
-ifneq "$(TERM)" "dumb"
-is_tty = $(shell test -t 2 && echo 1)
-endif
-
-
 .PHONY: default
 default: all
 
@@ -24,16 +19,12 @@ all: $(scripts)
 
 
 .PHONY: check test
-check test: bin/test flake8
-ifdef is_tty
-	bin/test $(TESTFLAGS) -c | $(PAGER)
-else
-	bin/test $(TESTFLAGS)
-endif
+check test:
+	tox -p auto
 
 .PHONY: flake8 lint
 flake8 lint:
-	flake8 src setup.py
+	tox -e flake8
 
 .PHONY: test-all-pythons
 test-all-pythons:
