@@ -70,7 +70,7 @@ FOOTER = u'''
  - find it at <a href="https://mg.pov.lt/irclog2html/">mg.pov.lt</a>!</p>
 </div>
 </body>
-</html>'''.format(version=__version__, date=__date__)
+</html>'''.format(version=__version__)
 
 
 class Channel(object):

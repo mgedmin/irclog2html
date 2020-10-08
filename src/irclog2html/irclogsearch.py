@@ -76,7 +76,7 @@ FOOTER = """
  - find it at <a href="%(HOMEPAGE)s">%(HOMEPAGE)s</a>!</p>
 </div>
 </body>
-</html>""" % {'VERSION': VERSION, 'RELEASE': RELEASE,
+</html>""" % {'VERSION': VERSION,
               'HOMEPAGE': escape(HOMEPAGE)}
 
 
