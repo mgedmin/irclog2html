@@ -1,53 +1,40 @@
-PYTHON = python
-PAGER = less -RFX
-TESTFLAGS = -v
-
-FILE_WITH_VERSION = src/irclog2html/_version.py
-FILE_WITH_CHANGELOG = CHANGES.rst
+PYTHON = python3
 
 scripts = bin/test bin/irclog2html bin/logs2html bin/irclogsearch bin/irclogserver
 
-SHELL = /bin/bash -o pipefail
-
-
-.PHONY: default
-default: all
-
 
 .PHONY: all
-all: $(scripts)
+all: $(scripts)         ##: build a local buildout with all the scripts
 
 
-.PHONY: check test
-check test:
+.PHONY: test
+test:                   ##: run tests
 	tox -p auto
 
-.PHONY: flake8 lint
-flake8 lint:
+.PHONY: flake8
+flake8:                 ##: check for style problems
 	tox -e flake8
 
-.PHONY: test-all-pythons
-test-all-pythons:
-	tox
-
 .PHONY: coverage
-coverage:
+coverage:               ##: measure test coverage
 	tox -e coverage2,coverage3
 
 .PHONY: diff-cover
-diff-cover: coverage
+diff-cover:             ##: find untested code on this branch
 	tox -e coverage
 	coverage xml
 	diff-cover coverage.xml
 
 .PHONY: clean
-clean:
+clean:                  ##: clean up build artifacts
 	rm -f testcases/*.html testcases/*.css
 
 
 .PHONY: releasechecklist
 releasechecklist: check-date  # also release.mk will add other checks
 
+
+FILE_WITH_VERSION = src/irclog2html/_version.py
 include release.mk
 
 .PHONY: check-date
@@ -67,7 +54,6 @@ bin/buildout: python bootstrap.py
 	python/bin/pip install -U setuptools
 	python/bin/python bootstrap.py
 	touch -c $@
-
 
 $(scripts): bin/buildout buildout.cfg setup.py python/bin/virtualenv
 	bin/buildout
