@@ -1,19 +1,29 @@
 language: python
 dist: focal
+cache: pip
 python:
-    - 2.7
-    - 3.6
-    - 3.7
-    - 3.8
-    - pypy2
-    - pypy3
+  - 2.7
+  - 3.6
+  - 3.7
+  - 3.8
+  - 3.9
+  - pypy2
+  - pypy3
 install:
-    - pip install zope.testrunner coverage coverage-python-version coveralls zope.testing mock
-    - pip install -e .
+  - pip install zope.testrunner coverage coverage-python-version coveralls zope.testing mock
+  - pip install -e .
 script:
-    - coverage run --source=irclog2html -m zope.testrunner --test-path=src
+  - coverage run --source=irclog2html -m zope.testrunner --test-path=src
 after_script:
-    - coveralls
-    - coverage report -m
+  - coveralls
+  - coverage report -m
+
 notifications:
-    email: false
+  irc:
+    channels:
+      - "chat.freenode.net##mgedmin"
+    on_success: change
+    on_failure: always
+    template:
+      # ping my nick so I get a pushbullet notification on my phone
+      - "mgedmin: %{repository_name} (%{branch}) build %{result}: %{build_url}"

@@ -140,8 +140,8 @@ Licence: GPL v2 or later (https://www.gnu.org/copyleft/gpl.html)
 
 |buildstatus|_ |appveyor|_ |coverage|_
 
-.. |buildstatus| image:: https://api.travis-ci.org/mgedmin/irclog2html.svg?branch=master
-.. _buildstatus: https://travis-ci.org/mgedmin/irclog2html
+.. |buildstatus| image:: https://api.travis-ci.com/mgedmin/irclog2html.svg?branch=master
+.. _buildstatus: https://travis-ci.com/mgedmin/irclog2html
 
 .. |appveyor| image:: https://ci.appveyor.com/api/projects/status/github/mgedmin/irclog2html?branch=master&svg=true
 .. _appveyor: https://ci.appveyor.com/project/mgedmin/irclog2html
