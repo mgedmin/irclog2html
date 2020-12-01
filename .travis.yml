@@ -10,10 +10,10 @@ python:
   - pypy2
   - pypy3
 install:
-  - pip install zope.testrunner coverage coverage-python-version coveralls zope.testing mock
-  - pip install -e .
+  - pip install zope.testrunner coverage coverage-python-version coveralls
+  - pip install -e .[test]
 script:
-  - coverage run --source=irclog2html -m zope.testrunner --test-path=src
+  - coverage run -m zope.testrunner --test-path=src
 after_script:
   - coveralls
   - coverage report -m
