@@ -36,19 +36,26 @@ import time
 from operator import attrgetter
 from wsgiref.simple_server import make_server
 
+
 try:
-    from urllib import quote_plus # Py2
+    from urllib import quote_plus  # Py2
 except ImportError:
     from urllib.parse import quote_plus # Py3
 
-from ._version import __version__, __date__
+from ._version import __date__, __version__
 from .irclog2html import (
-    CSS_FILE, LogParser, XHTMLTableStyle, convert_irc_log, escape,
+    CSS_FILE,
+    LogParser,
+    XHTMLTableStyle,
+    convert_irc_log,
+    escape,
 )
-from .logs2html import LogFile, Error, find_log_files, write_index
 from .irclogsearch import (
-    DEFAULT_LOGFILE_PATH, DEFAULT_LOGFILE_PATTERN, search_page,
+    DEFAULT_LOGFILE_PATH,
+    DEFAULT_LOGFILE_PATTERN,
+    search_page,
 )
+from .logs2html import Error, LogFile, find_log_files, write_index
 
 
 HEADER = u'''\

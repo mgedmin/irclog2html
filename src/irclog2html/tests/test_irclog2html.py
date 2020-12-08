@@ -9,10 +9,21 @@ import tempfile
 import unittest
 
 from irclog2html.irclog2html import (
-    LogParser, ColourChooser, NickColourizer, AbstractStyle,
-    SimpleTextStyle, TextStyle, SimpleTableStyle, TableStyle,
-    XHTMLStyle, XHTMLTableStyle, MediaWikiStyle,
-    COLOURS, parse_args, main)
+    COLOURS,
+    AbstractStyle,
+    ColourChooser,
+    LogParser,
+    MediaWikiStyle,
+    NickColourizer,
+    SimpleTableStyle,
+    SimpleTextStyle,
+    TableStyle,
+    TextStyle,
+    XHTMLStyle,
+    XHTMLTableStyle,
+    main,
+    parse_args,
+)
 
 
 try:

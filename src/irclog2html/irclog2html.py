@@ -47,6 +47,7 @@ was written by Jeff Waugh and is available at www.perkypants.org
 
 from __future__ import print_function, unicode_literals
 
+import datetime
 import gzip
 import io
 import itertools
@@ -56,15 +57,17 @@ import re
 import shlex
 import shutil
 import sys
-import datetime
+
 
 try:
     from urllib import quote
 except ImportError:
     from urllib.parse import quote
 
-from ._version import (
-    __version__ as VERSION, __date__ as RELEASE, __homepage__ as HOMEPAGE)
+from ._version import __date__ as RELEASE
+from ._version import __homepage__ as HOMEPAGE
+from ._version import __version__ as VERSION
+
 
 try:
     unicode

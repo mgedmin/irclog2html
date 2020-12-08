@@ -13,6 +13,13 @@ YYYYMMDD) in the filename.
 
 from __future__ import print_function, unicode_literals
 
+import datetime
+import glob
+import optparse
+import os
+import re
+import shutil
+import sys
 from operator import attrgetter
 
 
@@ -22,13 +29,6 @@ from operator import attrgetter
 # Released under the terms of the GNU GPL v2 or later
 # https://www.gnu.org/copyleft/gpl.html
 
-import os
-import re
-import sys
-import glob
-import datetime
-import optparse
-import shutil
 
 try:
     from urllib import quote
@@ -36,7 +36,7 @@ except ImportError:
     from urllib.parse import quote
 
 from . import irclog2html
-from .irclog2html import VERSION, RELEASE, HOMEPAGE, escape
+from .irclog2html import HOMEPAGE, RELEASE, VERSION, escape
 
 
 # If someone packages this for a Linux distro, they'll want to patch this to

@@ -14,8 +14,15 @@ import mock
 from zope.testing import renormalizing
 
 from irclog2html.irclogsearch import (
-    SearchResult, SearchResultFormatter, LogParser, search_irc_logs,
-    print_search_form, print_search_results, search_page, main)
+    LogParser,
+    SearchResult,
+    SearchResultFormatter,
+    main,
+    print_search_form,
+    print_search_results,
+    search_irc_logs,
+    search_page,
+)
 
 
 try:

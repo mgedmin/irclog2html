@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 import datetime
+import doctest
 import gzip
 import io
 import os
 import shutil
 import tempfile
-import doctest
 import unittest
 from contextlib import closing
 
 import mock
 
-from irclog2html.irclogserver import dir_listing, parse_path, application
+from irclog2html.irclogserver import application, dir_listing, parse_path
 
 
 here = os.path.dirname(__file__)

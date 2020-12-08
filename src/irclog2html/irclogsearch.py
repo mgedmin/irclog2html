@@ -33,13 +33,22 @@ import sys
 import time
 from contextlib import closing
 
+
 try:
     from urllib import quote
 except ImportError:
     from urllib.parse import quote
 
-from .irclog2html import (LogParser, XHTMLTableStyle, NickColourizer,
-                          escape, open_log_file, VERSION, RELEASE, HOMEPAGE)
+from .irclog2html import (
+    HOMEPAGE,
+    RELEASE,
+    VERSION,
+    LogParser,
+    NickColourizer,
+    XHTMLTableStyle,
+    escape,
+    open_log_file,
+)
 from .logs2html import find_log_files
 
 

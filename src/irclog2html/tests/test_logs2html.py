@@ -1,16 +1,22 @@
 import datetime
 import doctest
+import optparse
 import os
-import time
 import shutil
 import sys
 import tempfile
+import time
 import unittest
-import optparse
 
 from irclog2html.logs2html import (
-    Error, LogFile, find_log_files, write_index, process, move_symlink,
-    main)
+    Error,
+    LogFile,
+    find_log_files,
+    main,
+    move_symlink,
+    process,
+    write_index,
+)
 
 
 class TestCase(unittest.TestCase):

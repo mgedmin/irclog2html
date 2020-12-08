@@ -13,11 +13,11 @@ restore some actual IRC chat log history from my xchat logs.
 
 from __future__ import print_function
 
-import sys
-import time
+import locale
 import os
 import re
-import locale
+import sys
+import time
 from warnings import warn
 
 
