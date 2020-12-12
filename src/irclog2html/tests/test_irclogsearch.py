@@ -276,7 +276,7 @@ def doctest_search_page():
 
     Clean up:
 
-        >>> patcher.stop()
+        >>> _ = patcher.stop()
 
     """
 
