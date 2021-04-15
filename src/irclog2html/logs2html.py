@@ -26,7 +26,7 @@ from operator import attrgetter
 # Copyright (c) 2005--2013  Marius Gedminas
 # latest.log.html symlink suggested by Chris Foster
 #
-# Released under the terms of the GNU GPL v2 or later
+# Released under the terms of the GNU GPL v2 or v3
 # https://www.gnu.org/copyleft/gpl.html
 
 

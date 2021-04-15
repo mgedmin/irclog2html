@@ -26,7 +26,7 @@ setup(
     version=version,
     author='Marius Gedminas',
     author_email='marius@gedmin.as',
-    license='GPL v2 or later',
+    license='GPL v2 or v3',
     platforms=['any'],
     url=homepage,
     description='Convert IRC logs to HTML',
@@ -34,7 +34,8 @@ setup(
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: System Administrators',
-        'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
+        'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.6',

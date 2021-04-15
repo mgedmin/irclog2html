@@ -19,7 +19,7 @@ Apache configuration example:
 
 # Copyright (c) 2006-2013, Marius Gedminas and contributors
 #
-# Released under the terms of the GNU GPL v2 or later
+# Released under the terms of the GNU GPL v2 or v3
 # https://www.gnu.org/copyleft/gpl.html
 
 from __future__ import print_function, unicode_literals
