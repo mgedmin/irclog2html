@@ -37,6 +37,14 @@ releasechecklist: check-date  # also release.mk will add other checks
 FILE_WITH_VERSION = src/irclog2html/_version.py
 include release.mk
 
+# override the release recipe in release.mk
+define release_recipe =
+$(default_release_recipe_publish_and_tag)
+$(default_release_recipe_increment_and_push)
+	@echo "Then please go to https://github.com/mgedmin/irclog2html/tags"
+	@echo "and convert the $(changelog_ver) tag into a release."
+endef
+
 .PHONY: check-date
 check-date:
 	@date_line="__date__ = '`date +%Y-%m-%d`'" && \
