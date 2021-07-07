@@ -198,7 +198,10 @@ class TestLogFile(TestCase):
         os.chmod(self.filename('index.html'), 0o644)
 
     def test_process_with_output_dir(self):
-        self.create('somechannel-20130316.log')
+        self.create('somechannel-20130316.log', mtime=-200)
+        self.create('somechannel-20130316.log.html', mtime=-250)  # outdated
+        self.create('somechannel-20130317.log', mtime=-100)
+        self.create('somechannel-20130317.log.html', mtime=-50)   # up to date
         options = optparse.Values(dict(searchbox=True, dircproxy=True,
                                        pattern='*.log', force=False,
                                        prefix='IRC logs for ',
@@ -209,6 +212,8 @@ class TestLogFile(TestCase):
         self.assertTrue(os.path.exists(self.filename('new/out/dir/irclog.css')))
         self.assertTrue(os.path.exists(
             self.filename('new/out/dir/somechannel-20130316.log.html')))
+        self.assertTrue(os.path.exists(
+            self.filename('new/out/dir/somechannel-20130317.log.html')))
         if hasattr(os, 'symlink'):
             self.assertTrue(os.path.exists(
                 self.filename('new/out/dir/latest.log.html')))

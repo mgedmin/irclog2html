@@ -54,7 +54,7 @@ class Error(Exception):
 class LogFile:
     """IRC log file."""
 
-    def __init__(self, filename):
+    def __init__(self, filename, output_dir=None):
         self.filename = filename
         basename = os.path.basename(filename)
         m = DATE_REGEXP.match(basename)
@@ -64,6 +64,10 @@ class LogFile:
         self.date = datetime.date(*map(int, m.groups()))
         self.link = irclog2html.pick_output_filename(basename)
         self.title = self.date.strftime('%Y-%m-%d (%A)')
+        if output_dir:
+            self.html_filename = os.path.join(output_dir, basename + '.html')
+        else:
+            self.html_filename = self.filename + '.html'
 
     def __eq__(self, other):
         return isinstance(other, LogFile) and other.filename == self.filename
@@ -81,14 +85,14 @@ class LogFile:
         if not hasattr(self, '_newfile'):
             # Only do this once, so that self.generate() does not change
             # newness
-            self._newfile = not os.path.exists(self.filename + ".html")
+            self._newfile = not os.path.exists(self.html_filename)
         return self._newfile
 
     def uptodate(self):
         """Check whether the HTML version of the log is up to date."""
         log_mtime = os.stat(self.filename).st_mtime
         try:
-            html_mtime = os.stat(self.filename + ".html").st_mtime
+            html_mtime = os.stat(self.html_filename).st_mtime
         except OSError:
             return False
         return html_mtime > log_mtime
@@ -113,7 +117,7 @@ class LogFile:
         irclog2html.main(argv)
 
 
-def find_log_files(directory, pattern='*.log'):
+def find_log_files(directory, pattern='*.log', output_dir=None):
     """Find all IRC log files in a given directory.
 
     Returns a sorted list of LogFile objects (oldest first).
@@ -121,7 +125,7 @@ def find_log_files(directory, pattern='*.log'):
     pattern = os.path.join(directory, pattern)
     # ISO 8601 dates sort the way we need them
     return sorted([
-        LogFile(filename)
+        LogFile(filename, output_dir=output_dir)
         for filename in glob.glob(pattern) + glob.glob(pattern + '.gz')
     ], key=attrgetter('filename'))
 
@@ -243,7 +247,7 @@ def process(dir, options):
                 os.makedirs(out_dir)
             except OSError as e:
                 raise Error("Failed to create directory %s: %s" % (out_dir, e))
-    logfiles = find_log_files(dir, options.pattern)
+    logfiles = find_log_files(dir, options.pattern, options.output_dir)
     logfiles.reverse() # newest first
     for n, logfile in enumerate(logfiles):
         if n > 0:

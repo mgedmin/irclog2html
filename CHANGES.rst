@@ -8,6 +8,10 @@ Changelog
 
 - Drop support for Python 3.5.
 
+- Fix a bug where specifying --output-dir (-o) to logs2html would mistakenly
+  skip generating some HTML files if they existed in the source directory
+  (`issue 29 <https://github.com/mgedmin/irclog2html/issues/29>`_).
+
 
 2.17.2 (2019-04-23)
 -------------------
@@ -47,7 +51,8 @@ Changelog
   in some cases.
 
 - Add --output-dir (-o) parameter to logs2html so you can place the generated
-  HTML files in a directory different from the input directory.
+  HTML files in a directory different from the input directory (`PR #20
+  <https://github.com/mgedmin/irclog2html/issues/#20>`_).
 
 
 2.15.3 (2016-12-08)
