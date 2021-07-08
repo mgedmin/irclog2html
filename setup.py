@@ -31,6 +31,7 @@ setup(
     url=homepage,
     description='Convert IRC logs to HTML',
     long_description=long_description,
+    long_description_content_type='text/x-rst',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: System Administrators',
