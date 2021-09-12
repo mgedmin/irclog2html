@@ -53,6 +53,7 @@ import io
 import itertools
 import optparse
 import os
+import os.path
 import re
 import shlex
 import shutil
@@ -373,7 +374,7 @@ class AbstractStyle(object):
     description = "Single-line description"
     charset = 'US-ASCII'
 
-    def __init__(self, outfile, colours=None):
+    def __init__(self, outfile, *, outfilename='', colours=None):
         """Create a text formatter for writing to outfile.
 
         The ``colours`` dictionary may have the following items:
@@ -388,6 +389,7 @@ class AbstractStyle(object):
         self.outfile = io.TextIOWrapper(outfile, encoding=self.charset,
                                         errors='xmlcharrefreplace',
                                         line_buffering=True)
+        self.outfilename = os.path.basename(outfilename)
         self.colours = colours or {}
         self._anchors = set()
 
@@ -642,8 +644,9 @@ class XHTMLStyle(AbstractStyle):
         if time:
             print(
                 '<p id="{anchor}" class="{css_class}">'
-                '<a href="#{anchor}" class="time">{time}</a>'
+                '<a href="{outfilename}#{anchor}" class="time">{time}</a>'
                 ' {text}</p>'.format(
+                    outfilename=self.outfilename,
                     anchor=self.timestamp_anchor(time),
                     css_class=self.CLASSMAP[what],
                     time=shorttime(time),
@@ -669,11 +672,12 @@ class XHTMLStyle(AbstractStyle):
         if time:
             print(
                 '<p id="{anchor}" class="comment">'
-                '<a href="#{anchor}" class="time">{time}</a> '
+                '<a href="{outfilename}#{anchor}" class="time">{time}</a> '
                 '<span class="nick" style="color: {color}">'
                 '&lt;{nick}&gt;</span>'
                 ' <span class="text">{text}</span></p>'.format(
                     anchor=self.timestamp_anchor(time),
+                    outfilename=self.outfilename,
                     time=shorttime(time),
                     color=htmlcolour,
                     nick=nick,
@@ -712,7 +716,7 @@ class XHTMLTableStyle(XHTMLStyle):
                     anchor=self.timestamp_anchor(time),
                     css_class=self.CLASSMAP[what],
                     text=text,
-                    link=link,
+                    link=link or self.outfilename,
                     time=shorttime(time)),
                 file=self.outfile)
         else:
@@ -729,6 +733,7 @@ class XHTMLTableStyle(XHTMLStyle):
         text = escape(text)
         text = createlinks(text)
         text = text.replace('  ', '&nbsp;&nbsp;')
+        link = link or self.outfilename
         if time:
             print(
                 '<tr id="{anchor}">'
@@ -952,7 +957,7 @@ def main(argv=sys.argv):
                      % (parser.prog, outfilename, e))
         try:
             parser = LogParser(infile, dircproxy=options.dircproxy)
-            formatter = style(outfile, colours)
+            formatter = style(outfile, outfilename=outfilename, colours=colours)
             convert_irc_log(parser, formatter, title or filename,
                             prev, index, next, searchbox=options.searchbox)
             css_file = os.path.join(os.path.dirname(outfilename), 'irclog.css')
