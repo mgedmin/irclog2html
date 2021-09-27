@@ -1,10 +1,10 @@
 Changelog
 =========
 
-2.17.4 (unreleased)
--------------------
+3.0.0 (unreleased)
+------------------
 
-- Nothing changed yet.
+- Drop support for Python 2.
 
 
 2.17.3 (2021-07-08)
