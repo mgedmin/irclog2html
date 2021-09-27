@@ -6,6 +6,9 @@ Changelog
 
 - Drop support for Python 2.
 
+- Make permalinks permanent even from the latest.html file, by emitting the
+  filename in the links.
+
 
 2.17.3 (2021-07-08)
 -------------------
