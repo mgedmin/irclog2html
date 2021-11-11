@@ -6,6 +6,8 @@ Changelog
 
 - Drop support for Python 2.
 
+- Add support for Python 3.10.
+
 - Make permalinks permanent even from the latest.html file, by emitting the
   filename in the links.
 
