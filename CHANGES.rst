@@ -4,7 +4,7 @@ Changelog
 3.0.0 (unreleased)
 ------------------
 
-- Drop support for Python 2.
+- Drop support for Python 2.7 and 3.6.
 
 - Add support for Python 3.10.
 
