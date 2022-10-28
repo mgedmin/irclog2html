@@ -1,7 +1,5 @@
 [run]
 source = irclog2html
-plugins =
-    coverage_python_version
 
 [paths]
 source =

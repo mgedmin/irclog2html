@@ -17,7 +17,7 @@ flake8:                 ##: check for style problems
 
 .PHONY: coverage
 coverage:               ##: measure test coverage
-	tox -e coverage2,coverage3
+	tox -e coverage
 
 .PHONY: diff-cover
 diff-cover:             ##: find untested code on this branch
