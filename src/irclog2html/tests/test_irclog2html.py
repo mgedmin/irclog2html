@@ -327,6 +327,7 @@ def doctest_SimpleTextStyle():
             <meta name="generator" content="irclog2html.py ... by Marius Gedminas">
             <meta name="version" content="...">
             <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
         </head>
         <body text="#000000" bgcolor="#ffffff"><tt>
 
@@ -364,6 +365,7 @@ def doctest_SimpleTextStyle_colourful():
             <meta name="generator" content="irclog2html.py ... by Marius Gedminas">
             <meta name="version" content="...">
             <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
         </head>
         <body text="#000000" bgcolor="#ffffff"><tt>
 
@@ -401,6 +403,7 @@ def doctest_TextStyle_colourful():
             <meta name="generator" content="irclog2html.py ... by Marius Gedminas">
             <meta name="version" content="...">
             <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
         </head>
         <body text="#000000" bgcolor="#ffffff"><tt>
 
@@ -437,6 +440,7 @@ def doctest_SimpleTableStyle():
             <meta name="generator" content="irclog2html.py ... by Marius Gedminas">
             <meta name="version" content="...">
             <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
         </head>
         <body text="#000000" bgcolor="#ffffff"><tt>
         <table cellspacing=3 cellpadding=2 border=0>
@@ -475,6 +479,7 @@ def doctest_TableStyle():
             <meta name="generator" content="irclog2html.py ... by Marius Gedminas">
             <meta name="version" content="...">
             <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
         </head>
         <body text="#000000" bgcolor="#ffffff"><tt>
         <table cellspacing=3 cellpadding=2 border=0>
@@ -511,6 +516,7 @@ def doctest_XHTMLStyle():
         <html>
         <head>
           <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1">
           <title>IRC logs of #channel for Monday, 2008-06-10</title>
           <link rel="stylesheet" href="irclog.css" />
           <meta name="generator" content="irclog2html.py ... by Marius Gedminas" />
@@ -568,6 +574,7 @@ def doctest_XHTMLStyle_with_navigation_and_searchbox():
         <html>
         <head>
           <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1">
           <title>IRC logs of #channel for Monday, 2008-06-10</title>
           <link rel="stylesheet" href="irclog.css" />
           <meta name="generator" content="irclog2html.py ... by Marius Gedminas" />
@@ -599,6 +606,7 @@ def doctest_XHTMLTableStyle():
         <html>
         <head>
           <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1">
           <title>IRC logs of #channel for Monday, 2008-06-10</title>
           <link rel="stylesheet" href="irclog.css" />
           <meta name="generator" content="irclog2html.py ... by Marius Gedminas" />

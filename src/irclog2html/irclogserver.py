@@ -63,6 +63,7 @@ HEADER = u'''\
 <html>
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{title}</title>
   <link rel="stylesheet" href="irclog.css">
   <meta name="generator" content="irclogserver.py {version} by Marius Gedminas">

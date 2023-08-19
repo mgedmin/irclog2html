@@ -138,6 +138,7 @@ def write_index(outfile, title, logfiles, searchbox=False, latest_log_link=None)
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=%(charset)s" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>%(title)s</title>
   <link rel="stylesheet" href="irclog.css" />
   <meta name="generator" content="logs2html.py %(VERSION)s by Marius Gedminas" />

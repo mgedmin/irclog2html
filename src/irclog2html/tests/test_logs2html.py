@@ -265,6 +265,7 @@ def doctest_write_index():
         <html>
         <head>
           <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1">
           <title>IRC logs for somechannel</title>
           <link rel="stylesheet" href="irclog.css" />
           <meta name="generator" content="logs2html.py ... by Marius Gedminas" />

@@ -71,6 +71,7 @@ HEADER = """\
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=%(charset)s" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>%(title)s</title>
   <link rel="stylesheet" href="irclog.css" />
   <meta name="generator" content="irclogsearch.py %(VERSION)s by Marius Gedminas" />
