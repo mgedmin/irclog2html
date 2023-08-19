@@ -127,11 +127,11 @@ class LogParser(object):
     TIMESTAMP_REGEXP = re.compile(r'^(\d+) +')
     NICK_REGEXP = re.compile(r'^<(.*?)(!.*?)?>\s')
     DIRCPROXY_NICK_REGEXP = re.compile(r'^<(.*?)(!.*)?>\s[\+-]?')
-    JOIN_REGEXP = re.compile(r'^(?:\*\*\*|-->)\s.*joined')
-    PART_REGEXP = re.compile(r'^(?:\*\*\*|<--)\s.*(quit|left)')
-    SERVMSG_REGEXP = re.compile(r'^(?:\*\*\*|---)\s')
+    JOIN_REGEXP = re.compile(r'^(?:\*\*\*|-->|-!-)\s.*joined')
+    PART_REGEXP = re.compile(r'^(?:\*\*\*|<--|-!-)\s.*(quit|left)')
+    SERVMSG_REGEXP = re.compile(r'^(?:\*\*\*|---|-!-)\s')
     NICK_CHANGE_REGEXP = re.compile(
-        r'^(?:\*\*\*|---)\s+(.*?) (?:are|is) now known as (.*)')
+        r'^(?:\*\*\*|---|-!-)\s+(.*?) (?:are|is) now known as (.*)')
 
     def __init__(self, infile, dircproxy=False):
         self.infile = infile

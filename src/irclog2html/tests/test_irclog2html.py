@@ -136,6 +136,8 @@ def doctest_LogParser():
         None JOIN '*** someone joined #channel'
         >>> test('--> someone joined')
         None JOIN '--> someone joined'
+        >>> test('-!- someone has joined #channel')
+        None JOIN '-!- someone has joined #channel'
 
     ...PART...
 
@@ -143,6 +145,8 @@ def doctest_LogParser():
         None PART '*** someone quit'
         >>> test('<-- someone left #channel')
         None PART '<-- someone left #channel'
+        >>> test('-!- someone has quit #channel')
+        None PART '-!- someone has quit #channel'
 
     ...NICKCHANGE...
 
@@ -150,6 +154,8 @@ def doctest_LogParser():
         None NICKCHANGE ('*** X is now known as Y', 'X', 'Y')
         >>> test('--- X are now known as Y')
         None NICKCHANGE ('--- X are now known as Y', 'X', 'Y')
+        >>> test('-!- X is now known as Y')
+        None NICKCHANGE ('-!- X is now known as Y', 'X', 'Y')
 
     ...SERVER...
 
@@ -157,6 +163,8 @@ def doctest_LogParser():
         None SERVER '--- welcome to irc.example.org'
         >>> test('*** welcome to irc.example.org')
         None SERVER '*** welcome to irc.example.org'
+        >>> test('-!- welcome to irc.example.org')
+        None SERVER '-!- welcome to irc.example.org'
 
     All unrecognized lines are reported as OTHER
 
