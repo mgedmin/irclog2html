@@ -11,6 +11,9 @@ Changelog
 - Make permalinks permanent even from the latest.html file, by emitting the
   filename in the links.
 
+- Add <meta name="viewport"> to set initial scale to 1 for improved mobile
+  experience (`PR 32 <https://github.com/mgedmin/irclog2html/pull/32>`_).
+
 
 2.17.3 (2021-07-08)
 -------------------
