@@ -172,6 +172,7 @@ def doctest_print_search_form():
         <html>
         <head>
           <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1">
           <title>Search IRC logs</title>
           <link rel="stylesheet" href="irclog.css" />
           <meta name="generator" content="irclogsearch.py ... by Marius Gedminas" />
@@ -205,6 +206,7 @@ def doctest_print_search_results():
         <html>
         <head>
           <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1">
           <title>Search IRC logs</title>
           <link rel="stylesheet" href="irclog.css" />
           <meta name="generator" content="irclogsearch.py ... by Marius Gedminas" />
@@ -294,6 +296,7 @@ def doctest_main_prints_form():
         <html>
         <head>
           <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1">
           <title>Search IRC logs</title>
           <link rel="stylesheet" href="irclog.css" />
           <meta name="generator" content="irclogsearch.py ... by Marius Gedminas" />
@@ -332,6 +335,7 @@ def doctest_main_searches():
         <html>
         <head>
           <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1">
           <title>Search IRC logs</title>
           <link rel="stylesheet" href="irclog.css" />
           <meta name="generator" content="irclogsearch.py ... by Marius Gedminas" />

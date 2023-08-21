@@ -454,6 +454,7 @@ class SimpleTextStyle(AbstractStyle):
 \t<meta name="generator" content="irclog2html.py %(VERSION)s by Marius Gedminas">
 \t<meta name="version" content="%(VERSION)s - %(RELEASE)s">
 \t<meta http-equiv="Content-Type" content="text/html; charset=%(charset)s">
+\t<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body text="#000000" bgcolor="#ffffff"><tt>""" % {
             'VERSION': VERSION,
@@ -571,6 +572,7 @@ class XHTMLStyle(AbstractStyle):
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=%(charset)s" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>%(title)s</title>
   <link rel="stylesheet" href="irclog.css" />
   <meta name="generator" content="irclog2html.py %(VERSION)s by Marius Gedminas" />
