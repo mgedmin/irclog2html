@@ -516,7 +516,7 @@ def doctest_XHTMLStyle():
         <html>
         <head>
           <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
           <title>IRC logs of #channel for Monday, 2008-06-10</title>
           <link rel="stylesheet" href="irclog.css" />
           <meta name="generator" content="irclog2html.py ... by Marius Gedminas" />
@@ -574,7 +574,7 @@ def doctest_XHTMLStyle_with_navigation_and_searchbox():
         <html>
         <head>
           <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
           <title>IRC logs of #channel for Monday, 2008-06-10</title>
           <link rel="stylesheet" href="irclog.css" />
           <meta name="generator" content="irclog2html.py ... by Marius Gedminas" />
@@ -606,7 +606,7 @@ def doctest_XHTMLTableStyle():
         <html>
         <head>
           <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
           <title>IRC logs of #channel for Monday, 2008-06-10</title>
           <link rel="stylesheet" href="irclog.css" />
           <meta name="generator" content="irclog2html.py ... by Marius Gedminas" />
