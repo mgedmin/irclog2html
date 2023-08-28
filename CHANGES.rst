@@ -14,6 +14,9 @@ Changelog
 - Add <meta name="viewport"> to set initial scale to 1 for improved mobile
   experience (`PR 32 <https://github.com/mgedmin/irclog2html/pull/32>`_).
 
+- Support logs files created by `ii (Irc it) <https://tools.suckless.org/ii/>`_
+  (`PR 33 <https://github.com/mgedmin/irclog2html/pull/33>`_).
+
 
 2.17.3 (2021-07-08)
 -------------------
