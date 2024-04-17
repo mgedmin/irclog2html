@@ -1,3 +1,5 @@
+import cgi
+import datetime
 import doctest
 import gzip
 import os
@@ -7,6 +9,7 @@ import sys
 import tempfile
 import unittest
 from contextlib import closing
+from unittest import mock
 
 from zope.testing import renormalizing
 
