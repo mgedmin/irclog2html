@@ -3,7 +3,7 @@ import io
 import os
 import shutil
 import sys
-import tmpfile
+import tempfile
 import unittest
 
 from irclog2html.irclog2html import (
