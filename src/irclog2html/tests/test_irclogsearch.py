@@ -1,5 +1,3 @@
-import cgi
-import datetime
 import doctest
 import gzip
 import os
@@ -10,7 +8,6 @@ import tempfile
 import unittest
 from contextlib import closing
 
-import mock
 from zope.testing import renormalizing
 
 from irclog2html.irclogsearch import (
@@ -23,13 +20,6 @@ from irclog2html.irclogsearch import (
     search_irc_logs,
     search_page,
 )
-
-
-try:
-    unicode
-except NameError:
-    # Python 3.x
-    unicode = str
 
 
 here = os.path.dirname(__file__)
@@ -74,7 +64,7 @@ def myrepr(o):
             return '(%s, )' % ', '.join(map(myrepr, o))
         else:
             return '(%s)' % ', '.join(map(myrepr, o))
-    elif isinstance(o, unicode):
+    elif isinstance(o, str):
         return repr(o).lstrip('u')
     else:
         return repr(o)

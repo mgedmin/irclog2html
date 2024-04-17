@@ -8,8 +8,7 @@ import shutil
 import tempfile
 import unittest
 from contextlib import closing
-
-import mock
+from unittest import mock
 
 from irclog2html.irclogserver import application, dir_listing, parse_path
 

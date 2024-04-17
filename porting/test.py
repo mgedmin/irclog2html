@@ -52,7 +52,7 @@ def run_in_tempdir(inputfile, script, args):
         outfilename = newinputfile + '.html'
         try:
             return open(outfilename).read().replace(dir, '/tmpdir')
-        except IOError, e:
+        except IOError as e:
             raise AssertionError('%s did not create the output file\n%s' %
                                  (cmdline, e))
     finally:
@@ -95,30 +95,30 @@ DEFAULT_ARGS = ('-s table', '-s simplett', '-s tt', '-s simpletable',
 
 def testcase(inputfile, args_to_try=DEFAULT_ARGS):
     """Run both scripts on inputfile with various arguments."""
-    print inputfile,
+    print(inputfile),
     try:
         for args in args_to_try:
-            print ".",
+            print(".", end='')
             run_and_compare(inputfile, args)
-    except AssertionError, e:
-        print "FAILED"
-        print
-        print e
-        print
+    except AssertionError as e:
+        print("FAILED")
+        print()
+        print(e)
+        print()
     else:
-        print "ok"
+        print("ok")
 
 
 def main():
     os.chdir(os.path.dirname(__file__))
     # the Perl script takes ages to process dircproxy-example.log; ignore it
     testcases = glob.glob('testcases/test*.log')
-    print "Comparing outputs produced by the Perl version and the Python port"
-    print "There are %d test cases" % len(testcases)
+    print("Comparing outputs produced by the Perl version and the Python port")
+    print("There are %d test cases" % len(testcases))
     n = 0
     for inputfile in testcases:
         n += 1
-        print n,
+        print(n, end='')
         testcase(inputfile)
 
 

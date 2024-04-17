@@ -1,11 +1,6 @@
-from __future__ import print_function
-
 import doctest
-import io
 import os
-import shutil
 import sys
-import tempfile
 import unittest
 
 from irclog2html.irclog2html import (
@@ -26,13 +21,6 @@ from irclog2html.irclog2html import (
 )
 
 
-try:
-    unicode
-except NameError:
-    # Python 3.x
-    unicode = str
-
-
 here = os.path.dirname(__file__)
 
 
@@ -43,7 +31,7 @@ def myrepr(o):
             return '(%s, )' % ', '.join(map(myrepr, o))
         else:
             return '(%s)' % ', '.join(map(myrepr, o))
-    elif isinstance(o, unicode):
+    elif isinstance(o, str):
         return repr(o).lstrip('u')
     else:
         return repr(o)

@@ -22,8 +22,6 @@ Apache configuration example:
 # Released under the terms of the GNU GPL v2 or v3
 # https://www.gnu.org/copyleft/gpl.html
 
-from __future__ import print_function, unicode_literals
-
 import cgi
 import cgitb
 import io
@@ -32,12 +30,7 @@ import re
 import sys
 import time
 from contextlib import closing
-
-
-try:
-    from urllib import quote
-except ImportError:
-    from urllib.parse import quote
+from urllib.parse import quote
 
 from .irclog2html import (
     HOMEPAGE,
@@ -51,12 +44,6 @@ from .irclog2html import (
 )
 from .logs2html import find_log_files
 
-
-try:
-    unicode
-except NameError:
-    # Python 3.x
-    unicode = str
 
 
 DEFAULT_LOGFILE_PATH = os.path.dirname(__file__)
@@ -172,7 +159,7 @@ def search_irc_logs(query, stats=None, where=DEFAULT_LOGFILE_PATH,
             elif event == LogParser.NICKCHANGE:
                 text, oldnick, newnick = info
             else:
-                text = unicode(info)
+                text = str(info)
             stats.lines += 1
             if query in text.lower():
                 stats.matches += 1

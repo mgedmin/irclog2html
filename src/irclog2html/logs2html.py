@@ -11,8 +11,6 @@ Looks for *.log in a given directory.  Needs an ISO 8601 date (YYYY-MM-DD or
 YYYYMMDD) in the filename.
 """
 
-from __future__ import print_function, unicode_literals
-
 import datetime
 import glob
 import optparse
@@ -29,11 +27,7 @@ from operator import attrgetter
 # Released under the terms of the GNU GPL v2 or v3
 # https://www.gnu.org/copyleft/gpl.html
 
-
-try:
-    from urllib import quote
-except ImportError:
-    from urllib.parse import quote
+from urllib.parse import quote
 
 from . import irclog2html
 from .irclog2html import HOMEPAGE, RELEASE, VERSION, escape
