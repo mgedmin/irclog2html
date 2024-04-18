@@ -19,6 +19,10 @@ import re
 import shutil
 import sys
 from operator import attrgetter
+from urllib.parse import quote
+
+from . import irclog2html
+from .irclog2html import HOMEPAGE, RELEASE, VERSION, escape
 
 
 # Copyright (c) 2005--2013  Marius Gedminas
@@ -27,10 +31,7 @@ from operator import attrgetter
 # Released under the terms of the GNU GPL v2 or v3
 # https://www.gnu.org/copyleft/gpl.html
 
-from urllib.parse import quote
 
-from . import irclog2html
-from .irclog2html import HOMEPAGE, RELEASE, VERSION, escape
 
 
 # If someone packages this for a Linux distro, they'll want to patch this to

@@ -45,7 +45,6 @@ from .irclog2html import (
 from .logs2html import find_log_files
 
 
-
 DEFAULT_LOGFILE_PATH = os.path.dirname(__file__)
 DEFAULT_LOGFILE_PATTERN = "*.log"
 

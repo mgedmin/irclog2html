@@ -5,13 +5,13 @@ Functional tests for irclog2html.py
 You must run this script in a directory that contains irclog2html.py,
 irclog2html.pl and testcases/*.log.  Both scripts must be executable.
 """
-import os
-import tempfile
-import shutil
 import difflib
 import glob
+import os
+import shutil
+import tempfile
 
-from irclog2html import VERSION, RELEASE
+from irclog2html import RELEASE, VERSION
 
 
 def replace(s, replacements):
