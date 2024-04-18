@@ -35,8 +35,6 @@ def myrepr(o):
         else:
             return '(%s)' % ', '.join(map(myrepr, o))
     elif isinstance(o, str):
-        return repr(o).lstrip('u')
-    else:
         return repr(o)
 
 
