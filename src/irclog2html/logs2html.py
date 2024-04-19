@@ -32,8 +32,6 @@ from .irclog2html import HOMEPAGE, RELEASE, VERSION, escape
 # https://www.gnu.org/copyleft/gpl.html
 
 
-
-
 # If someone packages this for a Linux distro, they'll want to patch this to
 # something like /usr/share/irclog2html/irclog.css, I imagine
 CSS_FILE = os.path.join(os.path.dirname(__file__), 'irclog.css')
