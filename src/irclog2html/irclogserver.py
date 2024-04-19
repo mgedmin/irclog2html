@@ -25,8 +25,6 @@ Apache configuration example:
 # Released under the terms of the GNU GPL v2 or v3
 # https://www.gnu.org/copyleft/gpl.html
 
-from __future__ import print_function
-
 import argparse
 import cgi
 import datetime
@@ -34,13 +32,8 @@ import io
 import os
 import time
 from operator import attrgetter
+from urllib.parse import quote_plus
 from wsgiref.simple_server import make_server
-
-
-try:
-    from urllib import quote_plus  # Py2
-except ImportError:
-    from urllib.parse import quote_plus  # Py3
 
 from ._version import __date__, __version__
 from .irclog2html import (

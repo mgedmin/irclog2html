@@ -50,7 +50,6 @@ setup(
     python_requires='>=3.7',
     keywords='irc log colorizer html wsgi',
     extras_require=dict(test=[
-        "mock",
         "zope.testing",
     ]),
     packages=['irclog2html'],

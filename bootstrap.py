@@ -22,8 +22,8 @@ import os
 import shutil
 import sys
 import tempfile
-
 from optparse import OptionParser
+
 
 __version__ = '2015-07-01'
 # See zc.buildout's changelog if this version is up to date.
@@ -96,6 +96,7 @@ if not options.allow_site_packages:
     # this will remove them from the path to ensure that incompatible versions
     # of setuptools are not in the path
     import site
+
     # inside a virtualenv, there is no 'getsitepackages'.
     # We can't remove these reliably
     if hasattr(site, 'getsitepackages'):
@@ -115,8 +116,9 @@ if options.setuptools_to_dir is not None:
     setup_args['to_dir'] = options.setuptools_to_dir
 
 ez['use_setuptools'](**setup_args)
-import setuptools
 import pkg_resources
+import setuptools
+
 
 # This does not (always?) update the default working set.  We will
 # do it.
@@ -188,6 +190,8 @@ if version:
 cmd.append(requirement)
 
 import subprocess
+
+
 if subprocess.call(cmd) != 0:
     raise Exception(
         "Failed to execute command:\n%s" % repr(cmd)[1:-1])
@@ -198,6 +202,7 @@ if subprocess.call(cmd) != 0:
 ws.add_entry(tmpeggs)
 ws.require(requirement)
 import zc.buildout.buildout
+
 
 if not [a for a in args if '=' not in a]:
     args.append('bootstrap')

@@ -11,8 +11,6 @@ This is more of an example than a real script, although I have used it to
 restore some actual IRC chat log history from my xchat logs.
 """
 
-from __future__ import print_function
-
 import locale
 import os
 import re

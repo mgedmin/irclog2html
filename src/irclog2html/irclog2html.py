@@ -45,8 +45,6 @@ was written by Jeff Waugh and is available at www.perkypants.org
 #   New default style: xhtmltable
 #
 
-from __future__ import print_function, unicode_literals
-
 import datetime
 import gzip
 import io
@@ -58,23 +56,11 @@ import re
 import shlex
 import shutil
 import sys
-
-
-try:
-    from urllib import quote
-except ImportError:
-    from urllib.parse import quote
+from urllib.parse import quote
 
 from ._version import __date__ as RELEASE
 from ._version import __homepage__ as HOMEPAGE
 from ._version import __version__ as VERSION
-
-
-try:
-    unicode
-except NameError:
-    # Python 3.x
-    unicode = str
 
 
 # If someone packages this for a Linux distro, they'll want to patch this to
@@ -145,7 +131,7 @@ class LogParser(object):
         Supports xchat's hybrid Latin/Unicode encoding, as documented here:
         http://xchat.org/encoding/
         """
-        if isinstance(s, unicode):
+        if isinstance(s, str):
             # Accept input that's already Unicode, for convenience
             return s
         try:
