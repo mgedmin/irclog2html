@@ -34,7 +34,7 @@ def myrepr(o):
             return '(%s, )' % ', '.join(map(myrepr, o))
         else:
             return '(%s)' % ', '.join(map(myrepr, o))
-    elif isinstance(o, str):
+    else:
         return repr(o)
 
 
