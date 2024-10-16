@@ -1,5 +1,4 @@
 import doctest
-import io
 import os
 import shutil
 import sys
@@ -27,17 +26,6 @@ from irclog2html.irclog2html import (
 here = os.path.dirname(__file__)
 
 
-def myrepr(o):
-    """Repr that drops u prefixes on unicode strings."""
-    if isinstance(o, tuple):
-        if len(o) == 1:
-            return '(%s, )' % ', '.join(map(myrepr, o))
-        else:
-            return '(%s)' % ', '.join(map(myrepr, o))
-    else:
-        return repr(o)
-
-
 def doctest_LogParser():
     r"""Tests for LogParser
 
@@ -45,7 +33,7 @@ def doctest_LogParser():
 
         >>> def test(line):
         ...     for time, what, info in LogParser([line]):
-        ...         print(myrepr(time), what, myrepr(info))
+        ...         print(repr(time), what, repr(info))
 
     LogParser ignores empty lines
 
@@ -170,7 +158,7 @@ def doctest_LogParser_dircproxy_support():
 
         >>> def test(line):
         ...     for time, what, info in LogParser([line], dircproxy=True):
-        ...         print(myrepr(time), what, myrepr(info))
+        ...         print(repr(time), what, repr(info))
 
         >>> test('[15 Jan 08:42] <mg!n=user@10.0.0.1> -hmm')
         '15 Jan 08:42' COMMENT ('mg', 'hmm')
@@ -195,7 +183,7 @@ def doctest_LogParser_encodings():
 
         >>> def test(line):
         ...     for time, what, info in LogParser([line]):
-        ...         print(myrepr(time), what, myrepr(info))
+        ...         print(repr(time), what, repr(info))
 
     We accept input that's in UTF-8
 
@@ -728,7 +716,7 @@ def run(*args):
         main(['irclog2html'] + list(args))
     except SystemExit as e:
         if e.args[0] != 0:
-            print("SystemExit(%s)" % myrepr(e.args[0]))
+            print("SystemExit(%s)" % repr(e.args[0]))
     finally:
         sys.stderr = stderr
 
@@ -805,7 +793,7 @@ def doctest_main():
         >>> fn = os.path.join(tmpdir, 'sample.log')
         >>> _ = shutil.copyfile(os.path.join(here, 'sample.log'), fn)
         >>> run(fn)
-        >>> with io.open(fn + '.html', encoding='UTF-8') as f:
+        >>> with open(fn + '.html', encoding='UTF-8') as f:
         ...     print(f.read())
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
                   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -875,7 +863,7 @@ def doctest_main_output_file():
         >>> fn = os.path.join(here, 'sample.log')
         >>> outfn = os.path.join(tmpdir, 'output.html')
         >>> run(fn, '-o', outfn)
-        >>> with io.open(outfn, encoding='UTF-8') as f:
+        >>> with open(outfn, encoding='UTF-8') as f:
         ...     print(f.read())
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
                   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -892,7 +880,7 @@ def doctest_main_output_directory():
         >>> fn = os.path.join(here, 'sample.log')
         >>> run(fn, '-o', tmpdir)
         >>> outfn = os.path.join(tmpdir, 'sample.log.html')
-        >>> with io.open(outfn, encoding='UTF-8') as f:
+        >>> with open(outfn, encoding='UTF-8') as f:
         ...     print(f.read())
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
                   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">

@@ -137,8 +137,6 @@ class TestLogFile(TestCase):
 
     def test_move_symlink(self):
         if not hasattr(os, 'symlink'):
-            if not hasattr(self, 'skipTest'): # Python 2.6
-                return
             self.skipTest("platform does not support symlinks")
         move_symlink('somechannel-20130316.log.html',
                      self.filename('latest.log.html'))

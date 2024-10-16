@@ -1,3 +1,3 @@
-__version__ = '3.0.1.dev0'
-__date__ = '2023-08-28'
+__version__ = '4.0.0.dev0'
+__date__ = '2024-10-16'
 __homepage__ = 'https://mg.pov.lt/irclog2html/'

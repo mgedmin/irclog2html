@@ -2,15 +2,12 @@ import datetime
 import doctest
 import gzip
 import os
-import re
 import shutil
 import sys
 import tempfile
 import unittest
 from contextlib import closing
 from unittest import mock
-
-from zope.testing import renormalizing
 
 from irclog2html.irclogsearch import (
     LogParser,
@@ -58,11 +55,10 @@ class BytesIOWrapper(object):
 
 
 def prepare_stdout():
-    if sys.version_info[0] >= 3:
-        # Make the StringIO used by doctest act like the real sys.stdout, which
-        # has an underlying bytes-only output stream.  This is needed because
-        # we're going to print bytes in this CGI script.
-        sys.stdout.buffer = BytesIOWrapper(sys.stdout)
+    # Make the StringIO used by doctest act like the real sys.stdout, which
+    # has an underlying bytes-only output stream.  This is needed because
+    # we're going to print bytes in this CGI script.
+    sys.stdout.buffer = BytesIOWrapper(sys.stdout)
 
 
 def myrepr(o):
@@ -381,19 +377,11 @@ def doctest_main_searches():
     """
 
 
-checker = None
-if sys.version_info[0] == 2:
-    checker = renormalizing.RENormalizing([
-        (re.compile(r"^\['"), r"[b'"),
-        (re.compile(r"u('.*?')"), r"\1"),
-    ])
-
-
 def test_suite():
     optionflags = (doctest.ELLIPSIS | doctest.REPORT_NDIFF |
                    doctest.NORMALIZE_WHITESPACE)
     return unittest.TestSuite([
-        doctest.DocTestSuite(optionflags=optionflags, checker=checker),
+        doctest.DocTestSuite(optionflags=optionflags),
     ])
 
 

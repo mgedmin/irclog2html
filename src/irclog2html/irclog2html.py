@@ -190,7 +190,7 @@ def open_log_file(filename):
     if filename.endswith('.gz'):
         return gzip.open(filename, 'rb')
     else:
-        return io.open(filename, 'rb')
+        return open(filename, 'rb')
 
 
 def shorttime(time):
@@ -937,7 +937,7 @@ def main(argv=sys.argv):
         else:
             outfilename = options.output_file
         try:
-            outfile = io.open(outfilename, "wb")
+            outfile = open(outfilename, "wb")
         except EnvironmentError as e:
             infile.close()
             sys.exit("%s: cannot open %s for writing: %s"
