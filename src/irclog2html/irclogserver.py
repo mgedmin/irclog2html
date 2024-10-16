@@ -30,7 +30,7 @@ import io
 import os
 import time
 from operator import attrgetter
-from urllib.parse import quote_plus, parse_qsl
+from urllib.parse import parse_qsl, quote_plus
 from wsgiref.simple_server import make_server
 
 from ._version import __date__, __version__

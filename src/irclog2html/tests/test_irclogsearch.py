@@ -23,6 +23,7 @@ from irclog2html.irclogsearch import (
     search_page,
 )
 
+
 try:
     import cgi
 except ImportError:

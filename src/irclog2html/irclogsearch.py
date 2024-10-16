@@ -29,13 +29,6 @@ import time
 from contextlib import closing
 from urllib.parse import quote
 
-try:
-    import cgi
-    import cgitb
-except ImportError:
-    # Python 3.13 removed all CGI support
-    cgi = None
-
 from .irclog2html import (
     HOMEPAGE,
     RELEASE,
@@ -47,6 +40,14 @@ from .irclog2html import (
     open_log_file,
 )
 from .logs2html import find_log_files
+
+
+try:
+    import cgi
+    import cgitb
+except ImportError:
+    # Python 3.13 removed all CGI support
+    cgi = None
 
 
 DEFAULT_LOGFILE_PATH = os.path.dirname(__file__)
