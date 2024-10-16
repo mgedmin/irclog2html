@@ -42,8 +42,10 @@ include release.mk
 define release_recipe =
 $(default_release_recipe_publish_and_tag)
 $(default_release_recipe_increment_and_push)
-	@echo "Then please go to https://github.com/mgedmin/irclog2html/tags"
-	@echo "and convert the $(changelog_ver) tag into a release."
+	@echo "Then please create a GitHub release with"
+	@echo
+	@echo "  gh release create"
+	@echo
 endef
 
 .PHONY: check-date
