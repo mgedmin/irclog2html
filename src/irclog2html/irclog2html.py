@@ -154,8 +154,9 @@ class LogParser(object):
             if time is None:
                 m = self.TIMESTAMP_REGEXP.match(line)
                 if m:
-                    time = datetime.datetime.utcfromtimestamp(
-                        int(m.group(1))).isoformat()
+                    time = datetime.datetime.fromtimestamp(
+                        int(m.group(1)), datetime.timezone.utc
+                    ).strftime('%Y-%m-%dT%H:%M:%S')
                     line = line[len(m.group(0)):]
 
             m = self.NICK_REGEXP.match(line)
