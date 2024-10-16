@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Search IRC logs (a CGI script and a WSGI app).
 

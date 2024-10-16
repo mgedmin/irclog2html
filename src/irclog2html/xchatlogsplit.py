@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 """
 Split xchat2 log file into daily log files suitable as input for logs2html.py.

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Serve IRC logs (WSGI app)
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Convert a directory with IRC logs to HTML.
 
