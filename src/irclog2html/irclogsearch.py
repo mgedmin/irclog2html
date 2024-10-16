@@ -172,7 +172,7 @@ def search_irc_logs(query, stats=None, where=DEFAULT_LOGFILE_PATH,
                     return
 
 
-def print_cgi_headers(stream):
+def print_cgi_headers(stream):  # pragma: nocover
     print("Content-Type: text/html; charset=UTF-8", file=stream)
     print("", file=stream)
 
@@ -239,7 +239,7 @@ def print_search_results(query, where=DEFAULT_LOGFILE_PATH,
     print(FOOTER, file=stream)
 
 
-def unicode_stdout():
+def unicode_stdout():  # pragma: nocover
     stream = sys.stdout.buffer
     return io.TextIOWrapper(stream, 'ascii',
                             errors='xmlcharrefreplace',
