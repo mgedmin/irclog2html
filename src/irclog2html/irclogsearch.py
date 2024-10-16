@@ -44,10 +44,11 @@ from .logs2html import find_log_files
 
 try:
     import cgi
-    import cgitb
 except ImportError:
     # Python 3.13 removed all CGI support
     cgi = None
+else:  # pragma: nocover
+    import cgitb
 
 
 DEFAULT_LOGFILE_PATH = os.path.dirname(__file__)
