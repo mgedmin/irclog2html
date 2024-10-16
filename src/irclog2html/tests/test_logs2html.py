@@ -350,5 +350,5 @@ def doctest_main_extra_args():
 def test_suite():
     return unittest.TestSuite([
         doctest.DocTestSuite(optionflags=doctest.ELLIPSIS | doctest.REPORT_NDIFF),
-        unittest.makeSuite(TestLogFile),
+        unittest.defaultTestLoader.loadTestsFromName(__name__),
     ])

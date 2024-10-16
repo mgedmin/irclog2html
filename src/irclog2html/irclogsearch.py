@@ -21,8 +21,6 @@ Apache configuration example:
 # Released under the terms of the GNU GPL v2 or v3
 # https://www.gnu.org/copyleft/gpl.html
 
-import cgi
-import cgitb
 import io
 import os
 import re
@@ -30,6 +28,13 @@ import sys
 import time
 from contextlib import closing
 from urllib.parse import quote
+
+try:
+    import cgi
+    import cgitb
+except ImportError:
+    # Python 3.13 removed all CGI support
+    cgi = None
 
 from .irclog2html import (
     HOMEPAGE,
@@ -240,24 +245,28 @@ def unicode_stdout():
                             line_buffering=True)
 
 
-def search_page(stream, form, where, logfile_pattern):
-    if "q" not in form:
+def search_page(stream, query, where, logfile_pattern):
+    if query is None:
         print_search_form(stream)
     else:
-        search_text = form["q"].value
+        search_text = query
         print_search_results(search_text, stream=stream, where=where,
                              logfile_pattern=logfile_pattern)
 
 
-def main():
+def main():  # pragma: nocover
     """CGI script"""
+    if cgi is None:
+        print_cgi_headers(unicode_stdout())
+        sys.exit('CGI support not available with Python 3.13 or newer')
     cgitb.enable()
     logfile_path = os.getenv('IRCLOG_LOCATION') or DEFAULT_LOGFILE_PATH
     logfile_pattern = os.getenv('IRCLOG_GLOB') or DEFAULT_LOGFILE_PATTERN
     form = cgi.FieldStorage()
     stream = unicode_stdout()
     print_cgi_headers(stream)
-    search_page(stream, form, logfile_path, logfile_pattern)
+    query = form["q"].value if "q" in form else None
+    search_page(stream, query, logfile_path, logfile_pattern)
 
 
 if __name__ == '__main__':

@@ -1,4 +1,3 @@
-import cgi
 import datetime
 import doctest
 import gzip
@@ -23,6 +22,11 @@ from irclog2html.irclogsearch import (
     search_irc_logs,
     search_page,
 )
+
+try:
+    import cgi
+except ImportError:
+    cgi = None
 
 
 here = os.path.dirname(__file__)
@@ -69,6 +73,15 @@ def myrepr(o):
             return '(%s)' % ', '.join(map(myrepr, o))
     else:
         return repr(o)
+
+
+def skipIf(condition: bool):
+    """Skip a doctest if condition is false."""
+    def wrapper(fn):
+        if condition:
+            return None
+        return fn
+    return wrapper
 
 
 def doctest_SearchResultFormatter():
@@ -253,18 +266,14 @@ def doctest_search_page():
 
     When there is a 'q' param in the GET query, the logs are searched:
 
-        >>> form = cgi.FieldStorage(
-        ...     environ={'QUERY_STRING': 'q=123', 'HTTP_METHOD': 'GET'})
-        >>> search_page("The stream", form, "/logs", "#dev*.logs")
+        >>> search_page("The stream", '123', "/logs", "#dev*.logs")
         >>> values['print_search_results'].assert_called_once_with(
         ...     '123', logfile_pattern='#dev*.logs',
         ...     stream='The stream', where='/logs')
 
     When there is no query, the search form is displayed:
 
-        >>> form = cgi.FieldStorage(environ={
-        ...     'HTTP_METHOD': 'GET', 'QUERY_STRING': ''})
-        >>> search_page("The stream", form, "/logs", "#dev*.logs")
+        >>> search_page("The stream", None, "/logs", "#dev*.logs")
         >>> values['print_search_form'].assert_called_once_with('The stream')
 
     Clean up:
@@ -274,6 +283,7 @@ def doctest_search_page():
     """
 
 
+@skipIf(cgi is None)
 def doctest_main_prints_form():
     """Test for main
 
@@ -310,6 +320,7 @@ def doctest_main_prints_form():
     """
 
 
+@skipIf(cgi is None)
 def doctest_main_searches():
     r"""Test for main
 

@@ -1,10 +1,13 @@
 Changelog
 =========
 
-3.0.1 (unreleased)
+4.0.0 (unreleased)
 ------------------
 
-- Add support for Python 3.12.
+- Remove CGI support if you're using Python 3.13 or newer.  You'll have to
+  use the WSGI support instead.
+
+- Add support for Python 3.12 and 3.13.
 
 
 3.0.0 (2023-08-28)

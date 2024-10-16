@@ -25,13 +25,12 @@ Apache configuration example:
 # https://www.gnu.org/copyleft/gpl.html
 
 import argparse
-import cgi
 import datetime
 import io
 import os
 import time
 from operator import attrgetter
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, parse_qsl
 from wsgiref.simple_server import make_server
 
 from ._version import __date__, __version__
@@ -192,7 +191,7 @@ def application(environ, start_response):
     chan_path = getenv('IRCLOG_CHAN_DIR')
     logfile_path = getenv('IRCLOG_LOCATION') or DEFAULT_LOGFILE_PATH
     logfile_pattern = getenv('IRCLOG_GLOB') or DEFAULT_LOGFILE_PATTERN
-    form = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ)
+    form = dict(parse_qsl(environ['QUERY_STRING']))
     stream = io.TextIOWrapper(io.BytesIO(), 'ascii',
                               errors='xmlcharrefreplace',
                               line_buffering=True)
@@ -213,7 +212,7 @@ def application(environ, start_response):
         dir_listing(stream, chan_path)
         result = [stream.buffer.getvalue()]
     elif path == 'search':
-        search_page(stream, form, logfile_path, logfile_pattern)
+        search_page(stream, form.get('q'), logfile_path, logfile_pattern)
         result = [stream.buffer.getvalue()]
     elif path == 'irclog.css':
         content_type = "text/css"
