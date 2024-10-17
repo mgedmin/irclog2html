@@ -1,7 +1,7 @@
 Changelog
 =========
 
-4.0.0 (unreleased)
+4.0.0 (2024-10-17)
 ------------------
 
 - Remove CGI support if you're using Python 3.13 or newer.  You'll have to
