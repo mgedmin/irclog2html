@@ -140,7 +140,7 @@ Licence: GPL v2 or v3 (https://www.gnu.org/copyleft/gpl.html)
 
 |buildstatus|_ |appveyor|_ |coverage|_
 
-.. |buildstatus| image:: https://github.com/mgedmin/irclog2html/workflows/build/badge.svg?branch=master
+.. |buildstatus| image:: https://github.com/mgedmin/irclog2html/actions/workflows/build.yml/badge.svg?branch=master
 .. _buildstatus: https://github.com/mgedmin/irclog2html/actions
 
 .. |appveyor| image:: https://ci.appveyor.com/api/projects/status/github/mgedmin/irclog2html?branch=master&svg=true
