@@ -4,7 +4,7 @@ Changelog
 4.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Drop support for Python 3.7.
 
 
 4.0.0 (2024-10-17)

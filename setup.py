@@ -38,7 +38,6 @@ setup(
         'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
@@ -48,7 +47,7 @@ setup(
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
-    python_requires='>=3.7',
+    python_requires='>=3.8',
     keywords='irc log colorizer html wsgi',
     extras_require=dict(test=[
         "zope.testing",
