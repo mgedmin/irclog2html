@@ -26,7 +26,7 @@ setup(
     version=version,
     author='Marius Gedminas',
     author_email='marius@gedmin.as',
-    license='GPL v2 or v3',
+    license='GPL-3.0-or-later',
     platforms=['any'],
     url=homepage,
     description='Convert IRC logs to HTML',
@@ -35,8 +35,6 @@ setup(
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: System Administrators',
-        'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
@@ -53,7 +51,7 @@ setup(
     ]),
     packages=['irclog2html'],
     package_dir={'': 'src'},
-    include_package_data=True,
+    package_data={'irclog2html': ['*.css']},
     entry_points="""
         [console_scripts]
         irclog2html = irclog2html.irclog2html:main
