@@ -34,7 +34,7 @@ jobs:
           # with statement and closes the file before terminating, and the test
           # uses the generator in a for loop, so it should guarantee
           # termination and close the file before the cleanup code runs.
-          - python: "pypy3.10"
+          - python-version: "pypy3.10"
             os: ubuntu-latest
 
     steps:
