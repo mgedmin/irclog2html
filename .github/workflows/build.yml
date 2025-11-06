@@ -25,10 +25,17 @@ jobs:
           - "3.12"
           - "3.13"
           - "3.14"
-          - "pypy3.10"
         os:
           - ubuntu-latest
           - windows-latest
+        include:
+          # pypy3.10 on windows-latest fails one test, which I've briefly
+          # investigated and I think it's a bug in pypy -- the generator uses a
+          # with statement and closes the file before terminating, and the test
+          # uses the generator in a for loop, so it should guarantee
+          # termination and close the file before the cleanup code runs.
+          - python: "pypy3.10"
+            os: ubuntu-latest
 
     steps:
       - name: Git clone
