@@ -138,13 +138,10 @@ https://github.com/mgedmin/irclog2html/issues
 
 Licence: GPL v2 or v3 (https://www.gnu.org/copyleft/gpl.html)
 
-|buildstatus|_ |appveyor|_ |coverage|_
+|buildstatus|_ |coverage|_
 
 .. |buildstatus| image:: https://github.com/mgedmin/irclog2html/actions/workflows/build.yml/badge.svg?branch=master
 .. _buildstatus: https://github.com/mgedmin/irclog2html/actions
-
-.. |appveyor| image:: https://ci.appveyor.com/api/projects/status/github/mgedmin/irclog2html?branch=master&svg=true
-.. _appveyor: https://ci.appveyor.com/project/mgedmin/irclog2html
 
 .. |coverage| image:: https://coveralls.io/repos/mgedmin/irclog2html/badge.svg?branch=master
 .. _coverage: https://coveralls.io/r/mgedmin/irclog2html
