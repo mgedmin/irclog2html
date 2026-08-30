@@ -875,6 +875,12 @@ def parse_args(argv=sys.argv):
     parser.add_option('-o', '--output-file',
                       help="destination output file or directory"
                            " (default: <input-file-name>.html)")
+    parser.add_option('--hide-event', dest="hide_events", action='append',
+                      choices=['COMMENT', 'ACTION', 'JOIN', 'PART',
+                               'NICKCHANGE', 'SERVER', 'OTHER'], default=[],
+                      help="Event to ignore and not add to the output. Can be"
+                           "one of COMMENT, ACTION, JOIN, PART, NICKCHANGE,"
+                           "SERVER, OTHER. Can be given multiple times.")
     for name, default, what in COLOURS:
         parser.add_option('--color-%s' % name, '--colour-%s' % name,
                           dest="colour_%s" % name, default=default,
@@ -947,7 +953,8 @@ def main(argv=sys.argv):
             parser = LogParser(infile, dircproxy=options.dircproxy)
             formatter = style(outfile, outfilename=outfilename, colours=colours)
             convert_irc_log(parser, formatter, title or filename,
-                            prev, index, next, searchbox=options.searchbox)
+                            prev, index, next, searchbox=options.searchbox,
+                            hide_events=options.hide_events)
             css_file = os.path.join(os.path.dirname(outfilename), 'irclog.css')
             if not os.path.exists(css_file) and os.path.exists(CSS_FILE):
                 shutil.copy(CSS_FILE, css_file)
@@ -957,11 +964,13 @@ def main(argv=sys.argv):
 
 
 def convert_irc_log(parser, formatter, title, prev, index, next,
-                    searchbox=False):
+                    searchbox=False, hide_events=[]):
     """Convert IRC log to HTML or some other format."""
     nick_colour = NickColourizer()
     formatter.head(title, prev, index, next, searchbox=searchbox)
     for time, what, info in parser:
+        if what.value in hide_events:
+            continue
         if what == LogParser.COMMENT:
             nick, text = info
             htmlcolour = nick_colour[nick]
