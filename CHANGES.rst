@@ -4,7 +4,7 @@ Changelog
 4.1.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add support for Python 3.15.
 
 
 4.1.0 (2025-11-06)
