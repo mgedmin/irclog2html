@@ -786,6 +786,19 @@ def doctest_main_can_handle_input_errors():
     """
 
 
+def doctest_main_can_handle_corrupt_gzip_file():
+    """Test for main
+
+        >>> tmpdir = tempfile.mkdtemp(prefix='irclog2html-test-')
+        >>> fn = os.path.join(tmpdir, 'sample.log.gz')
+        >>> _ = open(fn, 'wb').write(b'not a gzipped file')
+        >>> run(fn)
+        SystemExit("irclog2html: cannot read ...: Not a gzipped file (b'no')")
+        >>> shutil.rmtree(tmpdir)
+
+    """
+
+
 def doctest_main():
     """Test for main
 
