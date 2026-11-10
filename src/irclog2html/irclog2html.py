@@ -943,6 +943,7 @@ def main(argv=sys.argv):
             infile.close()
             sys.exit("%s: cannot open %s for writing: %s"
                      % (parser.prog, outfilename, e))
+        prog = parser.prog
         try:
             parser = LogParser(infile, dircproxy=options.dircproxy)
             formatter = style(outfile, outfilename=outfilename, colours=colours)
@@ -951,6 +952,8 @@ def main(argv=sys.argv):
             css_file = os.path.join(os.path.dirname(outfilename), 'irclog.css')
             if not os.path.exists(css_file) and os.path.exists(CSS_FILE):
                 shutil.copy(CSS_FILE, css_file)
+        except OSError as e:
+            sys.exit("%s: cannot read %s: %s" % (prog, filename, e))
         finally:
             outfile.close()
             infile.close()
